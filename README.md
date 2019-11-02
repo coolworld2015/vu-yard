@@ -1,5 +1,5 @@
-# RN Base
-git clone https://github.com/coolworld2015/rn-dummy.git
+# VU Yard
+git clone https://github.com/coolworld2015/rn-yard.git
 -------------------------------------------------------------------------------------------------
 git config user.name "coolworld2015"
 -------------------------------------------------------------------------------------------------
