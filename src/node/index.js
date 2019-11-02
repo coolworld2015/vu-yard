@@ -24,9 +24,9 @@ const server = express()
 	.use(bodyParser({limit: '50mb'}))
 	.use(express.static(__dirname + '/build'))
 	
-	.get('/',(req, res) => res.sendFile(__dirname + '/build/index.html'))
+	//.get('/',(req, res) => res.sendFile(__dirname + '/build/index.html'))
 	//.get('/',(req, res) => res.send('It is just API Server...'))
-	//.get('/',(req, res) => res.sendFile(__dirname + '/auth.html'))
+	.get('/',(req, res) => res.sendFile(__dirname + '/auth.html'))
 	
 	.post('/api/login', Login)
 	
