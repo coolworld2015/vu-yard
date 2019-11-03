@@ -482,10 +482,10 @@
                     vehicleOid: this.vehicleOid,
                     plateNo: this.plateNo,
                     companyName: this.companyName,
-                    arrival: 'n/a',
-                    departure: 'n/a',
-                    docking: 'n/a',
-                    undocking: 'n/a',
+                    arrived: 'n/a',
+                    departed: 'n/a',
+                    docked: 'n/a',
+                    undocked: 'n/a',
                     status: 'n/a',
                     standing: 'n/a',
                     message: 'n/a',
@@ -538,7 +538,7 @@
             v-on:keypress="clearWarning"
             v-model="vehicleOid" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -20px;">
+            <span style="font-size: 24px; color: black;margin-left: -18px;">
                 Company:
             </span>
             <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
@@ -546,7 +546,7 @@
             v-on:keypress="clearWarning"
             v-model="companyName" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -20px;">
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
                 Arrived:
             </span>
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
@@ -554,7 +554,7 @@
             v-on:keypress="clearWarning"
             v-model="arrived" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -20px;">
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
                 Docked:
             </span>
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
@@ -562,7 +562,7 @@
             v-on:keypress="clearWarning"
             v-model="docked" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -20px;">
+            <span style="font-size: 24px; color: black;margin-left: -24px;">
                 Undocked:
             </span>
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
@@ -570,7 +570,7 @@
             v-on:keypress="clearWarning"
             v-model="undocked" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -20px;">
+            <span style="font-size: 24px; color: black;margin-left: -12px;">
                 Departed:
             </span>
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
@@ -578,7 +578,7 @@
             v-on:keypress="clearWarning"
             v-model="departed" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -20px;">
+            <span style="font-size: 24px; color: black;margin-left: 17px;">
                 Status:
             </span>
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
@@ -637,10 +637,10 @@
                 vehicleOid: '',
                 plateNo: '',
                 companyName: '',
-                arrival: '',
-                departure: '',
-                docking: '',
-                undocking: '',
+                arrived: '',
+                departed: '',
+                docked: '',
+                undocked: '',
                 status: '',
                 standing: '',
                 invalidValue: false,
@@ -663,7 +663,12 @@
                 this.plateNo = appConfig.item.plateNo;
                 this.vehicleOid = appConfig.item.vehicleOid;
                 this.companyName = appConfig.item.companyName;
+                this.arrived = appConfig.item.arrived;
+                this.departed = appConfig.item.departed;
+                this.docked = appConfig.item.docked;
+                this.undocked = appConfig.item.undocked;
                 this.standing = appConfig.item.standing;
+                this.status = appConfig.item.status;
                 appConfig.$emit('itemsCount', 1);
             },
             goBack() {
