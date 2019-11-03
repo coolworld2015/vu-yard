@@ -18,6 +18,36 @@ db.once('open', function callback() {
 var Schema = mongoose.Schema;
 
 //---------------------------------------------------------------------------------------------
+var Vehicles = new Schema({
+    id: {type: String, required: true},
+    vehicleOid: {type: String, required: true},
+    transportCompanyName: {type: String, required: true},
+    plateNo: {type: String, required: true},
+    arrival: {type: String, required: true},
+    departure: {type: String, required: true},
+    docking: {type: String, required: true},
+    undocking: {type: String, required: true},
+    status: {type: String, required: true},
+    standing: {type: String, required: true},
+    cargoUnitStatus: {type: String, required: true},
+    message: {type: String, required: true}
+});
+
+var VehiclesModel = mongoose.model('Vehicles', Vehicles);
+module.exports.VehiclesModel = VehiclesModel;
+
+//---------------------------------------------------------------------------------------------
+var Gates = new Schema({
+    id: {type: String, required: true},
+    name: {type: String, required: true},
+    status: {type: String, required: true},
+    message: {type: String, required: true}
+});
+
+var GatesModel = mongoose.model('Gates', Gates);
+module.exports.GatesModel = GatesModel;
+
+//---------------------------------------------------------------------------------------------
 var Messages = new Schema({
     id: {type: String, required: true},
     name: {type: String, required: true},
