@@ -306,7 +306,7 @@
         computed: {},
         methods: {
             renderStatus(item) {
-                switch (item.plateNo) {
+                switch (item.status) {
                     case '1':
                         return {
                             background: 'red',
@@ -519,6 +519,7 @@
 
             <span style="font-size: 24px; color: black;">Created:</span>
             <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="created"
             v-model="id"><br>
 
             <span style="font-size: 24px; color: black;margin-left: 0px;">
@@ -541,9 +542,49 @@
                 Company:
             </span>
             <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
-            placeholder="Company"
+            placeholder="company"
             v-on:keypress="clearWarning"
             v-model="companyName" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -20px;">
+                Arrived:
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="arrived"
+            v-on:keypress="clearWarning"
+            v-model="arrived" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -20px;">
+                Docked:
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="docked"
+            v-on:keypress="clearWarning"
+            v-model="docked" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -20px;">
+                Undocked:
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="undocked"
+            v-on:keypress="clearWarning"
+            v-model="undocked" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -20px;">
+                Departed:
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="departed"
+            v-on:keypress="clearWarning"
+            v-model="departed" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -20px;">
+                Status:
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="status"
+            v-on:keypress="clearWarning"
+            v-model="status" ><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-bottom: 20px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
@@ -551,7 +592,7 @@
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: yellow;color: blue;outline:none;"
             v-on:click="updateItem">
-                Gated
+                Arrived
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: green;color: white;outline:none;"
@@ -567,12 +608,17 @@
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: dodgerblue;color: white;outline:none;"
             v-on:click="deleteItem">
                 Undocked
+            </button>
+
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: gray;color: white;outline:none;"
+            v-on:click="deleteItem">
+                Left
             </button><br>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;margin-top: 20px;"
             v-on:click="goBack">
                 Back
-            </button>
+            </button><br><br>
 
             <div v-if="loading">
                 <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
@@ -580,7 +626,7 @@
                 </div>
             </div>
 
-            <div v-if="error" style="margin-top: 25px;">
+            <div v-if="error" style="color: red;margin-top: 25px;">
                 Server error - try again
             </div>
         </div>`,
@@ -591,6 +637,12 @@
                 vehicleOid: '',
                 plateNo: '',
                 companyName: '',
+                arrival: '',
+                departure: '',
+                docking: '',
+                undocking: '',
+                status: '',
+                standing: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
@@ -611,6 +663,7 @@
                 this.plateNo = appConfig.item.plateNo;
                 this.vehicleOid = appConfig.item.vehicleOid;
                 this.companyName = appConfig.item.companyName;
+                this.standing = appConfig.item.standing;
                 appConfig.$emit('itemsCount', 1);
             },
             goBack() {

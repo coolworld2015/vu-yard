@@ -23,12 +23,12 @@ var Vehicles = new Schema({
     vehicleOid: {type: String, required: true},
     plateNo: {type: String, required: true},
     companyName: {type: String, required: true},
-    arrival: {type: String, required: true},
-    departure: {type: String, required: true},
-    docking: {type: String, required: true},
-    undocking: {type: String, required: true},
-    status: {type: String, required: true},
+    arrived: {type: String, required: true},
+    departed: {type: String, required: true},
+    docked: {type: String, required: true},
+    undocked: {type: String, required: true},
     standing: {type: String, required: true},
+    status: {type: String, required: true},
     message: {type: String, required: true}
 });
 
