@@ -269,7 +269,15 @@
         <div v-if="!loading">
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
                 <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
-                    {{ item.plateNo }} - {{ item.vehicleOid }} - {{ item.companyName }} - {{ item.companyName }}
+                    {{ item.plateNo }} - {{ item.vehicleOid }} - {{ item.companyName }} -
+
+                    <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='arrived' && item.arrived!=='n/a'"> {{ new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='registered' && item.registered!=='n/a'"> {{ new Date(parseInt(item.registered)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.registered)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='docked' && item.docked!=='n/a'"> {{ new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='undocked' && item.undocked!=='n/a'"> {{ new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='departed' && item.departed!=='n/a'"> {{ new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+
                 </div>
             </div>
         </div>
@@ -284,6 +292,7 @@
                 filteredItems: [],
                 loading: true,
                 error: false,
+                tzoffset: (new Date()).getTimezoneOffset() * 60000
             };
         },
         created() {
