@@ -278,6 +278,7 @@
                     <span v-if="item.status=='undocked' && item.undocked!=='n/a'"> {{ new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='departed' && item.departed!=='n/a'"> {{ new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
 
+                    <span v-if="item.status=='registered' || item.status=='docked'"> - {{ item.standing }}</span>
                 </div>
             </div>
         </div>
@@ -785,7 +786,7 @@
                 this.$router.push('/dispatcher');
             },
             updateItem(status) {
-                if (status === 'registered') {
+                if ((status === 'registered') || (status === 'docked')) {
                     if (this.standing === 'n/a') {
                         this.invalidValue = true;
                     }
@@ -795,7 +796,7 @@
                     }
                 }
 
-                if (status !== 'registered') {
+                if ((status !== 'registered') && (status !== 'docked')) {
                     this.standing = 'n/a';
                 }
 
