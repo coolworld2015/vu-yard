@@ -218,8 +218,8 @@
             changeView() {
                 let route;
                 switch (appConfig.route) {
-                    case "employees":
-                        route = 'searchQueryEmployees';
+                    case "dispatcher":
+                        route = 'searchQueryDispatcher';
                         break;
                     case "goods":
                         route = 'searchQueryGoods';
@@ -297,9 +297,9 @@
         },
         created() {
             this.getVehicles();
-            appConfig.$on('searchQueryEmployees', searchQuery => {
+            appConfig.$on('searchQueryDispatcher', searchQuery => {
                 let arr = [].concat(appConfig.items);
-                let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                let items = arr.filter((el) => el.plateNo.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
                 this.filteredItems = items;
                 this.items = items;
 
