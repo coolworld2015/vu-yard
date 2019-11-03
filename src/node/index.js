@@ -200,9 +200,10 @@ function VehicleAdd(req, res) {
                     plateNo: req.body.plateNo,
                     companyName: req.body.companyName,
                     arrived: req.body.arrived,
-                    departed: req.body.departed,
+                    registered: req.body.registered,
                     docked: req.body.docked,
                     undocked: req.body.undocked,
+                    departed: req.body.departed,
                     standing: req.body.standing,
                     status: req.body.status,
                     message: req.body.message
@@ -234,13 +235,19 @@ function VehicleUpdate(req, res) {
                 if (err) {
                     res.send({error: err.message});
                 } else {
+
                     vehicle.vehicleOid = req.body.vehicleOid;
                     vehicle.plateNo = req.body.plateNo;
                     vehicle.companyName = req.body.companyName;
-                    vehicle.arrived = req.body.arrived;
-                    vehicle.departed = req.body.departed;
-                    vehicle.docked = req.body.docked;
-                    vehicle.undocked = req.body.undocked;
+
+                    switch (req.body.status) {
+                        case 'arrived': vehicle.arrived = +new Date();break;
+                        case 'registered': vehicle.registered = +new Date();break;
+                        case 'docked': vehicle.docked = +new Date();break;
+                        case 'undocked': vehicle.undocked = +new Date();break;
+                        case 'departed': vehicle.departed = +new Date();break;
+                    }
+
                     vehicle.standing = req.body.standing;
                     vehicle.status = req.body.status;
                     vehicle.message = req.body.message;

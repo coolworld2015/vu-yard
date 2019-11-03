@@ -269,7 +269,7 @@
         <div v-if="!loading">
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
                 <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
-                    {{ item.plateNo }}  - {{ item.vehicleOid }} - {{ item.companyName }} - {{ item.companyName }}
+                    {{ item.plateNo }} - {{ item.vehicleOid }} - {{ item.companyName }} - {{ item.companyName }}
                 </div>
             </div>
         </div>
@@ -491,6 +491,7 @@
                     plateNo: this.plateNo,
                     companyName: this.companyName,
                     arrived: 'n/a',
+                    registered: 'n/a',
                     departed: 'n/a',
                     docked: 'n/a',
                     undocked: 'n/a',
@@ -561,6 +562,14 @@
             placeholder="arrived"
             v-on:keypress="clearWarning"
             v-model="arrived" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -28px;">
+                Registered:
+            </span>
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="registered"
+            v-on:keypress="clearWarning"
+            v-model="registered" ><br>
 
             <span style="font-size: 24px; color: black;margin-left: 0px;">
                 Docked:
@@ -648,9 +657,10 @@
                 plateNo: '',
                 companyName: '',
                 arrived: '',
-                departed: '',
+                registered: '',
                 docked: '',
                 undocked: '',
+                departed: '',
                 status: '',
                 standing: '',
                 invalidValue: false,
@@ -674,10 +684,42 @@
                 this.plateNo = appConfig.item.plateNo;
                 this.vehicleOid = appConfig.item.vehicleOid;
                 this.companyName = appConfig.item.companyName;
-                this.arrived = appConfig.item.arrived;
-                this.departed = appConfig.item.departed;
-                this.docked = appConfig.item.docked;
-                this.undocked = appConfig.item.undocked;
+
+                if (appConfig.item.arrived == 'n/a') {
+                    this.arrived = appConfig.item.arrived;
+                } else {
+                    this.arrived = new Date(parseInt(appConfig.item.arrived)).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.arrived)).toISOString().split('T')[1].split('.')[0];
+                }
+
+                if (appConfig.item.registered == 'n/a') {
+                    this.registered = appConfig.item.registered;
+                } else {
+                    this.registered = new Date(parseInt(appConfig.item.registered)).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.registered)).toISOString().split('T')[1].split('.')[0];
+                }
+
+                if (appConfig.item.docked == 'n/a') {
+                    this.docked = appConfig.item.docked;
+                } else {
+                    this.docked = new Date(parseInt(appConfig.item.docked)).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.docked)).toISOString().split('T')[1].split('.')[0];
+                }
+
+                if (appConfig.item.undocked == 'n/a') {
+                    this.undocked = appConfig.item.undocked;
+                } else {
+                    this.undocked = new Date(parseInt(appConfig.item.undocked)).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.undocked)).toISOString().split('T')[1].split('.')[0];
+                }
+
+                if (appConfig.item.departed == 'n/a') {
+                    this.departed = appConfig.item.departed;
+                } else {
+                    this.departed = new Date(parseInt(appConfig.item.departed)).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.departed)).toISOString().split('T')[1].split('.')[0];
+                }
+
                 this.standing = appConfig.item.standing;
                 this.status = appConfig.item.status;
                 this.message = appConfig.item.message;
