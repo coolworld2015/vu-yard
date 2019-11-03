@@ -21,15 +21,14 @@ var Schema = mongoose.Schema;
 var Vehicles = new Schema({
     id: {type: String, required: true},
     vehicleOid: {type: String, required: true},
-    transportCompanyName: {type: String, required: true},
     plateNo: {type: String, required: true},
+    companyName: {type: String, required: true},
     arrival: {type: String, required: true},
     departure: {type: String, required: true},
     docking: {type: String, required: true},
     undocking: {type: String, required: true},
     status: {type: String, required: true},
     standing: {type: String, required: true},
-    cargoUnitStatus: {type: String, required: true},
     message: {type: String, required: true}
 });
 

@@ -196,15 +196,14 @@ function VehicleAdd(req, res) {
 			VehiclesModel.create({
 					id: +new Date(),
 					vehicleOid: req.body.vehicleOid,
-					transportCompanyName: req.body.transportCompanyName,
 					plateNo: req.body.plateNo,
+					companyName: req.body.companyName,
 					arrival: req.body.arrival,
 					departure: req.body.departure,
 					docking: req.body.docking,
 					undocking: req.body.undocking,
 					status: req.body.status,
 					standing: req.body.standing,
-					cargoUnitStatus: req.body.cargoUnitStatus,
 					message: req.body.message
 				},
 				function (err, user) {

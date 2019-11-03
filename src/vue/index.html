@@ -185,8 +185,8 @@
                         <div class="bottom"><bottom></bottom></div>
                     </div>`
     };
-    const EmployeesEdit = {template: '<employees-edit></employees-edit>'};
-    const EmployeesAdd = {template: '<employees-add></employees-add>'};
+    const VehiclesEdit = {template: '<vehicle-edit></vehicle-edit>'};
+    const VehicleAdd = {template: '<vehicle-add></vehicle-add>'};
 
     Vue.component('top', {
         template: `<div>
@@ -204,7 +204,7 @@
             </form>
         </div>
         <div style="float: right; margin: -100px 40px;">
-                <span style="font-size:50px;cursor:pointer; color: black" onclick="openNav()">&#43;</span>
+                <span style="font-size:50px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
         </div>
         </div>`,
         data() {
@@ -213,6 +213,9 @@
             };
         },
         methods: {
+            vehicleAdd() {
+                appConfig.$emit('route', 'vehicle-add');
+            },
             changeView() {
                 let route;
                 switch (appConfig.route) {
@@ -322,23 +325,24 @@
             });
         },
         methods: {
-            getVehicles() {
-                this.getToken();
-                setTimeout(this.fetchData, 1000);
-            },
             getToken() {
                 this.$http.get(appConfig.url + 'api/auth')
                     .then(result => {
                         appConfig.access_token = result.body;
+                        localStorage.setItem('access_token', result.body);
                     })
                     .catch(error => {
+                        this.getToken();
                         this.error = true;
                         this.loading = false;
                     });
             },
-            fetchData() {
+            getVehicles() {
+                appConfig.getAccessToken();
+
                 if (!appConfig.access_token) {
-                    setTimeout(this.fetchData, 1000);
+                    this.getToken();
+                    setTimeout(this.getVehicles, 100);
                     return;
                 }
 
@@ -363,7 +367,7 @@
             },
         },
     });
-    Vue.component('employees-edit', {
+    Vue.component('vehicle-edit', {
         template: `<div style="text-align: center;margin-top: 120px;">
             <div style="font-size: 40px;color: black;font-weight: bolder;margin: 20px;">
                 {{ title }}
@@ -505,7 +509,7 @@
             },
         },
     });
-    Vue.component('employees-add', {
+    Vue.component('vehicle-add', {
         props: ['item'],
         template: `<div style="text-align: center;margin-top: 120px;">
         <div style="font-size: 40px;
@@ -563,7 +567,7 @@
                 </div>
             </div>
 
-            <div v-if="error" style="margin-top: 25px;">
+            <div v-if="error" style="color: red; margin-top: 25px;">
                 Server error - try again
             </div>
         </div>`,
@@ -584,10 +588,10 @@
         },
         methods: {
             init() {
-                appConfig.$emit('itemsCount', 1);
+                appConfig.getAccessToken();
             },
             goBack() {
-                this.$router.push('/employees');
+                this.$router.push('/dispatcher');
             },
             addItem() {
                 if (this.employee_name === '') {
@@ -607,14 +611,29 @@
                 }
 
                 this.loading = true;
-                this.$http.post('http://dummy.restapiexample.com/api/v1/create',
-                    {
-                        name: this.employee_name,
-                        age: this.employee_age,
-                        salary: this.employee_salary,
-                    })
+                this.$http.post(appConfig.url + 'api/vehicles/add', {
+                    vehicleOid: req.body.vehicleOid,
+                    plateNo: req.body.plateNo,
+                    companyName: req.body.transportCompanyName,
+                    arrival: req.body.arrival,
+                    departure: req.body.departure,
+                    docking: req.body.docking,
+                    undocking: req.body.undocking,
+                    status: req.body.status,
+                    standing: req.body.standing,
+                    message: req.body.message,
+
+                    salary: this.employee_salary,
+                    authorization: appConfig.access_token
+                })
                     .then(result => {
-                        this.$router.push('/employees');
+                        if (result.body.error) {
+                            this.error = true;
+                        } else {
+                            this.$router.push('/dispatcher');
+                        }
+                        this.loading = false;
+
                     })
                     .catch(error => {
                         this.error = true;
@@ -630,8 +649,8 @@
     const routes = [
         {path: '/', component: Dispatcher},
         {path: '/dispatcher', component: Dispatcher},
-        {path: '/employees-add', component: EmployeesAdd},
-        {path: '/employees-edit', component: EmployeesEdit},
+        {path: '/vehicle-add', component: VehicleAdd},
+        {path: '/vehicle-edit', component: VehiclesEdit},
     ];
 
     const router = new VueRouter({
@@ -645,8 +664,17 @@
         created() {
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
+
             //appConfig.url = 'http://jwt-yard.herokuapp.com/';
             appConfig.url = 'http://localhost:3000/';
+
+            appConfig.getAccessToken = () => {
+                appConfig.access_token = localStorage.getItem('access_token');
+            };
+
+            appConfig.$on('route', route => {
+                this.changeRoute(route);
+            });
         },
         methods: {
             init() {
