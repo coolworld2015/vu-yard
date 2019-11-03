@@ -290,7 +290,7 @@
                 <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.id }} - {{ item.employee_name }} - {{ item.employee_age }} - {{ item.employee_salary }}</li></ul>
             </div>
         </div>
-        <div v-if="error">
+        <div v-if="error" style="color: red">
             Server error - try again
         </div>
         </div>`,
@@ -304,7 +304,7 @@
             };
         },
         created() {
-            this.fetchData();
+            this.getVehicles();
             appConfig.$on('searchQueryEmployees', searchQuery => {
                 let arr = [].concat(appConfig.items);
                 let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
@@ -319,12 +319,32 @@
             });
         },
         methods: {
-            fetchData() {
-                appConfig.message = 'Loading...';
-                this.$http.get('http://dummy.restapiexample.com/api/v1/employees')
+            getVehicles() {
+                this.getToken();
+                setTimeout(this.fetchData, 1000);
+            },
+            getToken() {
+                this.$http.get('http://jwt-yard.herokuapp.com/api/auth')
                     .then(result => {
-                        this.items = JSON.parse(result.data);
-                        this.filteredItems = JSON.parse(result.data);
+                        appConfig.access_token = result.body;
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            fetchData() {
+                if (!appConfig.access_token) {
+                    setTimeout(this.fetchData, 1000);
+                    return;
+                }
+
+                this.$http.get('http://jwt-yard.herokuapp.com/api/users/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data;
+                        this.filteredItems = result.data;
                         appConfig.items = this.filteredItems;
                         this.loading = false;
                         appConfig.$emit('itemsCount', this.items.length);
@@ -618,10 +638,7 @@
     new Vue({
         el: '#app',
         router,
-        data: {
-            map: false,
-            pos: ''
-        },
+        data: {},
         created() {
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
@@ -634,6 +651,10 @@
             },
             changeRoute(route) {
                 closeNav();
+                if (this.$router.currentRoute.path === '/' + route) {
+                    return false;
+                }
+
                 appConfig.route = route;
                 this.init();
                 this.$router.push('/' + route);
