@@ -795,6 +795,9 @@
                     }
                 }
 
+                if (status !== 'registered') {
+                    this.standing = 'n/a';
+                }
 
                 this.loading = true;
                 this.$http.post(appConfig.url + 'api/vehicles/update', {
