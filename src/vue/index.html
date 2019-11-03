@@ -517,7 +517,7 @@
             <span style="font-size: 24px; color: black;">Created:</span>
             <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="created"
-            v-model="id"><br>
+            v-model="created"><br>
 
             <span style="font-size: 24px; color: black;margin-left: 0px;">
                 PlateNo:
@@ -630,6 +630,7 @@
         data: function () {
             return {
                 id: '',
+                created: '',
                 title: '',
                 vehicleOid: '',
                 plateNo: '',
@@ -654,7 +655,8 @@
         },
         methods: {
             init() {
-                this.id = new Date(parseInt(appConfig.item.id)).toISOString().split('T')[0]
+                this.id = appConfig.item.id;
+                this.created = new Date(parseInt(appConfig.item.id)).toISOString().split('T')[0]
                     + ' ' + new Date(parseInt(appConfig.item.id)).toISOString().split('T')[1].split('.')[0];
                 this.title = appConfig.item.plateNo;
                 this.plateNo = appConfig.item.plateNo;
@@ -689,12 +691,21 @@
                 }
 
                 this.loading = true;
-                this.$http.put('http://dummy.restapiexample.com/api/v1/update/' + this.id,
-                    {
-                        name: this.employee_name,
-                        age: this.employee_age,
-                        salary: this.employee_salary,
-                    })
+                this.$http.post(appConfig.url + 'api/vehicles/update', {
+                    id: this.id,
+                    vehicleOid: this.vehicleOid,
+                    plateNo: this.plateNo,
+                    companyName: this.companyName,
+                    arrived: 'n/a',
+                    departed: 'n/a',
+                    docked: 'n/a',
+                    undocked: 'n/a',
+                    status: 'created',
+                    standing: 'n/a',
+                    message: 'n/a',
+
+                    authorization: appConfig.access_token
+                })
                     .then(result => {
                         this.$router.push('/dispatcher');
                     })
