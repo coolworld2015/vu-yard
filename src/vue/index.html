@@ -301,29 +301,40 @@
                 }
             });
         },
-
-        computed: {},
         methods: {
             renderStatus(item) {
                 switch (item.status) {
-                    case '1':
-                        return {
-                            background: 'red',
-                            color: 'white'
-                        };
-                        break;
-                    case '2':
+                    case 'arrived':
                         return {
                             background: 'yellow',
                             color: 'blue'
                         };
                         break;
+                    case 'registered':
+                        return {
+                            background: 'green',
+                            color: 'white'
+                        };
+                        break;
+                    case 'docked':
+                        return {
+                            background: 'red',
+                            color: 'white'
+                        };
+                        break;
+                    case 'undocked':
+                        return {
+                            background: 'dodgerblue',
+                            color: 'white'
+                        };
+                        break;
+                    case 'departed':
+                        return {
+                            background: 'gray',
+                            color: 'white'
+                        };
+                        break;
                 }
-                /*if (item.plateNo == 1)
-                    return {
-                        background: 'red',
-                        color: 'white'
-                    }*/
             },
             getToken() {
                 this.error = false;
@@ -546,7 +557,7 @@
             <span style="font-size: 24px; color: black;margin-left: 0px;">
                 Arrived:
             </span>
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="arrived"
             v-on:keypress="clearWarning"
             v-model="arrived" ><br>
@@ -554,7 +565,7 @@
             <span style="font-size: 24px; color: black;margin-left: 0px;">
                 Docked:
             </span>
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="docked"
             v-on:keypress="clearWarning"
             v-model="docked" ><br>
@@ -562,7 +573,7 @@
             <span style="font-size: 24px; color: black;margin-left: -24px;">
                 Undocked:
             </span>
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="undocked"
             v-on:keypress="clearWarning"
             v-model="undocked" ><br>
@@ -570,7 +581,7 @@
             <span style="font-size: 24px; color: black;margin-left: -12px;">
                 Departed:
             </span>
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="departed"
             v-on:keypress="clearWarning"
             v-model="departed" ><br>
@@ -578,7 +589,7 @@
             <span style="font-size: 24px; color: black;margin-left: 17px;">
                 Status:
             </span>
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="status"
             v-on:keypress="clearWarning"
             v-model="status" ><br>
@@ -587,28 +598,38 @@
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
             </div>
 
+            <div v-if="error" style="color: red; margin: -20px 0px 20px;">
+                Server error - try again
+            </div>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./loading.gif" alt="">
+                </div>
+            </div>
+
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: yellow;color: blue;outline:none;"
-            v-on:click="updateItem">
+            v-on:click="updateItem('arrived')">
                 Arrived
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: green;color: white;outline:none;"
-            v-on:click="deleteItem">
-                Moved
+            v-on:click="updateItem('registered')">
+                Registered
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;"
-            v-on:click="updateItem">
+            v-on:click="updateItem('docked')">
                 Docked
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: dodgerblue;color: white;outline:none;"
-            v-on:click="deleteItem">
+            v-on:click="updateItem('undocked')">
                 Undocked
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: gray;color: white;outline:none;"
-            v-on:click="deleteItem">
+            v-on:click="updateItem('departed')">
                 Left
             </button><br>
 
@@ -617,15 +638,6 @@
                 Back
             </button><br><br>
 
-            <div v-if="loading">
-                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                    <img src="./loading.gif" alt="">
-                </div>
-            </div>
-
-            <div v-if="error" style="color: red;margin-top: 25px;">
-                Server error - try again
-            </div>
         </div>`,
         data: function () {
             return {
@@ -648,7 +660,7 @@
         },
         created() {
             if (!appConfig.item) {
-                //this.$router.push('/dispatcher');
+                this.$router.push('/dispatcher');
             } else {
                 this.init();
             }
@@ -668,12 +680,13 @@
                 this.undocked = appConfig.item.undocked;
                 this.standing = appConfig.item.standing;
                 this.status = appConfig.item.status;
+                this.message = appConfig.item.message;
                 appConfig.$emit('itemsCount', 1);
             },
             goBack() {
                 this.$router.push('/dispatcher');
             },
-            updateItem() {
+            updateItem(status) {
                 if (this.employee_name === '') {
                     this.invalidValue = true;
                 }
@@ -696,18 +709,23 @@
                     vehicleOid: this.vehicleOid,
                     plateNo: this.plateNo,
                     companyName: this.companyName,
-                    arrived: 'n/a',
-                    departed: 'n/a',
-                    docked: 'n/a',
-                    undocked: 'n/a',
-                    status: 'created',
-                    standing: 'n/a',
-                    message: 'n/a',
+                    arrived: this.arrived,
+                    departed: this.departed,
+                    docked: this.docked,
+                    undocked: this.undocked,
+                    status: status,
+                    standing: this.standing,
+                    message: this.message,
 
                     authorization: appConfig.access_token
                 })
                     .then(result => {
-                        this.$router.push('/dispatcher');
+                        if (result.body.errors) {
+                            this.error = true;
+                        } else {
+                            this.$router.push('/dispatcher');
+                        }
+                        this.loading = false;
                     })
                     .catch(error => {
                         this.error = true;
