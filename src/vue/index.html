@@ -604,6 +604,24 @@
             v-on:keypress="clearWarning"
             v-model="departed" ><br>
 
+            <span style="font-size: 24px; color: black;margin-left: -10px;">
+                Standing:
+            </span>
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="standing"
+            v-on:keypress="clearWarning"
+            v-model="standing" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -42px;">
+                Set standing:
+            </span>
+            <select v-model="selected" @change="onChange($event)" style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;">
+              <option disabled value="">Choose standing</option>
+              <option v-for="option in options" v-bind:value="option.value">
+                {{ option.text }}
+              </option>
+            </select><br>
+
             <span style="font-size: 24px; color: black;margin-left: 17px;">
                 Status:
             </span>
@@ -675,6 +693,35 @@
                 invalidValue: false,
                 error: false,
                 loading: false,
+                selected: '',
+                options: [
+                    {text: 'P1', value: 'P1'},
+                    {text: 'P2', value: 'P2'},
+                    {text: 'P3', value: 'P3'},
+                    {text: 'P4', value: 'P4'},
+                    {text: 'P5', value: 'P5'},
+                    {text: 'P6', value: 'P6'},
+                    {text: 'P7', value: 'P7'},
+                    {text: 'P8', value: 'P8'},
+                    {text: 'P9', value: 'P9'},
+                    {text: 'P10', value: 'P10'},
+                    {text: 'P11', value: 'P11'},
+                    {text: 'P12', value: 'P12'},
+                    {text: 'P13', value: 'P13'},
+                    {text: 'P14', value: 'P14'},
+                    {text: 'P15', value: 'P15'},
+                    {text: 'P16', value: 'P16'},
+                    {text: 'P17', value: 'P17'},
+                    {text: 'P18', value: 'P18'},
+                    {text: 'P19', value: 'P19'},
+                    {text: 'P20', value: 'P20'},
+                    {text: 'P21', value: 'P21'},
+                    {text: 'P22', value: 'P22'},
+                    {text: 'P23', value: 'P23'},
+                    {text: 'P24', value: 'P24'},
+                    {text: 'P25', value: 'P25'},
+                    {text: 'P26', value: 'P26'},
+                ]
             };
         },
         created() {
@@ -738,21 +785,16 @@
                 this.$router.push('/dispatcher');
             },
             updateItem(status) {
-                if (this.employee_name === '') {
-                    this.invalidValue = true;
+                if (status === 'registered') {
+                    if (this.standing === 'n/a') {
+                        this.invalidValue = true;
+                    }
+
+                    if (this.invalidValue) {
+                        return;
+                    }
                 }
 
-                if (this.employee_age === '') {
-                    this.invalidValue = true;
-                }
-
-                if (this.employee_salary === '') {
-                    this.invalidValue = true;
-                }
-
-                if (this.invalidValue) {
-                    return;
-                }
 
                 this.loading = true;
                 this.$http.post(appConfig.url + 'api/vehicles/update', {
@@ -797,6 +839,10 @@
             clearWarning() {
                 this.invalidValue = false;
             },
+            onChange(event) {
+                this.standing = event.target.value;
+                this.clearWarning();
+            }
         },
     });
 
