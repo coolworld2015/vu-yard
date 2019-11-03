@@ -203,6 +203,9 @@
                 <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
             </form>
         </div>
+        <div style="float: right; margin: -100px 40px;">
+                <span style="font-size:50px;cursor:pointer; color: black" onclick="openNav()">&#43;</span>
+        </div>
         </div>`,
         data() {
             return {
@@ -324,7 +327,7 @@
                 setTimeout(this.fetchData, 1000);
             },
             getToken() {
-                this.$http.get('http://jwt-yard.herokuapp.com/api/auth')
+                this.$http.get(appConfig.url + 'api/auth')
                     .then(result => {
                         appConfig.access_token = result.body;
                     })
@@ -339,7 +342,7 @@
                     return;
                 }
 
-                this.$http.get('http://jwt-yard.herokuapp.com/api/users/get', {
+                this.$http.get(appConfig.url + 'api/audit/get', {
                     headers: {'Authorization': appConfig.access_token}
                 })
                     .then(result => {
@@ -642,6 +645,8 @@
         created() {
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
+            //appConfig.url = 'http://jwt-yard.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
         },
         methods: {
             init() {
