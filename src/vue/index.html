@@ -268,8 +268,8 @@
             </div>
         </div>
         <div v-if="!loading">
-            <div style="margin-top: 100px;margin-bottom: 50px;">
-                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.id }} - {{ item.plateNo }}  - {{ item.vehicleOid }} - {{ item.companyName }}</li></ul>
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div style="height: 50px; padding-top: 15px;border: 1px solid; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.plateNo }}  - {{ item.vehicleOid }} - {{ item.companyName }}</div>
             </div>
         </div>
         <div v-if="error" style="color: red">
@@ -302,6 +302,7 @@
         },
         methods: {
             getToken() {
+                this.error = false;
                 this.$http.get(appConfig.url + 'api/auth')
                     .then(result => {
                         appConfig.access_token = result.body;
@@ -326,16 +327,20 @@
                     headers: {'Authorization': appConfig.access_token}
                 })
                     .then(result => {
-                        this.items = result.data;
-                        this.filteredItems = result.data;
-                        appConfig.items = this.filteredItems;
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.items = this.filteredItems.sort(this.sort);
                         this.loading = false;
                         appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
                         this.error = true;
                         this.loading = false;
+                        this.getToken();
                     });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
             },
             showDetails(item) {
                 appConfig.item = item;
