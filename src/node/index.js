@@ -34,6 +34,7 @@ const server = express()
 
     .get('/api/vehicles/get', Vehicles)
     .post('/api/vehicles/add', VehicleAdd)
+    .post('/api/vehicles/update', VehicleUpdate)
 
     .get('/api/users/get', Users)
     .post('/api/users/add', UserAdd)
@@ -160,60 +161,101 @@ function Messages(req, res) {
 
 //------------------------------------------------------------------------
 function Vehicles(req, res) {
-	var agent = req.headers.authorization;
+    var agent = req.headers.authorization;
 
-	jwt.verify(agent, secret, function (err, decoded) {
-		if (err) {
-			return res.status(403).send({
-				success: false,
-				message: 'No token provided.'
-			});
-		} else {
-			var VehiclesModel = require('./mongo').VehiclesModel;
-			return VehiclesModel.find(function (err, vehicles) {
-				if (!err) {
-					return res.send(vehicles);
-				} else {
-					res.statusCode = 500;
-					return res.send({error: 'Server error'});
-				}
-			});
-		}
-	});
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var VehiclesModel = require('./mongo').VehiclesModel;
+            return VehiclesModel.find(function (err, vehicles) {
+                if (!err) {
+                    return res.send(vehicles);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            });
+        }
+    });
 }
 
 function VehicleAdd(req, res) {
-	var agent = req.body.authorization;
+    var agent = req.body.authorization;
 
-	jwt.verify(agent, secret, function (err, decoded) {
-		if (err) {
-			return res.status(403).send({
-				success: false,
-				message: 'No token provided.'
-			});
-		} else {
-			var VehiclesModel = require('./mongo').VehiclesModel;
-			VehiclesModel.create({
-					id: +new Date(),
-					vehicleOid: req.body.vehicleOid,
-					plateNo: req.body.plateNo,
-					companyName: req.body.companyName,
-					arrived: req.body.arrived,
-					departed: req.body.departed,
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var VehiclesModel = require('./mongo').VehiclesModel;
+            VehiclesModel.create({
+                    id: +new Date(),
+                    vehicleOid: req.body.vehicleOid,
+                    plateNo: req.body.plateNo,
+                    companyName: req.body.companyName,
+                    arrived: req.body.arrived,
+                    departed: req.body.departed,
                     docked: req.body.docked,
-					undocked: req.body.undocked,
+                    undocked: req.body.undocked,
                     standing: req.body.standing,
                     status: req.body.status,
-					message: req.body.message
-				},
-				function (err, user) {
-					if (err) {
-						return res.send({error: 'Server error'});
-					}
-					res.send(user);
-				});
-		}
-	});
+                    message: req.body.message
+                },
+                function (err, vehicle) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    }
+                    res.send(vehicle);
+                });
+        }
+    });
+}
+
+function VehicleUpdate(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var VehiclesModel = require('./mongo').VehiclesModel;
+            VehiclesModel.findOne({
+                id: req.body.id
+            }, function (err, vehicle) {
+                if (err) {
+                    res.send({error: err.message});
+                } else {
+                    vehicle.vehicleOid = req.body.vehicleOid;
+                    vehicle.plateNo = req.body.plateNo;
+                    vehicle.companyName = req.body.companyName;
+                    vehicle.arrived = req.body.arrived;
+                    vehicle.departed = req.body.departed;
+                    vehicle.docked = req.body.docked;
+                    vehicle.undocked = req.body.undocked;
+                    vehicle.standing = req.body.standing;
+                    vehicle.status = req.body.status;
+                    vehicle.message = req.body.message;
+
+                    vehicle.save(function (err) {
+                        if (!err) {
+                            res.send(vehicle);
+                        } else {
+                            return res.send(err);
+                        }
+                    });
+                }
+            });
+        }
+    });
 }
 
 //------------------------------------------------------------------------

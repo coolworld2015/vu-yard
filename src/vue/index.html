@@ -152,7 +152,6 @@
         <ul>
             <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
 
-
             <li v-on:click="changeRoute('dispatcher')" v-bind:class="{ active: dispatcher }">
                 <i class="fas fa-user-friends"></i><span style="margin: 15px;">Dispatcher</span></li>
 
@@ -270,7 +269,7 @@
         <div v-if="!loading">
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
                 <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
-                    {{ item.plateNo }}  - {{ item.vehicleOid }} - {{ item.companyName }}
+                    {{ item.plateNo }}  - {{ item.vehicleOid }} - {{ item.companyName }} - {{ item.companyName }}
                 </div>
             </div>
         </div>
@@ -405,8 +404,6 @@
             placeholder="CompanyName"
             v-on:keypress="clearWarning"
             v-model="companyName" ><br>
-
-
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
