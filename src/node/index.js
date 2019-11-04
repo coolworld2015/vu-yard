@@ -25,8 +25,8 @@ const server = express()
     .use(express.static(__dirname + '/build'))
 
     //.get('/',(req, res) => res.sendFile(__dirname + '/build/index.html'))
-    //.get('/',(req, res) => res.send('It is just API Server...'))
-    .get('/', (req, res) => res.sendFile(__dirname + '/auth.html'))
+    .get('/',(req, res) => res.send('It is just API Server...'))
+    //.get('/', (req, res) => res.sendFile(__dirname + '/auth.html'))
 
     .post('/api/login', Login)
 
@@ -109,6 +109,7 @@ function TestPOST(req, res) {
         res.send(body);
     });
 }
+
 //------------------------------------------------------------------------
 function TestPOST1(req, res) {
     const request = require('request');
