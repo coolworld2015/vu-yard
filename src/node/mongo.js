@@ -37,15 +37,16 @@ var VehiclesModel = mongoose.model('Vehicles', Vehicles);
 module.exports.VehiclesModel = VehiclesModel;
 
 //---------------------------------------------------------------------------------------------
-var Gates = new Schema({
+var Locations = new Schema({
     id: {type: String, required: true},
     name: {type: String, required: true},
     status: {type: String, required: true},
+    vehicle: {type: String, required: true},
     message: {type: String, required: true}
 });
 
-var GatesModel = mongoose.model('Gates', Gates);
-module.exports.GatesModel = GatesModel;
+var LocationsModel = mongoose.model('Locations', Locations);
+module.exports.LocationsModel = LocationsModel;
 
 //---------------------------------------------------------------------------------------------
 var Messages = new Schema({

@@ -32,6 +32,8 @@ const server = express()
 
     .get('/api/messages/get', Messages)
 
+    .get('/api/locations/get', Locations)
+
     .get('/api/vehicles/get', Vehicles)
     .post('/api/vehicles/add', VehicleAdd)
     .post('/api/vehicles/update', VehicleUpdate)
@@ -231,6 +233,29 @@ function Messages(req, res) {
     });
 }
 
+//------------------------------------------------------------------------
+function Locations(req, res) {
+    var agent = req.headers.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var LocationsModel = require('./mongo').LocationsModel;
+            return LocationsModel.find(function (err, locations) {
+                if (!err) {
+                    return res.send(locations);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            });
+        }
+    });
+}
 //------------------------------------------------------------------------
 function Vehicles(req, res) {
     var agent = req.headers.authorization;
