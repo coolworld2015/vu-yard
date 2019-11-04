@@ -273,7 +273,7 @@
 
                     <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='arrived' && item.arrived!=='n/a'"> {{ new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='registered' && item.registered!=='n/a'"> {{ new Date(parseInt(item.registered)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.registered)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='booked' && item.booked!=='n/a'"> {{ new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='docked' && item.docked!=='n/a'"> {{ new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='undocked' && item.undocked!=='n/a'"> {{ new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='departed' && item.departed!=='n/a'"> {{ new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
@@ -320,7 +320,7 @@
                             color: 'blue'
                         };
                         break;
-                    case 'registered':
+                    case 'booked':
                         return {
                             background: 'green',
                             color: 'white'
@@ -501,7 +501,7 @@
                     plateNo: this.plateNo,
                     companyName: this.companyName,
                     arrived: 'n/a',
-                    registered: 'n/a',
+                    booked: 'n/a',
                     departed: 'n/a',
                     docked: 'n/a',
                     undocked: 'n/a',
@@ -573,13 +573,13 @@
             v-on:keypress="clearWarning"
             v-model="arrived" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -28px;">
-                Registered:
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+                Booked:
             </span>
             <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
-            placeholder="registered"
+            placeholder="booked"
             v-on:keypress="clearWarning"
-            v-model="registered" ><br>
+            v-model="booked" ><br>
 
             <span style="font-size: 24px; color: black;margin-left: 0px;">
                 Docked:
@@ -651,8 +651,8 @@
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: green;color: white;outline:none;"
-            v-on:click="updateItem('registered')">
-                Registered
+            v-on:click="updateItem('booked')">
+                Booked
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;"
@@ -685,7 +685,7 @@
                 plateNo: '',
                 companyName: '',
                 arrived: '',
-                registered: '',
+                booked: '',
                 docked: '',
                 undocked: '',
                 departed: '',
@@ -749,11 +749,11 @@
                         + ' ' + new Date(parseInt(appConfig.item.arrived)).toISOString().split('T')[1].split('.')[0];
                 }
 
-                if (appConfig.item.registered == 'n/a') {
-                    this.registered = appConfig.item.registered;
+                if (appConfig.item.booked == 'n/a') {
+                    this.booked = appConfig.item.booked;
                 } else {
-                    this.registered = new Date(parseInt(appConfig.item.registered)).toISOString().split('T')[0]
-                        + ' ' + new Date(parseInt(appConfig.item.registered)).toISOString().split('T')[1].split('.')[0];
+                    this.booked = new Date(parseInt(appConfig.item.booked)).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.booked)).toISOString().split('T')[1].split('.')[0];
                 }
 
                 if (appConfig.item.docked == 'n/a') {
@@ -792,13 +792,13 @@
                     this.invalidValue = true;
                 }
 
-                if ((status === 'registered') || (status === 'docked')) {
+                if ((status === 'booked') || (status === 'docked')) {
                     if (this.standing === 'n/a') {
                         this.invalidValue = true;
                     }
                 }
 
-                if ((status !== 'registered') && (status !== 'docked')) {
+                if ((status !== 'booked') && (status !== 'docked')) {
                     this.standing = 'n/a';
                 }
 
@@ -813,9 +813,10 @@
                     plateNo: this.plateNo,
                     companyName: this.companyName,
                     arrived: this.arrived,
-                    departed: this.departed,
+                    booked: this.booked,
                     docked: this.docked,
                     undocked: this.undocked,
+                    departed: this.departed,
                     status: status,
                     standing: this.standing,
                     message: this.message,

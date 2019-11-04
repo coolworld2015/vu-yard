@@ -200,7 +200,7 @@ function VehicleAdd(req, res) {
                     plateNo: req.body.plateNo,
                     companyName: req.body.companyName,
                     arrived: req.body.arrived,
-                    registered: req.body.registered,
+                    booked: req.body.booked,
                     docked: req.body.docked,
                     undocked: req.body.undocked,
                     departed: req.body.departed,
@@ -242,7 +242,7 @@ function VehicleUpdate(req, res) {
 
                     switch (req.body.status) {
                         case 'arrived': vehicle.arrived = +new Date();break;
-                        case 'registered': vehicle.registered = +new Date();break;
+                        case 'booked': vehicle.booked = +new Date();break;
                         case 'docked': vehicle.docked = +new Date();break;
                         case 'undocked': vehicle.undocked = +new Date();break;
                         case 'departed': vehicle.departed = +new Date();break;

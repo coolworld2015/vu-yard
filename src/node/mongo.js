@@ -24,7 +24,7 @@ var Vehicles = new Schema({
     plateNo: {type: String, required: true},
     companyName: {type: String, required: true},
     arrived: {type: String, required: true},
-    registered: {type: String, required: true},
+    booked: {type: String, required: true},
     docked: {type: String, required: true},
     undocked: {type: String, required: true},
     departed: {type: String, required: true},
