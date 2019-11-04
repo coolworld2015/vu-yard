@@ -203,13 +203,13 @@
             </form>
         </div>
         <div style="float: right; margin: -128px 140px;">
-                <span style="font-size:25px;cursor:pointer; color: black" v-on:click="vehicleAdd()"><i class="fas fa-filter"></i></span>
-                <span style="color: #eee !important;font-size:25px;cursor:pointer; color: black" v-on:click="vehicleAdd()"><i class="fas fa-filter"></i></span>
-                <span style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="vehicleAdd()"><i class="fas fa-filter"></i></span>
-                <span style="color: green !important;font-size:25px;cursor:pointer; color: black" v-on:click="vehicleAdd()"><i class="fas fa-filter"></i></span>
-                <span style="color: red !important;font-size:25px;cursor:pointer; color: black" v-on:click="vehicleAdd()"><i class="fas fa-filter"></i></span>
-                <span style="color: dodgerblue !important;font-size:25px;cursor:pointer; color: black" v-on:click="vehicleAdd()"><i class="fas fa-filter"></i></span>
-                <span style="color: gray !important;font-size:25px;cursor:pointer; color: black" v-on:click="vehicleAdd()"><i class="fas fa-filter"></i></span>
+                <span style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('*')"><i class="fas fa-filter"></i></span>
+                <span style="color: #eee !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('created')"><i class="fas fa-filter"></i></span>
+                <span style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('arrived')"><i class="fas fa-filter"></i></span>
+                <span style="color: green !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('booked')"><i class="fas fa-filter"></i></span>
+                <span style="color: red !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('docked')"><i class="fas fa-filter"></i></span>
+                <span style="color: dodgerblue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('undocked')"><i class="fas fa-filter"></i></span>
+                <span style="color: gray !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('departed')"><i class="fas fa-filter"></i></span>
         </div>
         <div style="float: right; margin: -113px 40px;">
                 <span style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
@@ -247,8 +247,13 @@
                 this.changeView();
             },
             goSearch() {
-                if (appConfig.route === 'box') {
-                    appConfig.$emit('searchQueryITunes', this.searchQuery);
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
+                }
+            },
+            filterStatus(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatus', status);
                 }
             }
         },
@@ -318,6 +323,17 @@
                     this.items = appConfig.items;
                     this.filteredItems = appConfig.items;
                 }
+            });
+            appConfig.$on('filterStatus', status => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.status === status);
+                if (status === '*') {
+                    items = [].concat(appConfig.items);
+                }
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
             });
         },
         methods: {

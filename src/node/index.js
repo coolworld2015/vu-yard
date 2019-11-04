@@ -69,7 +69,6 @@ webSocketServer.on('connection', (ws) => {
     });
 
     ws.on('message', function (message) {
-
         // Message start
         var MessagesModel = require('./mongo').MessagesModel;
         var date = new Date().toJSON().slice(0, 10);
@@ -83,7 +82,6 @@ webSocketServer.on('connection', (ws) => {
             message: message.split('###')[0]
         });
         // Message end
-
         console.log('message received ' + message + '###' + now);
         for (var key in clients) {
             clients[key].send(message + '###' + now);
@@ -94,6 +92,25 @@ webSocketServer.on('connection', (ws) => {
 
 //------------------------------------------------------------------------
 function TestPOST(req, res) {
+    const request = require('request');
+
+    request.post('https://213.144.11.162:10380/authentication', {
+        form:
+            {
+                'grant_type': 'password',
+                'username': 'manyvehicles@abona-erp.com',
+                'password': '1234qwerQWER,.-'
+            }
+    }, (err, resp, body) => {
+        if (err) {
+            console.log(err);
+            res.send(err)
+        }
+        res.send(body);
+    });
+}
+//------------------------------------------------------------------------
+function TestPOST1(req, res) {
     const request = require('request');
 
     request.post('https://jwt-base.herokuapp.com/api/login', {
@@ -131,12 +148,15 @@ function TestGET_Old(req, res) {
         console.log("Error: " + err.message);
     });
 }
+
 //------------------------------------------------------------------------
 function TestGET(req, res) {
     const request = require('request');
 
-    request('https://ui-base.herokuapp.com/api/users/get', { json: true }, (err, resp, body) => {
-        if (err) { return console.log(err); }
+    request('https://ui-base.herokuapp.com/api/users/get', {json: true}, (err, resp, body) => {
+        if (err) {
+            return console.log(err);
+        }
         res.send(body);
     });
 }
