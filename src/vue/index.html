@@ -195,8 +195,40 @@
                         </div>
                     </div>`
     };
-    const VehiclesEdit = {template: '<vehicle-edit></vehicle-edit>'};
-    const VehicleAdd = {template: '<vehicle-add></vehicle-add>'};
+    const VehiclesEdit = {template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top></top>
+                        </div>
+                            <div>
+                                <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <vehicle-edit></vehicle-edit>
+                                </div>
+                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <dispatcher-items></dispatcher-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
+    };
+    const VehicleAdd = {template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top></top>
+                        </div>
+                            <div>
+                                <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <vehicle-add></vehicle-add>
+                                </div>
+                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <dispatcher-items></dispatcher-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
+    };
 
     Vue.component('top', {
         template: `<div>
@@ -712,7 +744,7 @@
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;margin-top: 20px;"
             v-on:click="goBack">
                 Back
-            </button><br><br>
+            </button><br><br><br><br><br><br><br><br><br><br>
 
         </div>`,
         data: function () {
