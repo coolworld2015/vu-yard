@@ -42,6 +42,8 @@ const server = express()
     .post('/api/users/delete', UserDelete)
 
     .get('/api/audit/get', Audit)
+
+    .get('/api/test', TestPOST)
     .get('/api/auth', (req, res) => res.send(token))
 
     .listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -89,6 +91,55 @@ webSocketServer.on('connection', (ws) => {
         }
     });
 });
+
+//------------------------------------------------------------------------
+function TestPOST(req, res) {
+    const request = require('request');
+
+    request.post('https://jwt-base.herokuapp.com/api/login', {
+        form:
+            {
+                'name': '1',
+                'pass': '1',
+                'description': 'test'
+            }
+    }, (err, resp, body) => {
+        if (err) {
+            return console.log(err);
+        }
+        res.send(body);
+    });
+}
+
+//------------------------------------------------------------------------
+function TestGET_Old(req, res) {
+    const https = require('https');
+
+    https.get('https://ui-base.herokuapp.com/api/users/get', (resp) => {
+        let data = '';
+        resp.on('data', (chunk) => {
+            data += chunk;
+            console.log(data);
+        });
+
+        resp.on('end', () => {
+            console.log(JSON.parse(data));
+            res.send(data);
+        });
+
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
+    });
+}
+//------------------------------------------------------------------------
+function TestGET(req, res) {
+    const request = require('request');
+
+    request('https://ui-base.herokuapp.com/api/users/get', { json: true }, (err, resp, body) => {
+        if (err) { return console.log(err); }
+        res.send(body);
+    });
+}
 
 //------------------------------------------------------------------------
 function Login(req, res) {
@@ -241,11 +292,21 @@ function VehicleUpdate(req, res) {
                     vehicle.companyName = req.body.companyName;
 
                     switch (req.body.status) {
-                        case 'arrived': vehicle.arrived = +new Date();break;
-                        case 'booked': vehicle.booked = +new Date();break;
-                        case 'docked': vehicle.docked = +new Date();break;
-                        case 'undocked': vehicle.undocked = +new Date();break;
-                        case 'departed': vehicle.departed = +new Date();break;
+                        case 'arrived':
+                            vehicle.arrived = +new Date();
+                            break;
+                        case 'booked':
+                            vehicle.booked = +new Date();
+                            break;
+                        case 'docked':
+                            vehicle.docked = +new Date();
+                            break;
+                        case 'undocked':
+                            vehicle.undocked = +new Date();
+                            break;
+                        case 'departed':
+                            vehicle.departed = +new Date();
+                            break;
                     }
 
                     vehicle.standing = req.body.standing;
