@@ -786,18 +786,24 @@
                 this.$router.push('/dispatcher');
             },
             updateItem(status) {
+                this.invalidValue = false;
+
+                if ((this.status === 'created') && (status !== 'arrived')) {
+                    this.invalidValue = true;
+                }
+
                 if ((status === 'registered') || (status === 'docked')) {
                     if (this.standing === 'n/a') {
                         this.invalidValue = true;
-                    }
-
-                    if (this.invalidValue) {
-                        return;
                     }
                 }
 
                 if ((status !== 'registered') && (status !== 'docked')) {
                     this.standing = 'n/a';
+                }
+
+                if (this.invalidValue) {
+                    return;
                 }
 
                 this.loading = true;
