@@ -178,10 +178,21 @@
 
     const Dispatcher = {
         template: `
-                    <div>
-                        <div class="top"><top></top></div>
-                            <dispatcher-items></dispatcher-items>
-                        <div class="bottom"><bottom></bottom></div>
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top></top>
+                        </div>
+                            <div>
+                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <dispatcher-items></dispatcher-items>
+                                </div>
+                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <dispatcher-items></dispatcher-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
                     </div>`
     };
     const VehiclesEdit = {template: '<vehicle-edit></vehicle-edit>'};
@@ -282,7 +293,7 @@
         </div>
         <div v-if="!loading">
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
-                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
+                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
                     {{ item.plateNo }} - {{ item.vehicleOid }} - {{ item.companyName }} -
 
                     <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
@@ -292,7 +303,7 @@
                     <span v-if="item.status=='undocked' && item.undocked!=='n/a'"> {{ new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='departed' && item.departed!=='n/a'"> {{ new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
 
-                    <span v-if="item.status=='registered' || item.status=='docked'"> - {{ item.standing }}</span>
+                    <span v-if="item.status=='booked' || item.status=='docked'"> - {{ item.standing }}</span>
                 </div>
             </div>
         </div>
@@ -927,6 +938,9 @@
             },
             changeRoute(route) {
                 closeNav();
+                if (route === 'gatekeeper' || route === 'driver') {
+                    return;
+                }
                 if (this.$router.currentRoute.path === '/' + route) {
                     return false;
                 }
