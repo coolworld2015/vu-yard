@@ -377,6 +377,7 @@
 
                 appConfig.$emit('itemsCount', items.length);
             });
+            appConfig.$emit('route', 'dispatcher');
         },
         methods: {
             renderStatus(item) {
@@ -1152,15 +1153,18 @@
             },
             changeRoute(route) {
                 closeNav();
+
                 if (route === 'gatekeeper' || route === 'driver') {
                     return;
-                }
-                if (this.$router.currentRoute.path === '/' + route) {
-                    return false;
                 }
 
                 appConfig.route = route;
                 this.init();
+
+                if (this.$router.currentRoute.path === '/' + route) {
+                    return false;
+                }
+
                 this.$router.push('/' + route);
                 return false;
             },
