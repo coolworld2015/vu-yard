@@ -770,34 +770,7 @@
                 locationID: '',
                 locationName: '',
                 locationStatus: 'booked',
-                options: [
-                    {name: 'P1', value: '1'},
-                    {name: 'P2', value: '2'},
-                    {name: 'P3', value: '3'},
-                    {name: 'P4', value: '4'},
-                    {name: 'P5', value: '5'},
-                    {name: 'P6', value: '6'},
-                    {name: 'P7', value: '7'},
-                    {name: 'P8', value: '8'},
-                    {name: 'P9', value: '9'},
-                    {name: 'P10', value: '10'},
-                    {name: 'P11', value: '11'},
-                    {name: 'P12', value: '12'},
-                    {name: 'P13', value: '13'},
-                    {name: 'P14', value: '14'},
-                    {name: 'P15', value: '15'},
-                    {name: 'P16', value: '16'},
-                    {name: 'P17', value: '17'},
-                    {name: 'P18', value: '18'},
-                    {name: 'P19', value: '19'},
-                    {name: 'P20', value: '20'},
-                    {name: 'P21', value: '21'},
-                    {name: 'P22', value: '22'},
-                    {name: 'P23', value: '23'},
-                    {name: 'P24', value: '24'},
-                    {name: 'P25', value: '25'},
-                    {name: 'P26', value: '26'},
-                ],
+                options: [],
             };
         },
         created() {
@@ -806,6 +779,7 @@
             } else {
                 this.init();
             }
+            this.options = [].concat(appConfig.locations);
         },
         methods: {
             init() {
@@ -866,7 +840,7 @@
 
                 if (this.standing !== 'n/a') {
                     let obj = this.options.filter((el) => (el.name === this.standing));
-                    this.locationID = obj[0].value;
+                    this.locationID = obj[0].id;
                     this.locationName = obj[0].name;
                 }
 
@@ -931,9 +905,14 @@
                 }
 
                 switch (this.locationStatus) {
-                    case 'booked': status = 'booked'; break;
-                    case 'docked': status = 'docked'; break;
-                    default: status = 'blank';
+                    case 'booked':
+                        status = 'booked';
+                        break;
+                    case 'docked':
+                        status = 'docked';
+                        break;
+                    default:
+                        status = 'blank';
                 }
 
                 this.loading = true;
@@ -976,7 +955,7 @@
             onChange(event) {
                 this.standing = this.selected.name;
                 this.locationName = this.selected.name;
-                this.locationID = this.selected.value;
+                this.locationID = this.selected.id;
                 this.clearWarning();
             }
         },
@@ -1018,7 +997,6 @@
                 this.filteredItems = items;
                 this.items = items;
 
-                //appConfig.$emit('itemsCount', items.length);
                 if (searchQuery === '') {
                     this.items = appConfig.locations;
                     this.filteredItems = appConfig.locations;
@@ -1032,42 +1010,25 @@
                 }
                 this.filteredItems = items;
                 this.items = items;
-
-                //appConfig.$emit('itemsCount', items.length);
             });
         },
         methods: {
             renderStatus(item) {
                 switch (item.status) {
                     case 'arrived':
-                        return {
-                            background: 'yellow',
-                            color: 'blue'
-                        };
+                        return {background: 'yellow', color: 'blue'};
                         break;
                     case 'booked':
-                        return {
-                            background: 'green',
-                            color: 'white'
-                        };
+                        return {background: 'green', color: 'white'};
                         break;
                     case 'docked':
-                        return {
-                            background: 'red',
-                            color: 'white'
-                        };
+                        return {background: 'red',color: 'white'};
                         break;
                     case 'undocked':
-                        return {
-                            background: 'dodgerblue',
-                            color: 'white'
-                        };
+                        return {background: 'dodgerblue',color: 'white'};
                         break;
                     case 'departed':
-                        return {
-                            background: 'gray',
-                            color: 'white'
-                        };
+                        return {background: 'gray',color: 'white'};
                         break;
                 }
             },
