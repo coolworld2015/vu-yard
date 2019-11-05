@@ -5,8 +5,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.0.3/vue-resource.min.js"></script>
 <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
 
 <style>
@@ -205,7 +203,7 @@
                                     <vehicle-edit></vehicle-edit>
                                 </div>
                                 <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
-                                    <vehicles-items></vehicles-items>
+                                    <locations-items></locations-items>
                                 </div>
                             </div>
                         <div class="bottom">
@@ -222,7 +220,7 @@
                                     <vehicle-add></vehicle-add>
                                 </div>
                                 <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
-                                    <vehicles-items></vehicles-items>
+                                    <locations-items></locations-items>
                                 </div>
                             </div>
                         <div class="bottom">
@@ -314,151 +312,6 @@
             });
         },
         methods: {},
-    });
-
-    Vue.component('locations-items', {
-        template: `<div>
-        <div v-if="loading">
-            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                <img src="./loading.gif" alt="">
-            </div>
-        </div>
-        <div v-if="!loading">
-            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
-                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
-                    {{ item.plateNo }} - {{ item.vehicleOid }} - {{ item.companyName }} -
-
-                    <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='arrived' && item.arrived!=='n/a'"> {{ new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='booked' && item.booked!=='n/a'"> {{ new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='docked' && item.docked!=='n/a'"> {{ new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='undocked' && item.undocked!=='n/a'"> {{ new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='departed' && item.departed!=='n/a'"> {{ new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-
-                    <span v-if="item.status=='booked' || item.status=='docked'"> - {{ item.standing }}</span>
-                </div>
-            </div>
-        </div>
-        <div v-if="error" style="color: red">
-            Server error - try again
-        </div>
-        </div>`,
-        data: function () {
-            return {
-                items: [],
-                searchQuery: '',
-                filteredItems: [],
-                loading: true,
-                error: false,
-            };
-        },
-        created() {
-            this.getLocations();
-            appConfig.$on('searchQueryDispatcher', searchQuery => {
-                let arr = [].concat(appConfig.items);
-                let items = arr.filter((el) => el.plateNo.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
-                this.filteredItems = items;
-                this.items = items;
-
-                appConfig.$emit('itemsCount', items.length);
-                if (searchQuery === '') {
-                    this.items = appConfig.items;
-                    this.filteredItems = appConfig.items;
-                }
-            });
-            appConfig.$on('filterStatus1', status => {
-                let arr = [].concat(appConfig.items);
-                let items = arr.filter((el) => el.status === status);
-                if (status === '*') {
-                    items = [].concat(appConfig.items);
-                }
-                this.filteredItems = items;
-                this.items = items;
-
-                //appConfig.$emit('itemsCount', items.length);
-            });
-        },
-        methods: {
-            renderStatus(item) {
-                switch (item.status) {
-                    case 'arrived':
-                        return {
-                            background: 'yellow',
-                            color: 'blue'
-                        };
-                        break;
-                    case 'booked':
-                        return {
-                            background: 'green',
-                            color: 'white'
-                        };
-                        break;
-                    case 'docked':
-                        return {
-                            background: 'red',
-                            color: 'white'
-                        };
-                        break;
-                    case 'undocked':
-                        return {
-                            background: 'dodgerblue',
-                            color: 'white'
-                        };
-                        break;
-                    case 'departed':
-                        return {
-                            background: 'gray',
-                            color: 'white'
-                        };
-                        break;
-                }
-            },
-            getToken() {
-                this.error = false;
-                this.$http.get(appConfig.url + 'api/auth')
-                    .then(result => {
-                        appConfig.access_token = result.body;
-                        localStorage.setItem('access_token', result.body);
-                    })
-                    .catch(error => {
-                        this.getToken();
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
-            getLocations() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.getToken();
-                    setTimeout(this.getVehicles, 100);
-                    return;
-                }
-
-                this.$http.get(appConfig.url + 'api/locations/get', {
-                    headers: {'Authorization': appConfig.access_token}
-                })
-                    .then(result => {
-                        this.items = result.data.sort(this.sort);
-                        this.filteredItems = result.data.sort(this.sort);
-                        appConfig.items = this.filteredItems.sort(this.sort);
-                        this.loading = false;
-                        //appConfig.$emit('itemsCount', this.items.length);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                        this.getToken();
-                    });
-            },
-            sort(a, b) {
-                return parseInt(b.id) - parseInt(a.id);
-            },
-            showDetails(item) {
-                appConfig.item = item;
-                this.$router.push('vehicle-edit');
-            },
-        },
     });
 
     Vue.component('vehicles-items', {
@@ -1073,6 +926,151 @@
                 this.standing = event.target.value;
                 this.clearWarning();
             }
+        },
+    });
+
+    Vue.component('locations-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
+                    {{ item.name }}
+
+                    <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='arrived' && item.arrived!=='n/a'"> {{ new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='booked' && item.booked!=='n/a'"> {{ new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='docked' && item.docked!=='n/a'"> {{ new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='undocked' && item.undocked!=='n/a'"> {{ new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+                    <span v-if="item.status=='departed' && item.departed!=='n/a'"> {{ new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+
+                    <span v-if="item.status=='booked' || item.status=='docked'"> - {{ item.standing }}</span>
+                </div>
+            </div>
+        </div>
+        <div v-if="error" style="color: red">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getLocations();
+            appConfig.$on('searchQueryDispatcher1', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.plateNo.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+            appConfig.$on('filterStatus1', status => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.status === status);
+                if (status === '*') {
+                    items = [].concat(appConfig.items);
+                }
+                this.filteredItems = items;
+                this.items = items;
+
+                //appConfig.$emit('itemsCount', items.length);
+            });
+        },
+        methods: {
+            renderStatus(item) {
+                switch (item.status) {
+                    case 'arrived':
+                        return {
+                            background: 'yellow',
+                            color: 'blue'
+                        };
+                        break;
+                    case 'booked':
+                        return {
+                            background: 'green',
+                            color: 'white'
+                        };
+                        break;
+                    case 'docked':
+                        return {
+                            background: 'red',
+                            color: 'white'
+                        };
+                        break;
+                    case 'undocked':
+                        return {
+                            background: 'dodgerblue',
+                            color: 'white'
+                        };
+                        break;
+                    case 'departed':
+                        return {
+                            background: 'gray',
+                            color: 'white'
+                        };
+                        break;
+                }
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.getToken();
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            getLocations() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.getToken();
+                    setTimeout(this.getVehicles, 100);
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/locations/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.items = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        //appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.getToken();
+                    });
+            },
+            sort(a, b) {
+                return parseInt(a.id) - parseInt(b.id);
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('vehicle-edit');
+            },
         },
     });
 
