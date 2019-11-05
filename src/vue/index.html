@@ -686,7 +686,7 @@
             </span>
             <select v-model="selected" @change="onChange($event)" style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;">
               <option disabled value="">Choose standing</option>
-              <option v-for="option in options" v-bind:value="option.value">
+              <option v-for="option in options" v-bind:value="option">
                 {{ option.text }}
               </option>
             </select><br>
@@ -767,9 +767,9 @@
                 invalidStandingValue: false,
                 error: false,
                 loading: false,
-                selected: '',
+                selected: [],
+                location: '',
                 locationStatus: 'booked',
-                name: 'P1',
                 options: [
                     {text: 'P1', value: '1'},
                     {text: 'P2', value: '2'},
@@ -908,7 +908,7 @@
                             this.error = true;
                         } else {
                             this.updateLocation();
-                            this.$router.push('/dispatcher');
+                            //this.$router.push('/dispatcher');
                         }
                         this.loading = false;
                     })
@@ -926,8 +926,8 @@
 
                 this.loading = true;
                 this.$http.post(appConfig.url + 'api/locations/update', {
-                    id: '1',
-                    name: this.name,
+                    id: this.location,
+                    name: this.standing,
                     vehicle: this.plateNo,
                     status: status,
                     message: 'n/a',
@@ -962,7 +962,8 @@
                 this.invalidValue = false;
             },
             onChange(event) {
-                this.standing = event.target.value;
+                this.standing = this.selected.text;
+                this.location = this.selected.value;
                 this.clearWarning();
             }
         },
@@ -979,16 +980,6 @@
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
                 <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
                     {{ item.name }}
-
-<!--
-                    <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='arrived' && item.arrived!=='n/a'"> {{ new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='booked' && item.booked!=='n/a'"> {{ new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='docked' && item.docked!=='n/a'"> {{ new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='undocked' && item.undocked!=='n/a'"> {{ new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
-                    <span v-if="item.status=='departed' && item.departed!=='n/a'"> {{ new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
--->
-
                     <span v-if="item.status=='booked' || item.status=='docked'"> - {{ item.vehicle }}</span>
                 </div>
             </div>
@@ -1008,13 +999,13 @@
         },
         created() {
             this.getLocations();
-            appConfig.$on('searchQueryDispatcher1', searchQuery => {
+            appConfig.$on('searchQueryDispatcher', searchQuery => {
                 let arr = [].concat(appConfig.locations);
-                let items = arr.filter((el) => el.plateNo.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                let items = arr.filter((el) => el.vehicle.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
                 this.filteredItems = items;
                 this.items = items;
 
-                appConfig.$emit('itemsCount', items.length);
+                //appConfig.$emit('itemsCount', items.length);
                 if (searchQuery === '') {
                     this.items = appConfig.locations;
                     this.filteredItems = appConfig.locations;
