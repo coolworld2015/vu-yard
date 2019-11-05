@@ -232,13 +232,19 @@
 
     Vue.component('top', {
         template: `<div>
-        <div style="float: left; margin: 20px; margin-top: 4px;">
-                <span style="font-size:30px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="float: left; margin: -34px 0px 0px 50px;">
+                <span title="All" style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('*')"><i class="fas fa-filter"></i></span>
+                <span title="Vacated" style="color: #eee !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('blank')"><i class="fas fa-filter"></i></span>
+                <span title="Booked" style="color: green !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('booked')"><i class="fas fa-filter"></i></span>
+                <span title="Docked" style="color: red !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('docked')"><i class="fas fa-filter"></i></span>
         </div>
         <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
             <form class="search-form" id="search" style="">
                 <label>
-                    <input type="text" style="font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                    <input type="text" style="margin-left: -180px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
                         placeholder="Search by PlateNo"
                         v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
                 </label>
@@ -246,16 +252,16 @@
             </form>
         </div>
         <div style="float: right; margin: -128px 140px;">
-                <span style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('*')"><i class="fas fa-filter"></i></span>
-                <span style="color: #eee !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('created')"><i class="fas fa-filter"></i></span>
-                <span style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('arrived')"><i class="fas fa-filter"></i></span>
-                <span style="color: green !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('booked')"><i class="fas fa-filter"></i></span>
-                <span style="color: red !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('docked')"><i class="fas fa-filter"></i></span>
-                <span style="color: dodgerblue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('undocked')"><i class="fas fa-filter"></i></span>
-                <span style="color: gray !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('departed')"><i class="fas fa-filter"></i></span>
+                <span title="All" style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('*')"><i class="fas fa-filter"></i></span>
+                <span title="Created" style="color: #eee !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('created')"><i class="fas fa-filter"></i></span>
+                <span title="Arrived" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('arrived')"><i class="fas fa-filter"></i></span>
+                <span title="Booked" style="color: green !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('booked')"><i class="fas fa-filter"></i></span>
+                <span title="Docked" style="color: red !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('docked')"><i class="fas fa-filter"></i></span>
+                <span title="Undocked" style="color: dodgerblue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('undocked')"><i class="fas fa-filter"></i></span>
+                <span title="Departed" style="color: gray !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('departed')"><i class="fas fa-filter"></i></span>
         </div>
         <div style="float: right; margin: -113px 40px;">
-                <span style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
+                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
         </div>
         </div>`,
         data() {
@@ -297,6 +303,11 @@
             filterStatus(status) {
                 if (appConfig.route === 'dispatcher') {
                     appConfig.$emit('filterStatus', status);
+                }
+            },
+            filterStatusL(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatusL', status);
                 }
             }
         },
@@ -460,7 +471,6 @@
         },
     });
     Vue.component('vehicle-add', {
-        props: ['item'],
         template: `<div style="text-align: center;margin-top: 120px;">
         <div style="font-size: 40px;
                         color: black;
@@ -1002,8 +1012,8 @@
                     this.filteredItems = appConfig.locations;
                 }
             });
-            appConfig.$on('filterStatus1', status => {
-                let arr = [].concat(appConfig.items);
+            appConfig.$on('filterStatusL', status => {
+                let arr = [].concat(appConfig.locations);
                 let items = arr.filter((el) => el.status === status);
                 if (status === '*') {
                     items = [].concat(appConfig.locations);
