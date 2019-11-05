@@ -1,4 +1,4 @@
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta http-equiv="content-type" content="name/html; charset=UTF-8"/>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
@@ -422,7 +422,6 @@
                         localStorage.setItem('access_token', result.body);
                     })
                     .catch(error => {
-                        //this.getToken();
                         this.error = true;
                         this.loading = false;
                     });
@@ -432,7 +431,6 @@
 
                 if (!appConfig.access_token) {
                     this.getToken();
-                    //setTimeout(this.getVehicles, 100);
                     return;
                 }
 
@@ -688,7 +686,7 @@
             <select v-model="selected" @change="onChange($event)" style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;">
               <option disabled value="">Choose standing</option>
               <option v-for="option in options" v-bind:value="option">
-                {{ option.text }}
+                {{ option.name }}
               </option>
             </select><br>
 
@@ -773,32 +771,32 @@
                 locationName: '',
                 locationStatus: 'booked',
                 options: [
-                    {text: 'P1', value: '1'},
-                    {text: 'P2', value: '2'},
-                    {text: 'P3', value: '3'},
-                    {text: 'P4', value: '4'},
-                    {text: 'P5', value: '5'},
-                    {text: 'P6', value: '6'},
-                    {text: 'P7', value: '7'},
-                    {text: 'P8', value: '8'},
-                    {text: 'P9', value: '9'},
-                    {text: 'P10', value: '10'},
-                    {text: 'P11', value: '11'},
-                    {text: 'P12', value: '12'},
-                    {text: 'P13', value: '13'},
-                    {text: 'P14', value: '14'},
-                    {text: 'P15', value: '15'},
-                    {text: 'P16', value: '16'},
-                    {text: 'P17', value: '17'},
-                    {text: 'P18', value: '18'},
-                    {text: 'P19', value: '19'},
-                    {text: 'P20', value: '20'},
-                    {text: 'P21', value: '21'},
-                    {text: 'P22', value: '22'},
-                    {text: 'P23', value: '23'},
-                    {text: 'P24', value: '24'},
-                    {text: 'P25', value: '25'},
-                    {text: 'P26', value: '26'},
+                    {name: 'P1', value: '1'},
+                    {name: 'P2', value: '2'},
+                    {name: 'P3', value: '3'},
+                    {name: 'P4', value: '4'},
+                    {name: 'P5', value: '5'},
+                    {name: 'P6', value: '6'},
+                    {name: 'P7', value: '7'},
+                    {name: 'P8', value: '8'},
+                    {name: 'P9', value: '9'},
+                    {name: 'P10', value: '10'},
+                    {name: 'P11', value: '11'},
+                    {name: 'P12', value: '12'},
+                    {name: 'P13', value: '13'},
+                    {name: 'P14', value: '14'},
+                    {name: 'P15', value: '15'},
+                    {name: 'P16', value: '16'},
+                    {name: 'P17', value: '17'},
+                    {name: 'P18', value: '18'},
+                    {name: 'P19', value: '19'},
+                    {name: 'P20', value: '20'},
+                    {name: 'P21', value: '21'},
+                    {name: 'P22', value: '22'},
+                    {name: 'P23', value: '23'},
+                    {name: 'P24', value: '24'},
+                    {name: 'P25', value: '25'},
+                    {name: 'P26', value: '26'},
                 ],
             };
         },
@@ -865,6 +863,12 @@
             updateVehicle(status) {
                 this.invalidValue = false;
                 this.invalidStandingValue = false;
+
+                if (this.standing !== 'n/a') {
+                    let obj = this.options.filter((el) => (el.name === this.standing));
+                    this.locationID = obj[0].value;
+                    this.locationName = obj[0].name;
+                }
 
                 if ((this.status === 'created') && (status !== 'arrived')) {
                     this.invalidValue = true;
@@ -970,8 +974,8 @@
                 this.invalidValue = false;
             },
             onChange(event) {
-                this.standing = this.selected.text;
-                this.locationName = this.selected.text;
+                this.standing = this.selected.name;
+                this.locationName = this.selected.name;
                 this.locationID = this.selected.value;
                 this.clearWarning();
             }
