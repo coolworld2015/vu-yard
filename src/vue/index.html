@@ -193,7 +193,8 @@
                         </div>
                     </div>`
     };
-    const VehiclesEdit = {template: `
+    const VehiclesEdit = {
+        template: `
                     <div style="width: 100%">
                         <div class="top">
                             <top></top>
@@ -210,7 +211,8 @@
                             <bottom></bottom>
                         </div>`
     };
-    const VehicleAdd = {template: `
+    const VehicleAdd = {
+        template: `
                     <div style="width: 100%">
                         <div class="top">
                             <top></top>
@@ -323,7 +325,7 @@
         </div>
         <div v-if="!loading">
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
-                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
+                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
                     {{ item.plateNo }} - {{ item.vehicleOid }} - {{ item.companyName }} -
 
                     <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
@@ -499,6 +501,7 @@
                             width: 150px;
                             border-radius: 5px;
                             background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                             color: white;outline:none;"
             v-on:click="addItem">Submit</button>
 
@@ -507,6 +510,7 @@
                             width: 150px;
                             border-radius: 5px;
                             background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                             color: white;outline:none;margin-top: 20px;"
             v-on:click="goBack">Back</button>
 
@@ -713,32 +717,32 @@
                 </div>
             </div>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: yellow;color: blue;outline:none;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: yellow;color: blue;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
             v-on:click="updateItem('arrived')">
                 Arrived
             </button>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: green;color: white;outline:none;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: green;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
             v-on:click="updateItem('booked')">
                 Booked
             </button>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
             v-on:click="updateItem('docked')">
                 Docked
             </button>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: dodgerblue;color: white;outline:none;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: dodgerblue;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
             v-on:click="updateItem('undocked')">
                 Undocked
             </button>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: gray;color: white;outline:none;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: gray;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
             v-on:click="updateItem('departed')">
                 Left
             </button><br>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;margin-top: 20px;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;margin-top: 20px;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
             v-on:click="goBack">
                 Back
             </button><br><br><br><br><br><br><br><br><br><br>
@@ -804,8 +808,8 @@
         methods: {
             init() {
                 this.id = appConfig.item.id;
-                this.created = new Date(parseInt(appConfig.item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
-                    + ' ' + new Date(parseInt(appConfig.item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
+                this.created = new Date(parseInt(appConfig.item.id) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
+                    + ' ' + new Date(parseInt(appConfig.item.id) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
                 this.title = appConfig.item.plateNo;
                 this.plateNo = appConfig.item.plateNo;
                 this.vehicleOid = appConfig.item.vehicleOid;
@@ -814,36 +818,36 @@
                 if (appConfig.item.arrived == 'n/a') {
                     this.arrived = appConfig.item.arrived;
                 } else {
-                    this.arrived = new Date(parseInt(appConfig.item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
-                        + ' ' + new Date(parseInt(appConfig.item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
+                    this.arrived = new Date(parseInt(appConfig.item.arrived) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.arrived) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
                 }
 
                 if (appConfig.item.booked == 'n/a') {
                     this.booked = appConfig.item.booked;
                 } else {
-                    this.booked = new Date(parseInt(appConfig.item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
-                        + ' ' + new Date(parseInt(appConfig.item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
+                    this.booked = new Date(parseInt(appConfig.item.booked) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.booked) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
                 }
 
                 if (appConfig.item.docked == 'n/a') {
                     this.docked = appConfig.item.docked;
                 } else {
-                    this.docked = new Date(parseInt(appConfig.item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
-                        + ' ' + new Date(parseInt(appConfig.item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
+                    this.docked = new Date(parseInt(appConfig.item.docked) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.docked) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
                 }
 
                 if (appConfig.item.undocked == 'n/a') {
                     this.undocked = appConfig.item.undocked;
                 } else {
-                    this.undocked = new Date(parseInt(appConfig.item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
-                        + ' ' + new Date(parseInt(appConfig.item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
+                    this.undocked = new Date(parseInt(appConfig.item.undocked) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.undocked) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
                 }
 
                 if (appConfig.item.departed == 'n/a') {
                     this.departed = appConfig.item.departed;
                 } else {
-                    this.departed = new Date(parseInt(appConfig.item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
-                        + ' ' + new Date(parseInt(appConfig.item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
+                    this.departed = new Date(parseInt(appConfig.item.departed) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
+                        + ' ' + new Date(parseInt(appConfig.item.departed) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
                 }
 
                 this.standing = appConfig.item.standing;
@@ -938,7 +942,7 @@
         </div>
         <div v-if="!loading">
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
-                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;" v-for="item in items" v-on:click="showDetails(item)">
+                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
                     {{ item.name }}
 
                     <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
@@ -968,22 +972,22 @@
         created() {
             this.getLocations();
             appConfig.$on('searchQueryDispatcher1', searchQuery => {
-                let arr = [].concat(appConfig.items);
+                let arr = [].concat(appConfig.locations);
                 let items = arr.filter((el) => el.plateNo.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
                 this.filteredItems = items;
                 this.items = items;
 
                 appConfig.$emit('itemsCount', items.length);
                 if (searchQuery === '') {
-                    this.items = appConfig.items;
-                    this.filteredItems = appConfig.items;
+                    this.items = appConfig.locations;
+                    this.filteredItems = appConfig.locations;
                 }
             });
             appConfig.$on('filterStatus1', status => {
                 let arr = [].concat(appConfig.items);
                 let items = arr.filter((el) => el.status === status);
                 if (status === '*') {
-                    items = [].concat(appConfig.items);
+                    items = [].concat(appConfig.locations);
                 }
                 this.filteredItems = items;
                 this.items = items;
@@ -1054,7 +1058,7 @@
                     .then(result => {
                         this.items = result.data.sort(this.sort);
                         this.filteredItems = result.data.sort(this.sort);
-                        appConfig.items = this.filteredItems.sort(this.sort);
+                        appConfig.locations = this.filteredItems.sort(this.sort);
                         this.loading = false;
                         //appConfig.$emit('itemsCount', this.items.length);
                     })
