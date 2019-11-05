@@ -421,7 +421,7 @@
                         localStorage.setItem('access_token', result.body);
                     })
                     .catch(error => {
-                        this.getToken();
+                        //this.getToken();
                         this.error = true;
                         this.loading = false;
                     });
@@ -431,7 +431,7 @@
 
                 if (!appConfig.access_token) {
                     this.getToken();
-                    setTimeout(this.getVehicles, 100);
+                    //setTimeout(this.getVehicles, 100);
                     return;
                 }
 
@@ -718,27 +718,27 @@
             </div>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: yellow;color: blue;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
-            v-on:click="updateItem('arrived')">
+            v-on:click="updateVehicle('arrived')">
                 Arrived
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: green;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
-            v-on:click="updateItem('booked')">
+            v-on:click="updateVehicle('booked')">
                 Booked
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
-            v-on:click="updateItem('docked')">
+            v-on:click="updateVehicle('docked')">
                 Docked
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: dodgerblue;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
-            v-on:click="updateItem('undocked')">
+            v-on:click="updateVehicle('undocked')">
                 Undocked
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: gray;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
-            v-on:click="updateItem('departed')">
+            v-on:click="updateVehicle('departed')">
                 Left
             </button><br>
 
@@ -768,33 +768,35 @@
                 error: false,
                 loading: false,
                 selected: '',
+                locationStatus: 'booked',
+                name: 'P1',
                 options: [
-                    {text: 'P1', value: 'P1'},
-                    {text: 'P2', value: 'P2'},
-                    {text: 'P3', value: 'P3'},
-                    {text: 'P4', value: 'P4'},
-                    {text: 'P5', value: 'P5'},
-                    {text: 'P6', value: 'P6'},
-                    {text: 'P7', value: 'P7'},
-                    {text: 'P8', value: 'P8'},
-                    {text: 'P9', value: 'P9'},
-                    {text: 'P10', value: 'P10'},
-                    {text: 'P11', value: 'P11'},
-                    {text: 'P12', value: 'P12'},
-                    {text: 'P13', value: 'P13'},
-                    {text: 'P14', value: 'P14'},
-                    {text: 'P15', value: 'P15'},
-                    {text: 'P16', value: 'P16'},
-                    {text: 'P17', value: 'P17'},
-                    {text: 'P18', value: 'P18'},
-                    {text: 'P19', value: 'P19'},
-                    {text: 'P20', value: 'P20'},
-                    {text: 'P21', value: 'P21'},
-                    {text: 'P22', value: 'P22'},
-                    {text: 'P23', value: 'P23'},
-                    {text: 'P24', value: 'P24'},
-                    {text: 'P25', value: 'P25'},
-                    {text: 'P26', value: 'P26'},
+                    {text: 'P1', value: '1'},
+                    {text: 'P2', value: '2'},
+                    {text: 'P3', value: '3'},
+                    {text: 'P4', value: '4'},
+                    {text: 'P5', value: '5'},
+                    {text: 'P6', value: '6'},
+                    {text: 'P7', value: '7'},
+                    {text: 'P8', value: '8'},
+                    {text: 'P9', value: '9'},
+                    {text: 'P10', value: '10'},
+                    {text: 'P11', value: '11'},
+                    {text: 'P12', value: '12'},
+                    {text: 'P13', value: '13'},
+                    {text: 'P14', value: '14'},
+                    {text: 'P15', value: '15'},
+                    {text: 'P16', value: '16'},
+                    {text: 'P17', value: '17'},
+                    {text: 'P18', value: '18'},
+                    {text: 'P19', value: '19'},
+                    {text: 'P20', value: '20'},
+                    {text: 'P21', value: '21'},
+                    {text: 'P22', value: '22'},
+                    {text: 'P23', value: '23'},
+                    {text: 'P24', value: '24'},
+                    {text: 'P25', value: '25'},
+                    {text: 'P26', value: '26'},
                 ],
             };
         },
@@ -858,7 +860,7 @@
             goBack() {
                 this.$router.push('/dispatcher');
             },
-            updateItem(status) {
+            updateVehicle(status) {
                 this.invalidValue = false;
                 this.invalidStandingValue = false;
 
@@ -882,6 +884,8 @@
                     return;
                 }
 
+                this.locationStatus = status;
+
                 this.loading = true;
                 this.$http.post(appConfig.url + 'api/vehicles/update', {
                     id: this.id,
@@ -896,6 +900,37 @@
                     status: status,
                     standing: this.standing,
                     message: this.message,
+
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        if (result.body.errors) {
+                            this.error = true;
+                        } else {
+                            this.updateLocation();
+                            this.$router.push('/dispatcher');
+                        }
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            updateLocation() {
+                var status = 'booked';
+
+                if (this.locationStatus === 'booked') {
+                    status = 'booked'
+                }
+
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/locations/update', {
+                    id: '1',
+                    name: this.name,
+                    vehicle: this.plateNo,
+                    status: status,
+                    message: 'n/a',
 
                     authorization: appConfig.access_token
                 })
@@ -945,14 +980,16 @@
                 <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
                     {{ item.name }}
 
+<!--
                     <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='arrived' && item.arrived!=='n/a'"> {{ new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='booked' && item.booked!=='n/a'"> {{ new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='docked' && item.docked!=='n/a'"> {{ new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='undocked' && item.undocked!=='n/a'"> {{ new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
                     <span v-if="item.status=='departed' && item.departed!=='n/a'"> {{ new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
+-->
 
-                    <span v-if="item.status=='booked' || item.status=='docked'"> - {{ item.standing }}</span>
+                    <span v-if="item.status=='booked' || item.status=='docked'"> - {{ item.vehicle }}</span>
                 </div>
             </div>
         </div>
@@ -1038,7 +1075,7 @@
                         localStorage.setItem('access_token', result.body);
                     })
                     .catch(error => {
-                        this.getToken();
+                        //this.getToken();
                         this.error = true;
                         this.loading = false;
                     });
@@ -1048,7 +1085,7 @@
 
                 if (!appConfig.access_token) {
                     this.getToken();
-                    setTimeout(this.getVehicles, 100);
+                    //setTimeout(this.getVehicles, 100);
                     return;
                 }
 

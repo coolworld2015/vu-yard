@@ -40,8 +40,8 @@ module.exports.VehiclesModel = VehiclesModel;
 var Locations = new Schema({
     id: {type: String, required: true},
     name: {type: String, required: true},
-    status: {type: String, required: true},
     vehicle: {type: String, required: true},
+    status: {type: String, required: true},
     message: {type: String, required: true}
 });
 

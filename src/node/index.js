@@ -33,7 +33,7 @@ const server = express()
     .get('/api/messages/get', Messages)
 
     .get('/api/locations/get', Locations)
-    .get('/api/locations/update', LocationUpdate)
+    .post('/api/locations/update', LocationUpdate)
 
     .get('/api/vehicles/get', Vehicles)
     .post('/api/vehicles/add', VehicleAdd)
@@ -268,8 +268,8 @@ function LocationUpdate(req, res) {
                 message: 'No token provided.'
             });
         } else {
-            var VehiclesModel = require('./mongo').VehiclesModel;
-            VehiclesModel.findOne({
+            var LocationsModel = require('./mongo').LocationsModel;
+            LocationsModel.findOne({
                 id: req.body.id
             }, function (err, location) {
                 if (err) {
