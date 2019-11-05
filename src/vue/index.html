@@ -768,7 +768,8 @@
                 error: false,
                 loading: false,
                 selected: [],
-                location: '',
+                locationID: '',
+                locationName: '',
                 locationStatus: 'booked',
                 options: [
                     {text: 'P1', value: '1'},
@@ -908,7 +909,6 @@
                             this.error = true;
                         } else {
                             this.updateLocation();
-                            //this.$router.push('/dispatcher');
                         }
                         this.loading = false;
                     })
@@ -918,16 +918,23 @@
                     });
             },
             updateLocation() {
-                var status = 'booked';
+                var status;
 
-                if (this.locationStatus === 'booked') {
-                    status = 'booked'
+                if (this.locationID === '') {
+                    this.$router.push('/dispatcher');
+                    return;
+                }
+
+                switch (this.locationStatus) {
+                    case 'booked': status = 'booked'; break;
+                    case 'docked': status = 'docked'; break;
+                    default: status = 'blank';
                 }
 
                 this.loading = true;
                 this.$http.post(appConfig.url + 'api/locations/update', {
-                    id: this.location,
-                    name: this.standing,
+                    id: this.locationID,
+                    name: this.locationName,
                     vehicle: this.plateNo,
                     status: status,
                     message: 'n/a',
@@ -963,7 +970,8 @@
             },
             onChange(event) {
                 this.standing = this.selected.text;
-                this.location = this.selected.value;
+                this.locationName = this.selected.text;
+                this.locationID = this.selected.value;
                 this.clearWarning();
             }
         },
