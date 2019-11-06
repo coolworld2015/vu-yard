@@ -1405,7 +1405,10 @@
                 if (messageObject.split('###')[0] !== 'still alive') {
                     if (messageObject.split('###')[0] === this.driver.plateNo) {
                         this.status = messageObject.split('###')[1];
-                        this.renderStatus();
+                        this.driver.standing = messageObject.split('###')[2];
+                        let time = messageObject.split('###')[3].split('.')[0];
+                        time = Math.round(new Date(time).getTime()/1000);
+                        this.renderStatus(time);
                     }
                 }
             };
@@ -1414,7 +1417,7 @@
             init() {
                 this.driver = appConfig.driver;
                 this.status = appConfig.driver.status;
-                this.renderStatus();
+                this.renderStatus(0);
             },
             goBack() {
                 this.$router.push('/driver-reg');
@@ -1478,25 +1481,30 @@
                 this.invalidValue = false;
                 this.massage = false;
             },
-            renderStatus() {
+            renderStatus(time) {
                 switch (this.status) {
                     case 'created':
                         this.command = 'Go to yard';
                         break;
                     case 'arrived':
                         this.command = 'Wait for destination';
+                        this.driver.arrived = parseInt(time);
                         break;
                     case 'booked':
-                        this.command = 'Go to destination';
+                        this.command = 'Go to ' + this.driver.standing;
+                        this.driver.booked = time;
                         break;
                     case 'docked':
                         this.command = 'Wait for undocking';
+                        this.driver.docked = time;
                         break;
                     case 'undocked':
                         this.command = 'Go from yard';
+                        this.driver.undocked = time;
                         break;
                     case 'departed':
                         this.command = 'You are left yard';
+                        this.driver.departed = time;
                         break;
                 }
             },
@@ -1555,7 +1563,7 @@
 
                     let notification = new Notification('VU-Demo', {
                         icon: './message.jpg',
-                        body: messageObject.split('###')[0] + ' ' + messageObject.split('###')[1] + ' ' + messageObject.split('###')[2],
+                        body: messageObject.split('###')[0] + ' ' + messageObject.split('###')[1] + ' ' + messageObject.split('###')[2] +' at ' + messageObject.split('###')[3].split('.')[0]
                     });
 
                     switch (messageObject.split('###')[0].toLowerCase()) {
