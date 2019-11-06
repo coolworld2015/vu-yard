@@ -1407,7 +1407,7 @@
                         this.status = messageObject.split('###')[1];
                         this.driver.standing = messageObject.split('###')[2];
                         let time = messageObject.split('###')[3].split('.')[0];
-                        time = Math.round(new Date(time).getTime()/1000);
+                        time = Date.parse(time);
                         this.renderStatus(time);
                     }
                 }
