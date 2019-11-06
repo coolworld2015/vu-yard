@@ -156,7 +156,7 @@
             <li v-on:click="changeRoute('gatekeeper')" v-bind:class="{ active: gatekeeper }">
                 <i class="fas fa-key"></i><span style="margin: 15px;">Gatekeeper</span></li>
 
-            <li v-on:click="changeRoute('driver')" v-bind:class="{ active: driver }">
+            <li v-on:click="changeRoute('driver-reg')" v-bind:class="{ active: driver }">
                 <i class="fas fa-truck-moving"></i><span style="margin: 15px;">Driver</span></li>
 
         </ul>
@@ -223,6 +223,25 @@
                                 </div>
                                 <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                                     <locations-items></locations-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
+    };
+
+    const DriverReg = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top></top>
+                        </div>
+                            <div>
+                                <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <driver-reg></driver-reg>
+                                </div>
+                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+
                                 </div>
                             </div>
                         <div class="bottom">
@@ -1093,11 +1112,148 @@
         },
     });
 
+    Vue.component('driver-reg', {
+        template: `<div style="text-align: center;margin-top: 120px;">
+        <div style="font-size: 40px;
+                        color: black;
+                        font-weight: bolder;
+                        margin: 20px;">Vehicle registration</div>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="PlateNo"
+            v-on:keypress="clearWarning"
+            v-model="plateNo"><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                            color: white;outline:none;"
+            v-on:click="doReg">Submit</button>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                            color: white;outline:none;margin-top: 20px;"
+            v-on:click="doClear">Clear</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="massage" style="color: red; margin-top: 25px;">
+                Can't register this PlateNo - try another one
+            </div>
+
+            <div v-if="error" style="color: red; margin-top: 25px;">
+                Server error - try again
+            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                vehicleOid: '',
+                plateNo: '',
+                companyName: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+                massage: false
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+            },
+            goBack() {
+                this.$router.push('/dispatcher');
+            },
+            doClear() {
+                this.plateNo = '';
+                this.massage = false;
+            },
+            doReg() {
+                if (this.plateNo === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.getToken();
+                    return;
+                }
+
+                this.loading = true;
+                this.massage = false;
+
+                this.$http.get(appConfig.url + 'api/vehicles/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data;
+                        if (this.items.filter((el) => el.plateNo === this.plateNo)[0].plateNo == this.plateNo) {
+                            appConfig.driver = this.items[0];
+                            appConfig.driver.reg = new Date(+new Date()-(new Date()).getTimezoneOffset() * 60000).toISOString();
+                            this.loading = false;
+                            this.$router.push('/dispatcher');
+                        } else {
+                            this.massage = true;
+                            this.loading = false;
+                        }
+                    })
+                    .catch(error => {
+                        this.massage = true;
+                        this.loading = false;
+                    });
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+                this.massage = false;
+            },
+        },
+    });
+
     const routes = [
         {path: '/', component: Dispatcher},
         {path: '/dispatcher', component: Dispatcher},
         {path: '/vehicle-add', component: VehicleAdd},
         {path: '/vehicle-edit', component: VehiclesEdit},
+        {path: '/driver-reg', component: DriverReg},
     ];
 
     const router = new VueRouter({
