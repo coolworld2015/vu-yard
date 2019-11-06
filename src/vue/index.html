@@ -323,6 +323,8 @@
             appConfig.$on('itemsCount', itemsCount => {
                 this.count = itemsCount;
             });
+
+
         },
         methods: {},
     });
@@ -897,7 +899,8 @@
                         if (result.body.errors) {
                             this.error = true;
                         } else {
-                            this.updateLocation();
+                            ws.send(this.plateNo + '###' + status +'###' +this.locationName);
+                            this.updateLocation(status);
                         }
                         this.loading = false;
                     })
@@ -1104,7 +1107,9 @@
     new Vue({
         el: '#app',
         router,
-        data: {},
+        data: {
+            items: [],
+        },
         created() {
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
@@ -1119,6 +1124,47 @@
             appConfig.$on('route', route => {
                 this.changeRoute(route);
             });
+
+            if (window.ws === undefined) {
+                //window.ws = new WebSocket('wss://jwt-chat.herokuapp.com');
+                window.ws = new WebSocket('ws://localhost:3000/');
+            }
+
+            ws.onmessage = (e) => {
+                let messageObject = e.data;
+                console.log(messageObject)
+                if (messageObject.split('###')[0] !== 'still alive') {
+                    this.items.unshift({
+                        id: +new Date(),
+                        name: messageObject.split('###')[1],
+                        date: messageObject.split('###')[2],
+                        message: messageObject.split('###')[0]
+                    });
+
+                    let notification = new Notification('VU-Demo', {
+                        icon: './message.jpg',
+                        body: messageObject.split('###')[0] + ' ' + messageObject.split('###')[1]+ ' ' + messageObject.split('###')[2],
+                    });
+
+                    switch (messageObject.split('###')[0].toLowerCase()) {
+                        case 'reload':
+                            appConfig.$emit('init', {});
+                            break;
+                        case 'set':
+                            appConfig.$emit('set', {});
+                            break;
+                        case 'show':
+                            appConfig.$emit('show', {});
+                            break;
+                        case 'get':
+                            appConfig.$emit('get', {});
+                            break;
+                        case 'yard':
+                            appConfig.$emit('yard', {});
+                            break;
+                    }
+                }
+            };
         },
         methods: {
             init() {

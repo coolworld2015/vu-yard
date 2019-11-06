@@ -74,8 +74,8 @@ webSocketServer.on('connection', (ws) => {
     ws.on('message', function (message) {
         // Message start
         var MessagesModel = require('./mongo').MessagesModel;
-        var date = new Date().toJSON().slice(0, 10);
-        var time = new Date().toTimeString().slice(0, 8);
+        var date = new Date(+new Date()-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0];
+        var time = new Date(+new Date()-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1];
         var now = date + ' ' + time;
         console.log(message)
         MessagesModel.create({
