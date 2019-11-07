@@ -370,7 +370,7 @@
         </div>
         <div v-if="!loading">
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
-                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
+                <div v-bind:style=renderStatus(item) style="height: 90px; padding: 50px 10px 0px 10px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
                     {{ item.plateNo }} - {{ item.vehicleOid }} - {{ item.companyName }} -
 
                     <span v-if="item.status=='created'"> {{ new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(item.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0] }} </span>
@@ -1507,7 +1507,7 @@
                         width: 450px;outline:none;margin-right: 0px;"
                         placeholder="Login"
                         v-on:keypress="clearWarning"
-                        v-on:keypress.enter="doReg"
+                        v-on:keypress.enter="doLogin"
                     v-model="login"><br>
 
                     <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
@@ -1515,7 +1515,7 @@
                         width: 450px;outline:none;margin-right: 0px;"
                         placeholder="Password"
                         v-on:keypress="clearWarning"
-                        v-on:keypress.enter="doReg"
+                        v-on:keypress.enter="doLogin"
                     v-model="password"><br>
 
                     <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
