@@ -40,10 +40,10 @@
 
     .middle {
         background: #f6f6f6;
-        /*margin-top: 50px;*/
+        /*        margin-left: -5px;
+                margin-right: 5px;*/
         width: 100%;
         height: 100%;
-        color: #ef835d;
         color: black;
         font-size: 200%;
         text-align: center;
@@ -159,6 +159,9 @@
             <li v-on:click="changeRoute('driver-reg')" v-bind:class="{ active: driver }">
                 <i class="fas fa-user"></i><span style="margin: 15px;">Driver</span></li>
 
+            <li v-on:click="changeRoute('locations-table')" v-bind:class="{ active: gtable }">
+                <i class="fa fa-fw fa-table"></i><span style="margin: 15px;">Locations</span></li>
+
             <li v-on:click="logout()" v-bind:class="{ active: driver }">
                 <i class="fas fa-sign-out-alt"></i><span style="margin: 15px;">Logout</span></li>
 
@@ -189,7 +192,7 @@
                                 <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                                     <vehicles-items></vehicles-items>
                                 </div>
-                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                                     <locations-items></locations-items>
                                 </div>
                             </div>
@@ -208,7 +211,7 @@
                                 <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                                     <vehicle-edit></vehicle-edit>
                                 </div>
-                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                                     <locations-items></locations-items>
                                 </div>
                             </div>
@@ -226,7 +229,7 @@
                                 <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                                     <vehicle-add></vehicle-add>
                                 </div>
-                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                                     <locations-items></locations-items>
                                 </div>
                             </div>
@@ -261,6 +264,154 @@
                             <bottom></bottom>
                         </div>`
     };
+
+    const LocationsTable = {
+        template: `
+                    <div>
+                        <div class="top"><top></top></div>
+                           <locations-items-table></locations-items-table>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`
+    };
+
+    Vue.component('login', {
+        template: `<div style="background: #01579B;width: 100%;height: 100%;position: absolute;">
+            <div class="content" style="background: #01579B">
+                <div style="width: 400px; padding: 45px 90px 30px;
+                    margin: 160px auto; border-radius: 3px;
+                    color: #000; background: #fff;
+                    box-shadow: 0px 2px 15px 0px rgba(0,0,0,0.5); text-align: center;">
+                <div class="col-sm-12 d-flex flex-column justify-content-around">
+
+                        <p class="h5" style="font-weight: bold;">Yard Management System</p>
+                        <img src="./yard.png" style="margin-top: -20px;margin-bottom: 20px; width: 150px;">
+
+
+                    <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+                        border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+                        width: 450px;outline:none;margin-right: 0px;"
+                        placeholder="Login"
+                        v-on:keypress="clearWarning"
+                        v-on:keypress.enter="doLogin"
+                    v-model="login"><br>
+
+                    <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+                        border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+                        width: 450px;outline:none;margin-right: 0px;"
+                        placeholder="Password"
+                        v-on:keypress="clearWarning"
+                        v-on:keypress.enter="doLogin"
+                    v-model="password"><br>
+
+                    <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                        <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+                        <span v-show="error" style="margin-left: 0px;">Access denied</span>
+                    </div>
+
+                    <button style="font-size: 24px;
+                        height: 50px;
+                        width: 150px;
+                        border-radius: 5px;
+                        background: #01579B;
+                        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                        color: white;outline:none;"
+                    v-on:click="doLogin">Submit</button>
+
+                    <button style="font-size: 24px;
+                        height: 50px;
+                        width: 150px;
+                        border-radius: 5px;
+                        background: #01579B;
+                        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                        margin-bottom: 100px;
+                        color: white;outline:none;margin-top: 20px;"
+                    v-on:click="doClear">Cancel</button>
+
+                        <div>
+                            <img v-show="loading" src="./loading.gif" style="margin-bottom: -50px; margin-top: -120px;height: 150px;">
+                        </div>
+                </div>
+                </div>
+            </div>
+        </div> `,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                login: '',
+                password: '',
+                companyName: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+                massage: false
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+            },
+            doClear() {
+                this.login = '';
+                this.password = '';
+                this.error = false;
+            },
+            doLogin() {
+                if (this.login === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.password === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                this.loading = true;
+                this.massage = false;
+
+                this.loading = true;
+                this.error = false;
+                this.$http.post(appConfig.url + 'api/login', {
+                    name: this.login,
+                    pass: this.password,
+                    description: 'Web'
+                })
+                    .then(result => {
+                        appConfig.access_token = result.body.token;
+                        localStorage.setItem('access_token', result.body.token);
+                        this.loading = false;
+                        this.error = false;
+                        this.$router.push('dispatcher');
+                    })
+                    .catch((error) => {
+                        this.loading = false;
+                        this.error = true;
+                    })
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+                this.massage = false;
+            },
+        },
+    });
 
     Vue.component('top', {
         template: `<div>
@@ -1489,141 +1640,118 @@
         },
     });
 
-    Vue.component('login', {
-        template: `<div style="background: #01579B;width: 100%;height: 100%;position: absolute;">
-            <div class="content" style="background: #01579B">
-                <div style="width: 400px; padding: 45px 90px 30px;
-                    margin: 160px auto; border-radius: 3px;
-                    color: #000; background: #fff;
-                    box-shadow: 0px 2px 15px 0px rgba(0,0,0,0.5); text-align: center;">
-                <div class="col-sm-12 d-flex flex-column justify-content-around">
-
-                        <p class="h5" style="font-weight: bold;">Yard Management System</p>
-                        <img src="./yard.png" style="margin-top: -20px;margin-bottom: 20px; width: 150px;">
-
-
-                    <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
-                        border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-                        width: 450px;outline:none;margin-right: 0px;"
-                        placeholder="Login"
-                        v-on:keypress="clearWarning"
-                        v-on:keypress.enter="doLogin"
-                    v-model="login"><br>
-
-                    <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
-                        border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-                        width: 450px;outline:none;margin-right: 0px;"
-                        placeholder="Password"
-                        v-on:keypress="clearWarning"
-                        v-on:keypress.enter="doLogin"
-                    v-model="password"><br>
-
-                    <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
-                        <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
-                        <span v-show="error" style="margin-left: 0px;">Access denied</span>
-                    </div>
-
-                    <button style="font-size: 24px;
-                        height: 50px;
-                        width: 150px;
-                        border-radius: 5px;
-                        background: #01579B;
-                        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
-                        color: white;outline:none;"
-                    v-on:click="doLogin">Submit</button>
-
-                    <button style="font-size: 24px;
-                        height: 50px;
-                        width: 150px;
-                        border-radius: 5px;
-                        background: #01579B;
-                        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
-                        margin-bottom: 100px;
-                        color: white;outline:none;margin-top: 20px;"
-                    v-on:click="doClear">Cancel</button>
-
-                        <div>
-                            <img v-show="loading" src="./loading.gif" style="margin-bottom: -50px; margin-top: -120px;height: 150px;">
-                        </div>
-                </div>
+    Vue.component('locations-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 100px;margin-bottom: 50px;">
+                <div style="color: black;border:solid 1px;height: 80px;" v-for="item in items" v-on:click1="showDetails(item)">
+                    <input v-model="item.id" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;outline:none;" readonly/>
+                    <input v-model="item.name" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.status" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
+                    <input v-model="item.vehicle" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
                 </div>
             </div>
-        </div> `,
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
         data: function () {
             return {
-                id: '',
-                title: '',
-                login: '',
-                password: '',
-                companyName: '',
-                invalidValue: false,
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
                 error: false,
-                loading: false,
-                massage: false
             };
         },
         created() {
-            this.init();
+            this.getLocations();
+            appConfig.$on('searchQuery', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
         },
         methods: {
-            init() {
+            getLocations() {
                 appConfig.getAccessToken();
-            },
-            doClear() {
-                this.login = '';
-                this.password = '';
-                this.error = false;
-            },
-            doLogin() {
-                if (this.login === '') {
-                    this.invalidValue = true;
-                }
 
-                if (this.password === '') {
-                    this.invalidValue = true;
-                }
-
-                if (this.invalidValue) {
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
                     return;
                 }
 
-                this.loading = true;
-                this.massage = false;
-
-                this.loading = true;
-                this.error = false;
-                this.$http.post(appConfig.url + 'api/login', {
-                    name: this.login,
-                    pass: this.password,
-                    description: 'Web'
+                this.$http.get(appConfig.url + 'api/locations/get', {
+                    headers: {'Authorization': appConfig.access_token}
                 })
                     .then(result => {
-                        appConfig.access_token = result.body.token;
-                        localStorage.setItem('access_token', result.body.token);
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.locations = this.filteredItems.sort(this.sort);
                         this.loading = false;
-                        this.error = false;
-                        this.$router.push('dispatcher');
-                    })
-                    .catch((error) => {
-                        this.loading = false;
-                        this.error = true;
-                    })
-            },
-            getToken() {
-                this.error = false;
-                this.$http.get(appConfig.url + 'api/auth')
-                    .then(result => {
-                        appConfig.access_token = result.body;
-                        localStorage.setItem('access_token', result.body);
+                        appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
                         this.error = true;
                         this.loading = false;
+                        this.$router.push('login');
                     });
             },
-            clearWarning() {
-                this.invalidValue = false;
-                this.massage = false;
+            sort(a, b) {
+                return parseInt(a.id) - parseInt(b.id);
+            },
+            updateItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/locations/update', {
+                    id: item.id,
+                    name: item.name,
+                    vehicle: item.vehicle,
+                    status: item.status,
+                    message: item.message,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                    });
+            },
+            deleteItem1(item) {
+                this.loading = true;
+                this.$http.post('http://ui-warehouse.herokuapp.com/api/goods/delete',
+                    {
+                        id: item.id
+                    })
+                    .then(result => {
+                        this.loading = true;
+                        this.fetchData();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        //this.loading = false;
+                    });
+            },
+            cancel() {
+                this.loading = true;
+                this.getLocations();
             },
         },
     });
@@ -1636,6 +1764,7 @@
         {path: '/vehicle-edit', component: VehiclesEdit},
         {path: '/driver-reg', component: DriverReg},
         {path: '/driver', component: DriverStatus},
+        {path: '/locations-table', component: LocationsTable},
     ];
 
     const router = new VueRouter({
@@ -1709,6 +1838,7 @@
                 this.dispatcher = appConfig.route === 'dispatcher';
                 this.gatekeeper = appConfig.route === 'gatekeeper';
                 this.driver = appConfig.route === 'driver';
+                this.gtable = appConfig.route === 'goods-table';
             },
             changeRoute(route) {
                 closeNav();
