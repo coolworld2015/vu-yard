@@ -157,7 +157,10 @@
                 <i class="fas fa-key"></i><span style="margin: 15px;">Gatekeeper</span></li>
 
             <li v-on:click="changeRoute('driver-reg')" v-bind:class="{ active: driver }">
-                <i class="fas fa-truck-moving"></i><span style="margin: 15px;">Driver</span></li>
+                <i class="fas fa-user"></i><span style="margin: 15px;">Driver</span></li>
+
+            <li v-on:click="logout()" v-bind:class="{ active: driver }">
+                <i class="fas fa-sign-out-alt"></i><span style="margin: 15px;">Logout</span></li>
 
         </ul>
     </div>
@@ -173,6 +176,8 @@
 <script>
     const appConfig = new Vue();
     appConfig.route = 'dispatcher';
+
+    const Login = {template: '<login></login>'};
 
     const Dispatcher = {
         template: `
@@ -340,7 +345,7 @@
         },
     });
     Vue.component('bottom', {
-        template: `<div>Records: {{count}}</div>`,
+        template: `<div style="margin-top: 3px;">Records: {{count}}</div>`,
         data() {
             return {
                 count: 0,
@@ -454,23 +459,11 @@
                         break;
                 }
             },
-            getToken() {
-                this.error = false;
-                this.$http.get(appConfig.url + 'api/auth')
-                    .then(result => {
-                        appConfig.access_token = result.body;
-                        localStorage.setItem('access_token', result.body);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
             getVehicles() {
                 appConfig.getAccessToken();
 
                 if (!appConfig.access_token) {
-                    this.getToken();
+                    this.$router.push('login');
                     return;
                 }
 
@@ -487,7 +480,7 @@
                     .catch(error => {
                         this.error = true;
                         this.loading = false;
-                        this.getToken();
+                        this.$router.push('login');
                     });
             },
             sort(a, b) {
@@ -1072,25 +1065,11 @@
                         break;
                 }
             },
-            getToken() {
-                this.error = false;
-                this.$http.get(appConfig.url + 'api/auth')
-                    .then(result => {
-                        appConfig.access_token = result.body;
-                        localStorage.setItem('access_token', result.body);
-                    })
-                    .catch(error => {
-                        //this.getToken();
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
             getLocations() {
                 appConfig.getAccessToken();
 
                 if (!appConfig.access_token) {
-                    this.getToken();
-                    //setTimeout(this.getVehicles, 100);
+                    this.$router.push('login');
                     return;
                 }
 
@@ -1102,12 +1081,11 @@
                         this.filteredItems = result.data.sort(this.sort);
                         appConfig.locations = this.filteredItems.sort(this.sort);
                         this.loading = false;
-                        //appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
                         this.error = true;
                         this.loading = false;
-                        this.getToken();
+                        this.$router.push('login');
                     });
             },
             sort(a, b) {
@@ -1156,7 +1134,7 @@
                             background: #01579B;
                             box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                             color: white;outline:none;margin-top: 20px;"
-            v-on:click="doClear">Clear</button>
+            v-on:click="doClear">Cancel</button>
 
             <div v-if="loading">
                 <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
@@ -1511,8 +1489,148 @@
         },
     });
 
+    Vue.component('login', {
+        template: `<div style="background: #01579B;width: 100%;height: 100%;position: absolute;">
+            <div class="content" style="background: #01579B">
+                <div style="width: 400px; padding: 45px 90px 30px;
+                    margin: 160px auto; border-radius: 3px;
+                    color: #000; background: #fff;
+                    box-shadow: 0px 2px 15px 0px rgba(0,0,0,0.5); text-align: center;">
+                <div class="col-sm-12 d-flex flex-column justify-content-around">
+
+                        <p class="h5" style="font-weight: bold;">Yard Management System</p>
+                        <img src="./yard.png" style="margin-top: -20px;margin-bottom: 20px; width: 150px;">
+
+
+                    <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+                        border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+                        width: 450px;outline:none;margin-right: 0px;"
+                        placeholder="Login"
+                        v-on:keypress="clearWarning"
+                        v-on:keypress.enter="doReg"
+                    v-model="login"><br>
+
+                    <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+                        border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+                        width: 450px;outline:none;margin-right: 0px;"
+                        placeholder="Password"
+                        v-on:keypress="clearWarning"
+                        v-on:keypress.enter="doReg"
+                    v-model="password"><br>
+
+                    <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                        <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+                        <span v-show="error" style="margin-left: 0px;">Access denied</span>
+                    </div>
+
+                    <button style="font-size: 24px;
+                        height: 50px;
+                        width: 150px;
+                        border-radius: 5px;
+                        background: #01579B;
+                        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                        color: white;outline:none;"
+                    v-on:click="doLogin">Submit</button>
+
+                    <button style="font-size: 24px;
+                        height: 50px;
+                        width: 150px;
+                        border-radius: 5px;
+                        background: #01579B;
+                        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                        margin-bottom: 100px;
+                        color: white;outline:none;margin-top: 20px;"
+                    v-on:click="doClear">Cancel</button>
+
+                        <div>
+                            <img v-show="loading" src="./loading.gif" style="margin-bottom: -50px; margin-top: -120px;height: 150px;">
+                        </div>
+                </div>
+                </div>
+            </div>
+        </div> `,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                login: '',
+                password: '',
+                companyName: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+                massage: false
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+            },
+            doClear() {
+                this.login = '';
+                this.password = '';
+                this.error = false;
+            },
+            doLogin() {
+                if (this.login === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.password === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                this.loading = true;
+                this.massage = false;
+
+                this.loading = true;
+                this.error = false;
+                this.$http.post(appConfig.url + 'api/login', {
+                    name: this.login,
+                    pass: this.password,
+                    description: 'Web'
+                })
+                    .then(result => {
+                        appConfig.access_token = result.body.token;
+                        localStorage.setItem('access_token', result.body.token);
+                        this.loading = false;
+                        this.error = false;
+                        this.$router.push('dispatcher');
+                    })
+                    .catch((error) => {
+                        this.loading = false;
+                        this.error = true;
+                    })
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+                this.massage = false;
+            },
+        },
+    });
+
     const routes = [
-        {path: '/', component: Dispatcher},
+        {path: '/', component: Login},
+        {path: '*', component: Login},
         {path: '/dispatcher', component: Dispatcher},
         {path: '/vehicle-add', component: VehicleAdd},
         {path: '/vehicle-edit', component: VehiclesEdit},
@@ -1534,8 +1652,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
@@ -1546,8 +1664,8 @@
             });
 
             if (window.ws === undefined) {
-                window.ws = new WebSocket('wss://jwt-yard.herokuapp.com');
-                //window.ws = new WebSocket('ws://localhost:3000/');
+                //window.ws = new WebSocket('wss://jwt-yard.herokuapp.com');
+                window.ws = new WebSocket('ws://localhost:3000/');
             }
 
             ws.onmessage = (e) => {
@@ -1563,7 +1681,7 @@
 
                     let notification = new Notification('VU-Demo', {
                         icon: './message.jpg',
-                        body: messageObject.split('###')[0] + ' ' + messageObject.split('###')[1] + ' ' + messageObject.split('###')[2] +' at ' + messageObject.split('###')[3].split('.')[0]
+                        body: messageObject.split('###')[0] + ' ' + messageObject.split('###')[1] + ' ' + messageObject.split('###')[2] + ' at ' + messageObject.split('###')[3].split('.')[0]
                     });
 
                     switch (messageObject.split('###')[0].toLowerCase()) {
@@ -1612,6 +1730,11 @@
             emitEvent(event) {
                 appConfig.$emit(event, {});
                 this.map = true;
+                closeNav();
+            },
+            logout() {
+                localStorage.setItem('access_token', null);
+                this.changeRoute('login');
                 closeNav();
             }
         },
