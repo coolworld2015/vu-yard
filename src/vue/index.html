@@ -298,6 +298,7 @@
                     <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
                         border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
                         width: 450px;outline:none;margin-right: 0px;"
+                        type="password"
                         placeholder="Password"
                         v-on:keypress="clearWarning"
                         v-on:keypress.enter="doLogin"
@@ -1781,8 +1782,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            appConfig.url = 'http://localhost:3000/';
+            appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            //appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
@@ -1793,8 +1794,8 @@
             });
 
             if (window.ws === undefined) {
-                //window.ws = new WebSocket('wss://jwt-yard.herokuapp.com');
-                window.ws = new WebSocket('ws://localhost:3000/');
+                window.ws = new WebSocket('wss://jwt-yard.herokuapp.com');
+                //window.ws = new WebSocket('ws://localhost:3000/');
             }
 
             ws.onmessage = (e) => {
