@@ -47,7 +47,7 @@ const server = express()
     .get('/api/audit/get', Audit)
 
     .get('/api/test', TestPOST)
-    .get('/api/auth', (req, res) => res.send(token))
+    .get('/api/auth', (req, res) => res.send({token: token}))
 
     .listen(PORT, () => console.log(`Listening on ${PORT}`));
 

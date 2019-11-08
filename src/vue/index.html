@@ -153,9 +153,6 @@
             <li v-on:click="changeRoute('dispatcher')" v-bind:class="{ active: dispatcher }">
                 <i class="fas fa-user-friends"></i><span style="margin: 15px;">Dispatcher</span></li>
 
-            <li v-on:click="changeRoute('gatekeeper')" v-bind:class="{ active: gatekeeper }">
-                <i class="fas fa-key"></i><span style="margin: 15px;">Gatekeeper</span></li>
-
             <li v-on:click="changeRoute('driver-reg')" v-bind:class="{ active: driver }">
                 <i class="fas fa-user"></i><span style="margin: 15px;">Driver</span></li>
 
@@ -399,7 +396,7 @@
                 this.error = false;
                 this.$http.get(appConfig.url + 'api/auth')
                     .then(result => {
-                        appConfig.access_token = result.body;
+                        appConfig.access_token = result.body.token;
                         localStorage.setItem('access_token', result.body);
                     })
                     .catch(error => {
@@ -1381,7 +1378,7 @@
                 this.error = false;
                 this.$http.get(appConfig.url + 'api/auth')
                     .then(result => {
-                        appConfig.access_token = result.body;
+                        appConfig.access_token = result.body.token;
                         localStorage.setItem('access_token', result.body);
                     })
                     .catch(error => {
@@ -1599,7 +1596,7 @@
                 this.error = false;
                 this.$http.get(appConfig.url + 'api/auth')
                     .then(result => {
-                        appConfig.access_token = result.body;
+                        appConfig.access_token = result.body.token;
                         localStorage.setItem('access_token', result.body);
                     })
                     .catch(error => {
@@ -1782,8 +1779,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
@@ -1794,8 +1791,8 @@
             });
 
             if (window.ws === undefined) {
-                window.ws = new WebSocket('wss://jwt-yard.herokuapp.com');
-                //window.ws = new WebSocket('ws://localhost:3000/');
+                //window.ws = new WebSocket('wss://jwt-yard.herokuapp.com');
+                window.ws = new WebSocket('ws://localhost:3000/');
             }
 
             ws.onmessage = (e) => {
