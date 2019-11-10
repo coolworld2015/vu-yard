@@ -316,6 +316,21 @@
                     </div>`
     };
 
+    const Audit = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-locations></top-locations>
+                        </div>
+                            <div>
+                                <audit-items></audit-items>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
+                    </div>`
+    };
+
     Vue.component('login', {
         template: `<div style="background: #01579B;width: 100%;height: 100%;position: absolute;">
             <div class="content" style="background: #01579B">
@@ -614,22 +629,7 @@
                 appConfig.$emit('route', 'location-add');
             },
             changeView() {
-                let route;
-                switch (appConfig.route) {
-                    case "dispatcher":
-                        route = 'searchQueryDispatcher';
-                        break;
-                    case "locations-table":
-                        route = 'searchQueryLocations';
-                        break;
-                    case "phones":
-                        route = 'searchQueryPhones';
-                        break;
-                    case "box":
-                        route = 'searchQueryBox';
-                        break;
-                }
-                appConfig.$emit(route, this.searchQuery);
+                appConfig.$emit('searchQueryLocations', this.searchQuery);
             },
             searchClear() {
                 this.searchQuery = '';
@@ -2285,6 +2285,82 @@
         },
     });
 
+    Vue.component('audit-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
+                    {{ item.name }} - {{ item.date }} - {{ item.description }}
+                </div>
+            </div>
+        </div>
+        <div v-if="error" style="color: red">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getAudit();
+            appConfig.$on('searchQueryLocations', searchQuery => {
+                let arr = [].concat(appConfig.audits);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                if (searchQuery === '') {
+                    this.items = appConfig.audits;
+                    this.filteredItems = appConfig.audits;
+                }
+                appConfig.$emit('itemsCount', items.length);
+            });
+        },
+        methods: {
+            getAudit() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/audit/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.audits = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('vehicle-edit');
+            },
+        },
+    });
 
     const routes = [
         {path: '/', component: Login},
@@ -2298,6 +2374,7 @@
         {path: '/driver', component: DriverStatus},
         {path: '/locations-table', component: LocationsTable},
         {path: '/location-add', component: LocationAdd},
+        {path: '/audit', component: Audit},
     ];
 
     const router = new VueRouter({
