@@ -9,10 +9,6 @@ var jwt = require('jsonwebtoken');
 var secret = 'f3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjoibWFnaWMiLCJpYXQiOjE1NzMxNTY0OTgsImV4cCI6MTU3MzE2MDA5OH0.uUlMkCQKt3U0OWvjBzAZEaa3V49g1AbuVOufNx-g4F0of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32o';
 var token = jwt.sign({auth: 'magic'}, secret, {expiresIn: 60 * 60});
 
-setInterval(function () {
-    token = jwt.sign({auth: 'magic'}, secret, {expiresIn: 60 * 60});
-}, 1000 * 60 * 60);
-
 //------------------------------------------------------------------------
 const server = express()
     .use((req, res, next) => {
@@ -48,12 +44,19 @@ const server = express()
     .post('/api/users/delete', UserDelete)
 
     .get('/api/audit/get', Audit)
+    .post('/api/audit/add', AuditAdd)
+
     .get('/api/operations/get', Operations)
 
-    .get('/api/test', TestPOST)
     .get('/api/auth', (req, res) => res.send({token: token}))
 
+    .get('/api/test', TestPOST)
+
     .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+setInterval(function () {
+    token = jwt.sign({auth: 'magic'}, secret, {expiresIn: 60 * 60});
+}, 1000 * 60 * 60);
 
 //------------------------------------------------------------------------
 var SocketServer = require('ws').Server;
@@ -664,6 +667,27 @@ function Audit(req, res) {
             }).sort({date: -1});
         }
     });
+}
+
+//------------------------------------------------------------------------
+function AuditAdd(req, res) {
+    var AuditModel = require('./mongo').AuditModel;
+    var date = new Date().toJSON().slice(0, 10);
+    var time = new Date().toTimeString().slice(0, 8);
+    AuditModel.create({
+            id: +new Date(),
+            name: req.body.name,
+            date: date + ' ' + time,
+            ip: req.ip,
+            description: req.body.description
+        },
+        function (err, audit) {
+            if (err) {
+                return res.send({error: 'Server error'});
+            } else {
+                res.send({token: token}); // Send TOKEN here !!!
+            }
+        });
 }
 
 //------------------------------------------------------------------------

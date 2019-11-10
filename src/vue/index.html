@@ -2096,23 +2096,31 @@
                             if (arr[0].plateNo.toLowerCase() === this.plateNo.toLowerCase()) {
                                 appConfig.driver = arr[0];
                                 appConfig.driver.reg = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString();
-                                this.loading = false;
-                                this.$router.push('/driver');
-                            } else {
-                                this.massage = true;
-                                this.loading = false;
+
+                                this.$http.post(appConfig.url + 'api/audit/add', {
+                                    name: this.plateNo,
+                                    description: 'Driver',
+                                    authorization: appConfig.access_token
+                                })
+                                    .then(result => {
+                                        this.loading = false;
+                                        this.$router.push('/driver');
+                                    })
+                                    .catch(error => {
+                                        this.error = true;
+                                        this.loading = false;
+                                    });
                             }
+
+                        } else {
                             this.massage = true;
                             this.loading = false;
                         }
-                        this.massage = true;
-                        this.loading = false;
                     })
                     .catch(error => {
-                        console.log(error)
                         this.error = true;
                         this.loading = false;
-                        this.getToken()
+                        this.$router.push('/login');
                     });
             },
             getToken() {
