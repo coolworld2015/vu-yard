@@ -35,10 +35,12 @@ const server = express()
     .get('/api/locations/get', Locations)
     .post('/api/locations/add', LocationAdd)
     .post('/api/locations/update', LocationUpdate)
+    .post('/api/locations/delete', LocationDelete)
 
     .get('/api/vehicles/get', Vehicles)
     .post('/api/vehicles/add', VehicleAdd)
     .post('/api/vehicles/update', VehicleUpdate)
+    .post('/api/vehicles/delete', VehicleDelete)
 
     .get('/api/users/get', Users)
     .post('/api/users/add', UserAdd)
@@ -323,6 +325,32 @@ function LocationUpdate(req, res) {
     });
 }
 
+function LocationDelete(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var LocationsModel = require('./mongo').LocationsModel;
+            LocationsModel.remove({
+                    "id": req.body.id
+                },
+                function (err) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    } else {
+                        console.log('Loc with id: ', req.body.id, ' was removed');
+                        res.send('Location with id: ' + req.body.id + ' was removed');
+                    }
+                });
+        }
+    });
+}
+
 //------------------------------------------------------------------------
 function Vehicles(req, res) {
     var agent = req.headers.authorization;
@@ -435,6 +463,32 @@ function VehicleUpdate(req, res) {
                     });
                 }
             });
+        }
+    });
+}
+
+function VehicleDelete(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var VehiclesModel = require('./mongo').VehiclesModel;
+            VehiclesModel.remove({
+                    "id": req.body.id
+                },
+                function (err) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    } else {
+                        console.log('Vehicle with id: ', req.body.id, ' was removed');
+                        res.send('Vehicle with id: ' + req.body.id + ' was removed');
+                    }
+                });
         }
     });
 }

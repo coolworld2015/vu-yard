@@ -806,7 +806,9 @@
         methods: {
             init() {
                 appConfig.getAccessToken();
-                setTimeout(function(){appConfig.$emit('itemsCount', 1)},100);
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1)
+                }, 100);
             },
             goBack() {
                 this.$router.push('/dispatcher');
@@ -1394,7 +1396,9 @@
         methods: {
             init() {
                 appConfig.getAccessToken();
-                setTimeout(function(){appConfig.$emit('itemsCount', 1)},100);
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1)
+                }, 100);
             },
             goBack() {
                 this.$router.push('/locations-table');
@@ -1919,19 +1923,19 @@
                         this.error = true;
                     });
             },
-            deleteItem1(item) {
+            deleteItem(item) {
                 this.loading = true;
-                this.$http.post('http://ui-warehouse.herokuapp.com/api/goods/delete',
-                    {
-                        id: item.id
-                    })
+                this.$http.post(appConfig.url + 'api/locations/delete', {
+                    id: item.id,
+                    authorization: appConfig.access_token
+                })
                     .then(result => {
                         this.loading = true;
-                        this.fetchData();
+                        this.getLocations();
                     })
                     .catch(error => {
                         this.error = true;
-                        //this.loading = false;
+                        this.loading = false;
                     });
             },
             cancel() {
