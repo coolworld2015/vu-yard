@@ -424,7 +424,7 @@ function VehicleAdd(req, res) {
                         return res.send({error: 'Server error'});
                     }
                 });
-            // Audit end
+            // Operations end
         }
     });
 }
@@ -480,6 +480,25 @@ function VehicleUpdate(req, res) {
                             return res.send(err);
                         }
                     });
+
+                    // Operations start
+                    var OperationsModel = require('./mongo').OperationsModel;
+                    var date = new Date().toJSON().slice(0, 10);
+                    var time = new Date().toTimeString().slice(0, 8);
+                    OperationsModel.create({
+                            id: +new Date(),
+                            plateNo: req.body.plateNo,
+                            status: req.body.status,
+                            date: date + ' ' + time,
+                            standing: req.body.standing
+                        },
+                        function (err, audit) {
+                            if (err) {
+                                return res.send({error: 'Server error'});
+                            }
+                        });
+                    // Operations end
+
                 }
             });
         }
