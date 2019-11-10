@@ -295,6 +295,20 @@
                         </div>
                     </div>`
     };
+    const VehiclesTableAdd = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-vehicles></top-vehicles>
+                        </div>
+                            <div>
+                                <vehicle-table-add></vehicle-table-add>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
+                    </div>`
+    };
 
     Vue.component('login', {
         template: `<div style="background: #01579B;width: 100%;height: 100%;position: absolute;">
@@ -544,7 +558,7 @@
         },
         methods: {
             vehicleAdd() {
-                appConfig.$emit('route', 'vehicles-add');
+                appConfig.$emit('route', 'vehicle-table-add');
             },
             changeView() {
                 appConfig.$emit('searchQueryVehicles', this.searchQuery);
@@ -1410,6 +1424,146 @@
             },
         },
     });
+    Vue.component('vehicle-table-add', {
+        template: `<div style="text-align: center;margin-top: 120px;">
+        <div style="font-size: 40px;
+                        color: black;
+                        font-weight: bolder;
+                        margin: 20px;">New record</div>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="VehicleOid"
+            v-on:keypress="clearWarning"
+            v-model="vehicleOid" ><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="PlateNo"
+            v-on:keypress="clearWarning"
+            v-model="plateNo"><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="CompanyName"
+            v-on:keypress="clearWarning"
+            v-model="companyName" ><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                            color: white;outline:none;"
+            v-on:click="addItem">Submit</button>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                            color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">Back</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="error" style="color: red; margin-top: 25px;">
+                Server error - try again
+            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                vehicleOid: '',
+                plateNo: '',
+                companyName: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1)
+                }, 100);
+            },
+            goBack() {
+                this.$router.push('/vehicles-table');
+            },
+            addItem() {
+                if (this.vehicleOid === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.plateNo === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.companyName === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/vehicles/add', {
+                    vehicleOid: this.vehicleOid,
+                    plateNo: this.plateNo,
+                    companyName: this.companyName,
+                    arrived: 'n/a',
+                    booked: 'n/a',
+                    departed: 'n/a',
+                    docked: 'n/a',
+                    undocked: 'n/a',
+                    status: 'created',
+                    standing: 'n/a',
+                    message: 'n/a',
+
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        if (result.body.error) {
+                            this.error = true;
+                        } else {
+                            this.$router.push('/vehicles-table');
+                        }
+                        this.loading = false;
+
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
 
     Vue.component('locations-items', {
         template: `<div>
@@ -2133,6 +2287,7 @@
         {path: '/vehicle-add', component: VehicleAdd},
         {path: '/vehicle-edit', component: VehiclesEdit},
         {path: '/vehicles-table', component: VehiclesTable},
+        {path: '/vehicle-table-add', component: VehiclesTableAdd},
         {path: '/driver-reg', component: DriverReg},
         {path: '/driver', component: DriverStatus},
         {path: '/locations-table', component: LocationsTable},
