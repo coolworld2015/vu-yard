@@ -25,7 +25,7 @@ const server = express()
     .use(express.static(__dirname + '/build'))
 
     //.get('/',(req, res) => res.sendFile(__dirname + '/build/index.html'))
-    .get('/',(req, res) => res.send('It is just API Server...'))
+    .get('/', (req, res) => res.send('It is just API Server...'))
     //.get('/', (req, res) => res.sendFile(__dirname + '/auth.html'))
 
     .post('/api/login', Login)
@@ -33,6 +33,7 @@ const server = express()
     .get('/api/messages/get', Messages)
 
     .get('/api/locations/get', Locations)
+    .post('/api/locations/add', LocationAdd)
     .post('/api/locations/update', LocationUpdate)
 
     .get('/api/vehicles/get', Vehicles)
@@ -74,8 +75,8 @@ webSocketServer.on('connection', (ws) => {
     ws.on('message', function (message) {
         // Message start
         var MessagesModel = require('./mongo').MessagesModel;
-        var date = new Date(+new Date()-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0];
-        var time = new Date(+new Date()-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1];
+        var date = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0];
+        var time = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1];
         var now = date + ' ' + time;
         console.log(message)
         MessagesModel.create({
@@ -254,6 +255,34 @@ function Locations(req, res) {
                     return res.send({error: 'Server error'});
                 }
             });
+        }
+    });
+}
+
+function LocationAdd(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var LocationsModel = require('./mongo').LocationsModel;
+            LocationsModel.create({
+                    id: +new Date(),
+                    name: req.body.name,
+                    vehicle: 'none',
+                    status: 'blank',
+                    message: 'n/a',
+                },
+                function (err, location) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    }
+                    res.send(location);
+                });
         }
     });
 }
