@@ -81,3 +81,14 @@ var Audit = new Schema({
 
 var AuditModel = mongoose.model('Audit', Audit);
 module.exports.AuditModel = AuditModel;
+//---------------------------------------------------------------------------------------------
+var Operations = new Schema({
+    id: {type: String, required: true},
+    plateNo: {type: String, required: true},
+    status: {type: String, required: true},
+    date: {type: String, required: true},
+    standing: {type: String, required: true},
+});
+
+var OperationsModel = mongoose.model('Operations', Operations);
+module.exports.OperationsModel = OperationsModel;

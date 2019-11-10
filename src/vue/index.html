@@ -153,14 +153,20 @@
             <li v-on:click="changeRoute('dispatcher')" v-bind:class="{ active: dispatcher }">
                 <i class="fas fa-user-friends"></i><span style="margin: 15px;">Dispatcher</span></li>
 
+            <li v-on:click="changeRoute('driver-reg')" v-bind:class="{ active: driver }">
+                <i class="fas fa-user"></i><span style="margin: 15px;">Driver</span></li>
+
             <li v-on:click="changeRoute('vehicles-table')" v-bind:class="{ active: vehicles }">
                 <i class="fas fa-truck-moving"></i><span style="margin: 15px;">Vehicles</span></li>
 
             <li v-on:click="changeRoute('locations-table')" v-bind:class="{ active: locations }">
                 <i class="fas fa-parking"></i><span style="margin: 15px;">Locations</span></li>
 
-            <li v-on:click="changeRoute('driver-reg')" v-bind:class="{ active: driver }">
-                <i class="fas fa-user"></i><span style="margin: 15px;">Driver</span></li>
+            <li v-on:click="changeRoute('operations')" v-bind:class="{ active: operations }">
+                <i class="fas fa-history"></i><span style="margin: 15px;">Operations</span></li>
+
+            <li v-on:click="changeRoute('audit')" v-bind:class="{ active: audit }">
+                <i class="fas fa-shield-alt"></i><span style="margin: 15px;">Security log</span></li>
 
             <li v-on:click="logout()" v-bind:class="{ active: driver }">
                 <i class="fas fa-sign-out-alt"></i><span style="margin: 15px;">Logout</span></li>
@@ -2365,6 +2371,8 @@
                 this.dispatcher = appConfig.route === 'dispatcher';
                 this.vehicles = appConfig.route === 'vehicles-table';
                 this.locations = appConfig.route === 'locations-table';
+                this.operations = appConfig.route === 'operations';
+                this.audit = appConfig.route === 'audit';
                 this.driver = appConfig.route === 'driver';
             },
             changeRoute(route) {
