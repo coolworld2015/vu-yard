@@ -153,11 +153,11 @@
             <li v-on:click="changeRoute('dispatcher')" v-bind:class="{ active: dispatcher }">
                 <i class="fas fa-user-friends"></i><span style="margin: 15px;">Dispatcher</span></li>
 
+            <li v-on:click="changeRoute('vehicles-table')" v-bind:class="{ active: vehicles }">
+                <i class="fas fa-truck-moving"></i><span style="margin: 15px;">Vehicles</span></li>
+
             <li v-on:click="changeRoute('locations-table')" v-bind:class="{ active: locations }">
                 <i class="fas fa-parking"></i><span style="margin: 15px;">Locations</span></li>
-
-            <li v-on:click="changeRoute('vehicles-table')" v-bind:class="{ active: gtable }">
-                <i class="fas fa-truck-moving"></i><span style="margin: 15px;">Vehicles</span></li>
 
             <li v-on:click="changeRoute('driver-reg')" v-bind:class="{ active: driver }">
                 <i class="fas fa-user"></i><span style="margin: 15px;">Driver</span></li>
@@ -236,6 +236,14 @@
                         <div class="bottom">
                             <bottom></bottom>
                         </div>`
+    };
+    const VehiclesTable = {
+        template: `
+                    <div>
+                        <div class="top"><top-vehicles></top-vehicles></div>
+                           <vehicles-items-table></vehicles-items-table>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`
     };
 
     const DriverReg = {
@@ -497,6 +505,53 @@
                 if (appConfig.route === 'dispatcher') {
                     appConfig.$emit('searchQueryDispatcher', this.searchQuery);
                 }
+            },
+            filterStatus(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatus', status);
+                }
+            },
+            filterStatusL(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatusL', status);
+                }
+            }
+        },
+    });
+    Vue.component('top-vehicles', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Search by PlateNo"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        <div style="float: right; margin: -113px 40px;">
+                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            vehicleAdd() {
+                appConfig.$emit('route', 'vehicles-add');
+            },
+            changeView() {
+                appConfig.$emit('searchQueryVehicles', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
             },
             filterStatus(status) {
                 if (appConfig.route === 'dispatcher') {
@@ -1229,6 +1284,132 @@
             }
         },
     });
+    Vue.component('vehicles-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 95px;margin-bottom: 50px;">
+                <div style="color: black;border:solid 1px;height: 80px;" v-for="item in items" v-on:click1="showDetails(item)">
+                    <input v-model="item.plateNo" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.status" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.standing" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getVehicles();
+            appConfig.$on('searchQueryVehicles', searchQuery => {
+                let arr = [].concat(appConfig.vehicles);
+                let items = arr.filter((el) => el.plateNo.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.vehicles;
+                    this.filteredItems = appConfig.vehicles;
+                }
+            });
+        },
+        methods: {
+            getVehicles() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/vehicles/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.vehicles = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(a.id) - parseInt(b.id);
+            },
+            updateItem(item) {
+                this.$http.post(appConfig.url + 'api/vehicles/update', {
+                    id: item.id,
+                    vehicleOid: item.vehicleOid,
+                    plateNo: item.plateNo,
+                    companyName: item.companyName,
+                    arrived: item.arrived,
+                    booked: item.booked,
+                    docked: item.docked,
+                    undocked: item.undocked,
+                    departed: item.departed,
+                    status: item.status,
+                    standing: item.standing,
+                    message: item.message,
+
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        if (result.body.errors) {
+                            this.error = true;
+                        } else {
+                            this.getVehicles();
+                        }
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            deleteItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/vehicles/delete', {
+                    id: item.id,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getVehicles();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            cancel() {
+                this.loading = true;
+                this.getVehicles();
+            },
+        },
+    });
 
     Vue.component('locations-items', {
         template: `<div>
@@ -1434,6 +1615,121 @@
             },
             clearWarning() {
                 this.invalidValue = false;
+            },
+        },
+    });
+    Vue.component('locations-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 95px;margin-bottom: 50px;">
+                <div style="color: black;border:solid 1px;height: 80px;" v-for="item in items" v-on:click1="showDetails(item)">
+                    <input v-model="item.name" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.status" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
+                    <input v-model="item.vehicle" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.message" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getLocations();
+            appConfig.$on('searchQueryLocations', searchQuery => {
+                let arr = [].concat(appConfig.locations);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.locations;
+                    this.filteredItems = appConfig.locations;
+                }
+            });
+        },
+        methods: {
+            getLocations() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/locations/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.locations = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(a.id) - parseInt(b.id);
+            },
+            updateItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/locations/update', {
+                    id: item.id,
+                    name: item.name,
+                    vehicle: item.vehicle,
+                    status: item.status,
+                    message: item.message,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                    });
+            },
+            deleteItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/locations/delete', {
+                    id: item.id,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            cancel() {
+                this.loading = true;
+                this.getLocations();
             },
         },
     });
@@ -1829,121 +2125,6 @@
         },
     });
 
-    Vue.component('locations-items-table', {
-        template: `<div>
-        <div v-if="loading">
-            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                <img src="./loading.gif" alt="">
-            </div>
-        </div>
-        <div v-if="!loading">
-            <div style="margin-top: 100px;margin-bottom: 50px;">
-                <div style="color: black;border:solid 1px;height: 80px;" v-for="item in items" v-on:click1="showDetails(item)">
-                    <input v-model="item.name" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
-                    <input v-model="item.status" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
-                    <input v-model="item.vehicle" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
-                    <input v-model="item.message" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
-                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
-                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
-                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
-                </div>
-            </div>
-        </div>
-        <div v-if="error">
-            Server error - try again
-        </div>
-      </div>`,
-        data: function () {
-            return {
-                items: [],
-                searchQuery: '',
-                filteredItems: [],
-                loading: true,
-                error: false,
-            };
-        },
-        created() {
-            this.getLocations();
-            appConfig.$on('searchQueryLocations', searchQuery => {
-                let arr = [].concat(appConfig.locations);
-                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
-                this.filteredItems = items;
-                this.items = items;
-
-                appConfig.$emit('itemsCount', items.length);
-                if (searchQuery === '') {
-                    this.items = appConfig.locations;
-                    this.filteredItems = appConfig.locations;
-                }
-            });
-        },
-        methods: {
-            getLocations() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                this.$http.get(appConfig.url + 'api/locations/get', {
-                    headers: {'Authorization': appConfig.access_token}
-                })
-                    .then(result => {
-                        this.items = result.data.sort(this.sort);
-                        this.filteredItems = result.data.sort(this.sort);
-                        appConfig.locations = this.filteredItems.sort(this.sort);
-                        this.loading = false;
-                        appConfig.$emit('itemsCount', this.items.length);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                        this.$router.push('login');
-                    });
-            },
-            sort(a, b) {
-                return parseInt(a.id) - parseInt(b.id);
-            },
-            updateItem(item) {
-                this.loading = true;
-                this.$http.post(appConfig.url + 'api/locations/update', {
-                    id: item.id,
-                    name: item.name,
-                    vehicle: item.vehicle,
-                    status: item.status,
-                    message: item.message,
-                    authorization: appConfig.access_token
-                })
-                    .then(result => {
-                        this.loading = true;
-                        this.getLocations();
-                    })
-                    .catch(error => {
-                        this.error = true;
-                    });
-            },
-            deleteItem(item) {
-                this.loading = true;
-                this.$http.post(appConfig.url + 'api/locations/delete', {
-                    id: item.id,
-                    authorization: appConfig.access_token
-                })
-                    .then(result => {
-                        this.loading = true;
-                        this.getLocations();
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
-            cancel() {
-                this.loading = true;
-                this.getLocations();
-            },
-        },
-    });
 
     const routes = [
         {path: '/', component: Login},
@@ -1951,6 +2132,7 @@
         {path: '/dispatcher', component: Dispatcher},
         {path: '/vehicle-add', component: VehicleAdd},
         {path: '/vehicle-edit', component: VehiclesEdit},
+        {path: '/vehicles-table', component: VehiclesTable},
         {path: '/driver-reg', component: DriverReg},
         {path: '/driver', component: DriverStatus},
         {path: '/locations-table', component: LocationsTable},
@@ -2026,9 +2208,9 @@
         methods: {
             init() {
                 this.dispatcher = appConfig.route === 'dispatcher';
+                this.vehicles = appConfig.route === 'vehicles-table';
                 this.locations = appConfig.route === 'locations-table';
                 this.driver = appConfig.route === 'driver';
-                this.gtable = appConfig.route === 'goods-table';
             },
             changeRoute(route) {
                 closeNav();
