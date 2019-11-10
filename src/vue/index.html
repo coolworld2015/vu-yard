@@ -637,21 +637,11 @@
         },
         methods: {
             changeView() {
-                appConfig.$emit('searchQueryVehicles', this.searchQuery);
+                appConfig.$emit('searchQueryOperations', this.searchQuery);
             },
             searchClear() {
                 this.searchQuery = '';
                 this.changeView();
-            },
-            filterStatus(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatus', status);
-                }
-            },
-            filterStatusL(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatusL', status);
-                }
             }
         },
     });
@@ -2494,7 +2484,7 @@
         },
         created() {
             this.getOperations();
-            appConfig.$on('searchQueryLocations', searchQuery => {
+            appConfig.$on('searchQueryOperations', searchQuery => {
                 let arr = [].concat(appConfig.operations);
                 let items = arr.filter((el) => el.plateNo.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
                 this.filteredItems = items;
