@@ -2099,7 +2099,7 @@
 
                                 this.$http.post(appConfig.url + 'api/audit/add', {
                                     name: this.plateNo,
-                                    description: 'Driver',
+                                    description: 'Driver - Web',
                                     authorization: appConfig.access_token
                                 })
                                     .then(result => {
@@ -2293,70 +2293,12 @@
             init() {
                 this.driver = appConfig.driver;
                 this.status = appConfig.driver.status;
-                this.renderStatus(0);
+                this.renderStatus(+new Date());
             },
             goBack() {
                 this.$router.push('/driver-reg');
             },
-            doClear() {
-                this.plateNo = '';
-                this.massage = false;
-            },
-            doReg() {
-                if (this.plateNo === '') {
-                    this.invalidValue = true;
-                }
 
-                if (this.invalidValue) {
-                    return;
-                }
-
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.getToken();
-                    return;
-                }
-
-                this.loading = true;
-                this.massage = false;
-
-                this.$http.get(appConfig.url + 'api/vehicles/get', {
-                    headers: {'Authorization': appConfig.access_token}
-                })
-                    .then(result => {
-                        this.items = result.data;
-                        if (this.items.filter((el) => el.plateNo === this.plateNo)[0].plateNo == this.plateNo) {
-                            appConfig.driver = this.items[0];
-                            appConfig.driver.reg = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString();
-                            this.loading = false;
-                            this.$router.push('/dispatcher');
-                        } else {
-                            this.massage = true;
-                            this.loading = false;
-                        }
-                    })
-                    .catch(error => {
-                        this.massage = true;
-                        this.loading = false;
-                    });
-            },
-            getToken() {
-                this.error = false;
-                this.$http.get(appConfig.url + 'api/auth')
-                    .then(result => {
-                        appConfig.access_token = result.body.token;
-                        localStorage.setItem('access_token', result.body);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
-            clearWarning() {
-                this.invalidValue = false;
-                this.massage = false;
-            },
             renderStatus(time) {
                 switch (this.status) {
                     case 'created':
