@@ -386,7 +386,7 @@
                 <div class="col-sm-12 d-flex flex-column justify-content-around">
 
                         <p class="h5" style="font-weight: bold;">Yard Management System</p>
-                        <img src="./yard.png" style="margin-top: -20px;margin-bottom: 20px; width: 150px;">
+                        <img src="./img/yard.png" style="margin-top: -20px;margin-bottom: 20px; width: 150px;">
 
 
                     <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
@@ -431,7 +431,7 @@
                     v-on:click="doClear">Cancel</button>
 
                         <div>
-                            <img v-show="loading" src="./loading.gif" style="margin-bottom: -50px; margin-top: -120px;height: 150px;">
+                            <img v-show="loading" src="./img/loading.gif" style="margin-bottom: -50px; margin-top: -120px;height: 150px;">
                         </div>
                 </div>
                 </div>
@@ -2739,50 +2739,12 @@
         },
         methods: {
             init() {
-                this.loading = false;
-                //this.getToken();
+                this.loading = true;
                 setTimeout(this.setMap, 100);
-                //setTimeout(this.getAllCars, 2000);
+                this.getVehiclesPositions();
                 //setTimeout(this.getVehiclesCurrentPositions, 5000);
 
                 appConfig.map = true;
-            },
-            getTokenAjax() {
-                $.ajax({
-                    url: 'https://213.144.11.162:10380/authentication',
-                    type: "POST",
-                    data: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
-                    headers: {
-                        'Accept': 'application/x-www-form-urlencoded',
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    },
-                    success: function (data, textStatus) {
-                        window.access_token = 'Bearer ' + data.access_token;
-                    },
-                    error: function () {
-                        appConfig.$emit('loaded', {});
-                        appConfig.$emit('error', {});
-                    }
-                });
-            },
-            getToken() {
-                var request = new XMLHttpRequest();
-                var FD = new URLSearchParams();
-                FD.append('grant_type', 'password');
-                FD.append('username', 'manyvehicles@abona-erp.com');
-                FD.append('password', '1234qwerQWER,.-');
-                request.open('POST', 'https://213.144.11.162:10380/authentication', true);
-                request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;');
-                request.onload = function () {
-                    if (this.status >= 200 && this.status < 400) {
-                        window.access_token = 'Bearer ' + JSON.parse(this.responseText).access_token;
-                    } else {
-                    }
-                };
-                request.onerror = function (error) {
-                    console.log(error);
-                };
-                request.send(FD.toString());
             },
             setMap() {
                 let lat = '50.4272102';
@@ -2831,38 +2793,48 @@
                     map: map
                 });
             },
-            getAllCars() {
-                if (!window.access_token) {
-                    console.log('getAllCars')
-                    setTimeout(this.getAllCars, 1000);
-                    return false;
+            getVehiclesPositions() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
                 }
 
-                this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetAllVehicleData', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': window.access_token
-                    }
+                this.$http.get(appConfig.url + 'api/positions/get', {
+                    headers: {'Authorization': appConfig.access_token}
                 })
-                    .then((response) => response.json())
                     .then(result => {
-                        appConfig.items = result.data;
+                        this.positions = result.body.sort(this.sort);
+                        appConfig.positions = result.body.sort(this.sort);
+                        this.setPoints();
                         this.loading = false;
-                        appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
-                        appConfig.$emit('loaded', {});
-                        appConfig.$emit('error', {});
+                        this.error = true;
+                        this.loading = false;
+                        //this.$router.push('login');
                     });
             },
-            getVehiclesCurrentPositions() {
-                if (!window.access_token) {
-                    console.log('getVehiclesCurrentPositions')
-                    setTimeout(this.getVehiclesCurrentPositions, 1000);
-                    return false;
-                }
+            setPoints() {
+                var infowindow = new google.maps.InfoWindow();
 
+                for (var i = 0; i < this.positions.length; i++) {
+                    marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(this.positions[i].lat, this.positions[i].lng),
+                        map: map
+                    });
+                    let positions = this.positions.map((item) => ['<h3>PlateNo: ' + item.vehicle + '&nbsp&nbsp&nbsp</h3><hr>'
+                    + item.date + '<br><br>', item.lat, item.lng]);
+                    google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                        return function () {
+                            infowindow.setContent(positions[i][0]);
+                            infowindow.open(map, marker);
+                        }
+                    })(marker, i));
+                }
+            },
+            getVehiclesCurrentPositions() {
                 this.$http.get('https://213.144.11.162:10380/api/Positions/GetAllPositions', {
                     headers: {
                         'Accept': 'application/json',
@@ -2912,66 +2884,6 @@
                         appConfig.$emit('error', {});
                     });
             },
-            getCar() {
-                this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetSpecificVehicleData?vehicleOid=37069743473', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': window.access_token
-                    }
-                })
-                    .then((response) => response.json())
-                    .then(result => {
-                        //this.items = JSON.parse(result.data);
-                        //this.filteredItems = JSON.parse(result.data);
-                        appConfig.items = this.filteredItems;
-                        this.loading = false;
-                        appConfig.$emit('itemsCount', this.items.length);
-                    })
-                    .catch(error => {
-                        appConfig.$emit('loaded', {});
-                        appConfig.$emit('error', {});
-                    });
-            },
-            getSpecificPositionDataInPeriod() {
-                this.$http.get('https://213.144.11.162:10380/api/Positions/GetSpecificPositionDataInPeriod?vehicleOid=37065506704&startDate=2019-10-31&endDate=2019-11-01', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': window.access_token
-                    }
-                })
-                    .then((response) => response.json())
-                    .then(result => {
-                        this.items = result.data;
-
-                        let path = [];
-                        this.items.forEach((item) => {
-                            let obj = {};
-                            obj.lat = item.lat;
-                            obj.lng = item.lng;
-                            obj.date = item.dateTimeOfRecording;
-                            path.push(obj)
-                        });
-
-                        path.sort(function (a, b) {
-                            return new Date(b.date) - new Date(a.date);
-                        });
-
-                        this.flightPath = new google.maps.Polyline({
-                            path: path.slice(0, 1000),
-                            geodesic: true,
-                            strokeColor: '#01579B',
-                            strokeOpacity: 1.0,
-                            strokeWeight: 6
-                        });
-                        this.flightPath.setMap(map);
-                    })
-                    .catch(error => {
-                        appConfig.$emit('loaded', {});
-                        appConfig.$emit('error', {});
-                    });
-            },
             getSpecificPositionDataFromStart(id) {
                 this.$http.get('https://213.144.11.162:10380/api/Positions/GetSpecificPositionDataFromStart?vehicleOid=' + id + '&startDate=2019-01-01', {
                     headers: {
@@ -3012,109 +2924,7 @@
                         appConfig.$emit('error', {});
                     });
             },
-            getAllPositions() {
-                this.$http.get('https://213.144.11.162:10380/api/Positions/GetAllPositions', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': window.access_token
-                    }
-                })
-                    .then((response) => response.json())
-                    .then(result => {
-                        this.items = result.data.splice(0, 5000);
-                        let locations = this.items.map((item) => ['<h3>VehicleOid: ' + item.vehicleOid + '&nbsp&nbsp&nbsp</h3><hr>'
-                        + item.dateTimeOfRecording.split('T').join(' '), item.lat, item.lng, item.vehicleOid]);
 
-                        var infowindow = new google.maps.InfoWindow();
-                        var that = this;
-                        for (var i = 0; i < this.items.length; i++) {
-                            marker = new google.maps.Marker({
-                                position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-                                map: map
-                            });
-
-                            var locs = [].concat(locations);
-                            google.maps.event.addListener(marker, 'click', (function (marker, i) {
-                                return function () {
-                                    infowindow.setContent(locs[i][0]);
-                                    infowindow.open(map, marker);
-                                    that.getSpecificPositionDataFromStart(locs[i][3])
-                                }
-                            })(marker, i));
-                        }
-                    })
-                    .catch(error => {
-                        appConfig.$emit('loaded', {});
-                        appConfig.$emit('error', {});
-                    });
-            },
-            yard() {
-                map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 18,
-                    center: new google.maps.LatLng(49.1234807, 8.5564619),
-                    mapTypeId: google.maps.MapTypeId.SATELLITE
-                });
-
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(49.1242421, 8.5586618),
-                    draggable: true,
-                    title: 'Truck 1',
-                    //animation: google.maps.Animation.BOUNCE,
-                    icon: this.truck,
-                    map: map
-                });
-
-                marker1 = new google.maps.Marker({
-                    position: new google.maps.LatLng(49.1232625, 8.5555243),
-                    draggable: true,
-                    title: 'Truck 2',
-                    icon: this.truck_f,
-                    map: map
-                });
-
-                marker2 = new google.maps.Marker({
-                    position: new google.maps.LatLng(49.124633, 8.5552671),
-                    draggable: true,
-                    title: 'Truck 3',
-                    icon: this.truck_long,
-                    map: map
-                });
-
-                var infowindow = new google.maps.InfoWindow();
-
-                google.maps.event.addListener(marker, 'click', function () {
-                    infowindow.setContent('<h3>Truck 1 - Moving &nbsp&nbsp</h3>');
-                    infowindow.open(map, marker);
-                });
-                google.maps.event.addListener(marker1, 'click', function () {
-                    infowindow.setContent('<h3>Truck 2 - Docked &nbsp&nbsp</h3>');
-                    infowindow.open(map, marker1);
-                });
-                google.maps.event.addListener(marker2, 'click', function () {
-                    infowindow.setContent('<h3>Truck 3 - Wating &nbsp&nbsp</h3>');
-                    infowindow.open(map, marker2);
-                });
-
-                appConfig.map = true;
-            },
-            setPoints() {
-                var infowindow = new google.maps.InfoWindow();
-
-                for (var i = 0; i < this.locations.length; i++) {
-                    marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(this.locations[i][1], this.locations[i][2]),
-                        map: map
-                    });
-                    var locations = [].concat(this.locations);
-                    google.maps.event.addListener(marker, 'click', (function (marker, i) {
-                        return function () {
-                            infowindow.setContent(locations[i][0]);
-                            infowindow.open(map, marker);
-                        }
-                    })(marker, i));
-                }
-            },
             showRoutes() {
                 this.flightPath.setMap(map);
             },
