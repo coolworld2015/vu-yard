@@ -79,23 +79,12 @@ webSocketServer.on('connection', (ws) => {
     });
 
     ws.on('message', function (message) {
-        // Message start
-        var MessagesModel = require('./mongo').MessagesModel;
         var date = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0];
         var time = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1];
         var now = date + ' ' + time;
-        console.log(message)
-        MessagesModel.create({
-            id: +new Date(),
-            name: message.split('###')[1],
-            date: now,
-            message: message.split('###')[0]
-        });
-        // Message end
         console.log('message received ' + message + '###' + now);
         for (var key in clients) {
             clients[key].send(message + '###' + now);
-            //this.send(message);
         }
     });
 });

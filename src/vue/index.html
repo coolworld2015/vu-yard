@@ -1,5 +1,6 @@
 <meta http-equiv="content-type" content="name/html; charset=UTF-8"/>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<link rel="shortcut icon" type="image/png" href="./yard.png"/>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.0.3/vue-resource.min.js"></script>
@@ -2059,6 +2060,9 @@
         methods: {
             init() {
                 appConfig.getAccessToken();
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1)
+                }, 100);
             },
             goBack() {
                 this.$router.push('/dispatcher');
@@ -2144,86 +2148,39 @@
     Vue.component('driver-status', {
         template: `<div style="text-align: center;margin-top: 120px;">
             <div style="font-size: 50px;
-                color: black;
+                color: white;
                 font-weight: bolder;
-                margin: 20px;">
+                margin: 20px;
+                background: #01579B;
+                height: 85px;
+                border-radius: 15px;
+                padding-top: 30px;">
                 {{driver.plateNo}}
             </div>
 
-            <div style="font-size: 30px;
-                color: black;
-                font-weight: bolder;
-                margin: 20px;">
-                {{driver.companyName}}
-            </div>
-
-            <div style="font-size: 20px;
-                color: black;
-                font-weight: bolder;
-                margin: 20px;">
-                Created: {{
-                    new Date(parseInt(driver.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(driver.id)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0]
-                }}
-            </div>
-
-            <div v-if="driver.arrived !=='n/a'" style="font-size: 20px;
-                color: black;
-                font-weight: bolder;
-                margin: 20px;">
-                Arrived: {{
-                    new Date(parseInt(driver.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(driver.arrived)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0]
-                }}
-            </div>
-
-            <div v-if="driver.booked !=='n/a'" style="font-size: 20px;
-                color: black;
-                font-weight: bolder;
-                margin: 20px;">
-                Booked: {{
-                    new Date(parseInt(driver.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(driver.booked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0]
-                }}
-            </div>
-
-            <div v-if="driver.docked !=='n/a'" style="font-size: 20px;
-                color: black;
-                font-weight: bolder;
-                margin: 20px;">
-                Docked: {{
-                    new Date(parseInt(driver.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(driver.docked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0]
-                }}
-            </div>
-
-            <div v-if="driver.undocked !=='n/a'" style="font-size: 20px;
-                color: black;
-                font-weight: bolder;
-                margin: 20px;">
-                Undocked: {{
-                    new Date(parseInt(driver.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(driver.undocked)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0]
-                }}
-            </div>
-
-            <div v-if="driver.departed !=='n/a'" style="font-size: 20px;
-                color: black;
-                font-weight: bolder;
-                margin: 20px;">
-                Departed: {{
-                    new Date(parseInt(driver.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0] + ' ' + new Date(parseInt(driver.departed)-(new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0]
-                }}
-            </div>
-
-            <div style="font-size: 40px;
-                color: black;
+            <div style="font-size: 100px;
+                color: white;
                 font-weight: bolder;
                 margin: 20px;
-                margin-bottom: 10px;">
-                Standing: {{driver.standing}}
+                background: red;
+                height: 240px;
+                border-radius: 15px;
+                padding-top: 120px;">
+                {{command}}
             </div>
 
-            <div style="font-size: 100px;
-                color: red;
+            <div style="text-align: center;margin-top: 120px;">
+            <div style="font-size: 30px;
+                color: white;
                 font-weight: bolder;
-                margin-bottom: 30px;">
-                {{command}}
+                margin: 20px;
+                background: #01579B;
+                height: 60px;
+                border-radius: 15px;
+                padding-top: 30px;
+                margin-bottom: 50px;
+                margin-top: -100px;">
+                {{time}}
             </div>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
@@ -2257,7 +2214,7 @@
             return {
                 id: '',
                 title: '',
-                vehicleOid: '',
+                time: '',
                 plateNo: '',
                 companyName: '',
                 invalidValue: false,
@@ -2277,52 +2234,55 @@
 
             ws.onmessage = (e) => {
                 let messageObject = e.data;
-                console.log(messageObject)
+                console.log(messageObject);
                 if (messageObject.split('###')[0] !== 'still alive') {
                     if (messageObject.split('###')[0] === this.driver.plateNo) {
                         this.status = messageObject.split('###')[1];
                         this.driver.standing = messageObject.split('###')[2];
-                        let time = messageObject.split('###')[3].split('.')[0];
-                        time = Date.parse(time);
-                        this.renderStatus(time);
+                        var date = new Date().toJSON().slice(0, 10);
+                        var time = new Date().toTimeString().slice(0, 8);
+                        this.time = date + ' ' + time;
+                        this.renderStatus();
                     }
                 }
             };
         },
         methods: {
             init() {
+                var date = new Date().toJSON().slice(0, 10);
+                var time = new Date().toTimeString().slice(0, 8);
+                this.time = date + ' ' + time;
                 this.driver = appConfig.driver;
                 this.status = appConfig.driver.status;
-                this.renderStatus(+new Date());
+                this.renderStatus();
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1)
+                }, 100);
+
             },
             goBack() {
                 this.$router.push('/driver-reg');
             },
 
-            renderStatus(time) {
+            renderStatus() {
                 switch (this.status) {
                     case 'created':
                         this.command = 'Go to yard';
                         break;
                     case 'arrived':
                         this.command = 'Wait for destination';
-                        this.driver.arrived = parseInt(time);
                         break;
                     case 'booked':
                         this.command = 'Go to ' + this.driver.standing;
-                        this.driver.booked = time;
                         break;
                     case 'docked':
                         this.command = 'Wait for undocking';
-                        this.driver.docked = time;
                         break;
                     case 'undocked':
                         this.command = 'Go from yard';
-                        this.driver.undocked = time;
                         break;
                     case 'departed':
                         this.command = 'You left the yard';
-                        this.driver.departed = time;
                         break;
                 }
             },
