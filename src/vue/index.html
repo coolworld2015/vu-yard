@@ -167,6 +167,9 @@
             <li v-on:click="changeRoute('map')" v-bind:class="{ active: map }">
                 <i class="fas fa-map-marked-alt"></i><span style="margin: 15px;">Map</span></li>
 
+            <li v-on:click="changeRoute('targets')" v-bind:class="{ active: targets }">
+                <i class="fas fa-crosshairs"></i><span style="margin: 15px;">Targets</span></li>
+
             <li v-on:click="changeRoute('positions')" v-bind:class="{ active: positions }">
                 <i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Positions</span></li>
 
@@ -2813,7 +2816,7 @@
                     .catch(error => {
                         this.error = true;
                         this.loading = false;
-                        //this.$router.push('login');
+                        this.$router.push('login');
                     });
             },
             setPoints() {
@@ -3020,10 +3023,11 @@
                 this.dispatcher = appConfig.route === 'dispatcher';
                 this.vehicles = appConfig.route === 'vehicles-table';
                 this.locations = appConfig.route === 'locations-table';
-                this.positions = appConfig.route === 'positions';
                 this.operations = appConfig.route === 'operations';
                 this.audit = appConfig.route === 'audit';
                 this.driver = appConfig.route === 'driver';
+                this.positions = appConfig.route === 'positions';
+                this.targets = appConfig.route === 'targets';
                 this.map = appConfig.route === 'map';
             },
             changeRoute(route) {
