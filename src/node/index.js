@@ -381,46 +381,59 @@ function VehicleAdd(req, res) {
             });
         } else {
             var VehiclesModel = require('./mongo').VehiclesModel;
-            VehiclesModel.create({
-                    id: +new Date(),
-                    vehicleOid: req.body.vehicleOid,
-                    plateNo: req.body.plateNo,
-                    companyName: req.body.companyName,
-                    arrived: req.body.arrived,
-                    booked: req.body.booked,
-                    docked: req.body.docked,
-                    undocked: req.body.undocked,
-                    departed: req.body.departed,
-                    standing: req.body.standing,
-                    status: req.body.status,
-                    message: req.body.message
-                },
-                function (err, vehicle) {
+            VehiclesModel.findOne({plateNo: req.body.plateNo}, function (err, vehicle) {
                     if (err) {
-                        return res.send({error: 'Server error'});
+                        res.send({error: err.message});
                     }
-                    res.send(vehicle);
-                });
+                    if (vehicle) {
+                        if (vehicle.plateNo === req.body.plateNo) {
+                            res.send({error: vehicle.plateNo + ' - already exist, can not duplicate'});
+                        }
+                    } else {
+                        VehiclesModel.create({
+                                id: +new Date(),
+                                vehicleOid: req.body.vehicleOid,
+                                plateNo: req.body.plateNo,
+                                companyName: req.body.companyName,
+                                arrived: req.body.arrived,
+                                booked: req.body.booked,
+                                docked: req.body.docked,
+                                undocked: req.body.undocked,
+                                departed: req.body.departed,
+                                standing: req.body.standing,
+                                status: req.body.status,
+                                message: req.body.message
+                            },
+                            function (err, vehicle) {
+                                if (err) {
+                                    return res.send({error: 'Server error'});
+                                }
+                                res.send(vehicle);
+                            });
 
-            // Operations start
-            var OperationsModel = require('./mongo').OperationsModel;
-            var date = new Date().toJSON().slice(0, 10);
-            var time = new Date().toTimeString().slice(0, 8);
-            OperationsModel.create({
-                    id: +new Date(),
-                    plateNo: req.body.plateNo,
-                    status: req.body.status,
-                    date: date + ' ' + time,
-                    standing: req.body.standing
-                },
-                function (err, audit) {
-                    if (err) {
-                        return res.send({error: 'Server error'});
+                        // Operations start
+                        var OperationsModel = require('./mongo').OperationsModel;
+                        var date = new Date().toJSON().slice(0, 10);
+                        var time = new Date().toTimeString().slice(0, 8);
+                        OperationsModel.create({
+                                id: +new Date(),
+                                plateNo: req.body.plateNo,
+                                status: req.body.status,
+                                date: date + ' ' + time,
+                                standing: req.body.standing
+                            },
+                            function (err, audit) {
+                                if (err) {
+                                    return res.send({error: 'Server error'});
+                                }
+                            });
+                        // Operations end
+
                     }
-                });
-            // Operations end
+                }
+            )
         }
-    });
+    })
 }
 
 function VehicleUpdate(req, res) {
