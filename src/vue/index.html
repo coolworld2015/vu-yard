@@ -163,6 +163,9 @@
             <li v-on:click="changeRoute('locations-table')" v-bind:class="{ active: locations }">
                 <i class="fas fa-parking"></i><span style="margin: 15px;">Locations</span></li>
 
+            <li v-on:click="changeRoute('positions')" v-bind:class="{ active: positions }">
+                <i class="fas fa-parking"></i><span style="margin: 15px;">Positions</span></li>
+
             <li v-on:click="changeRoute('operations')" v-bind:class="{ active: operations }">
                 <i class="fas fa-history"></i><span style="margin: 15px;">Operations</span></li>
 
@@ -339,6 +342,21 @@
                         </div>
                             <div>
                                 <operations-items></operations-items>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
+                    </div>`
+    };
+
+    const Positions = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-operations></top-operations>
+                        </div>
+                            <div>
+                                <positions-items-table></positions-items-table>
                             </div>
                         <div class="bottom">
                             <bottom></bottom>
@@ -876,7 +894,7 @@
                     .then(result => {
                         appConfig.vehicles = result.data.sort(this.sort);
                         let items = result.data.sort(this.sort);
-                        items = items.filter(el=> el.status !=='departed');
+                        items = items.filter(el => el.status !== 'departed');
                         appConfig.items = items;
                         this.items = items;
                         this.filteredItems = items;
@@ -1227,7 +1245,7 @@
             init() {
                 this.locations = [].concat(appConfig.locations);
                 var options = [].concat(appConfig.locations);
-                this.options = options.filter((el)=> el.status === 'blank');
+                this.options = options.filter((el) => el.status === 'blank');
 
                 this.id = appConfig.item.id;
                 this.created = new Date(parseInt(appConfig.item.id) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
@@ -2450,6 +2468,122 @@
         },
     });
 
+    Vue.component('positions-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 95px;margin-bottom: 50px;">
+                <div style="color: black;border:solid 1px;height: 80px;" v-for="item in items" v-on:click1="showDetails(item)">
+                    <input v-model="item.name" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.status" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
+                    <input v-model="item.vehicle" style="height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.message" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getPositions();
+            appConfig.$on('searchQueryLocations', searchQuery => {
+                let arr = [].concat(appConfig.positions);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.positions;
+                    this.filteredItems = appConfig.positions;
+                }
+            });
+        },
+        methods: {
+            getPositions() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/positions/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.positions = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(a.id) - parseInt(b.id);
+            },
+            updateItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/locations/update', {
+                    id: item.id,
+                    name: item.name,
+                    vehicle: item.vehicle,
+                    status: item.status,
+                    message: item.message,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                    });
+            },
+            deleteItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/locations/delete', {
+                    id: item.id,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            cancel() {
+                this.loading = true;
+                this.getLocations();
+            },
+        },
+    });
+
     const routes = [
         {path: '/', component: Login},
         {path: '*', component: Login},
@@ -2464,6 +2598,7 @@
         {path: '/location-add', component: LocationAdd},
         {path: '/audit', component: Audit},
         {path: '/operations', component: Operations},
+        {path: '/positions', component: Positions},
     ];
 
     const router = new VueRouter({
@@ -2480,8 +2615,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
@@ -2537,6 +2672,7 @@
                 this.dispatcher = appConfig.route === 'dispatcher';
                 this.vehicles = appConfig.route === 'vehicles-table';
                 this.locations = appConfig.route === 'locations-table';
+                this.positions = appConfig.route === 'positions';
                 this.operations = appConfig.route === 'operations';
                 this.audit = appConfig.route === 'audit';
                 this.driver = appConfig.route === 'driver';

@@ -81,6 +81,7 @@ var Audit = new Schema({
 
 var AuditModel = mongoose.model('Audit', Audit);
 module.exports.AuditModel = AuditModel;
+
 //---------------------------------------------------------------------------------------------
 var Operations = new Schema({
     id: {type: String, required: true},
@@ -92,3 +93,15 @@ var Operations = new Schema({
 
 var OperationsModel = mongoose.model('Operations', Operations);
 module.exports.OperationsModel = OperationsModel;
+
+//---------------------------------------------------------------------------------------------
+var Positions = new Schema({
+    id: {type: String, required: true},
+    vehicle: {type: String, required: true},
+    lat: {type: String, required: true},
+    lng: {type: String, required: true},
+    date: {type: String, required: true},
+});
+
+var PositionsModel = mongoose.model('Positions', Positions);
+module.exports.PositionsModel = PositionsModel;

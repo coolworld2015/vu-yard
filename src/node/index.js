@@ -48,6 +48,8 @@ const server = express()
 
     .get('/api/operations/get', Operations)
 
+    .get('/api/positions/get', Positions)
+
     .get('/api/auth', (req, res) => res.send({token: token}))
 
     .get('/api/test', TestPOST)
@@ -646,9 +648,9 @@ function Audit(req, res) {
             });
         } else {
             var AuditModel = require('./mongo').AuditModel;
-            return AuditModel.find(function (err, users) {
+            return AuditModel.find(function (err, audit) {
                 if (!err) {
-                    return res.send(users);
+                    return res.send(audit);
                 } else {
                     res.statusCode = 500;
                     return res.send({error: 'Server error'});
@@ -658,7 +660,6 @@ function Audit(req, res) {
     });
 }
 
-//------------------------------------------------------------------------
 function AuditAdd(req, res) {
     var AuditModel = require('./mongo').AuditModel;
     var date = new Date().toJSON().slice(0, 10);
@@ -691,9 +692,33 @@ function Operations(req, res) {
             });
         } else {
             var OperationsModel = require('./mongo').OperationsModel;
-            return OperationsModel.find(function (err, users) {
+            return OperationsModel.find(function (err, operations) {
                 if (!err) {
-                    return res.send(users);
+                    return res.send(operations);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            }).sort({date: -1});
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+function Positions(req, res) {
+    var agent = req.headers.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var PositionsModel = require('./mongo').PositionsModel;
+            return PositionsModel.find(function (err, positions) {
+                if (!err) {
+                    return res.send(positions);
                 } else {
                     res.statusCode = 500;
                     return res.send({error: 'Server error'});
