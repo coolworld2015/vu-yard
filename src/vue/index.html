@@ -1217,10 +1217,14 @@
             } else {
                 this.init();
             }
-            this.options = [].concat(appConfig.locations);
+
         },
         methods: {
             init() {
+                this.locations = [].concat(appConfig.locations);
+                var options = [].concat(appConfig.locations);
+                this.options = options.filter((el)=> el.status === 'blank');
+
                 this.id = appConfig.item.id;
                 this.created = new Date(parseInt(appConfig.item.id) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[0]
                     + ' ' + new Date(parseInt(appConfig.item.id) - (new Date()).getTimezoneOffset() * 60000).toISOString().split('T')[1].split('.')[0];
@@ -1277,7 +1281,7 @@
                 this.invalidStandingValue = false;
 
                 if (this.standing !== 'n/a') {
-                    let obj = this.options.filter((el) => (el.name === this.standing));
+                    let obj = this.locations.filter((el) => (el.name === this.standing));
                     this.locationID = obj[0].id;
                     this.locationName = obj[0].name;
                 }
