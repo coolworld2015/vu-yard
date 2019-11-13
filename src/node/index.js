@@ -387,7 +387,7 @@ function VehicleAdd(req, res) {
                     }
                     if (vehicle) {
                         if (vehicle.plateNo === req.body.plateNo) {
-                            res.send({error: vehicle.plateNo + ' - already exist, can not duplicate'});
+                            res.send({error: 'PlateNo: ' + vehicle.plateNo + ' - already exist'});
                         }
                     } else {
                         VehiclesModel.create({

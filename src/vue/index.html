@@ -1017,7 +1017,7 @@
             </div>
 
             <div v-if="error" style="color: red; margin-top: 25px;">
-                Server error - try again
+                {{errorText}}
             </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         </div>`,
         data: function () {
@@ -1027,6 +1027,7 @@
                 vehicleOid: '',
                 plateNo: '',
                 companyName: '',
+                errorText: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
@@ -1081,6 +1082,8 @@
                     .then(result => {
                         if (result.body.error) {
                             this.error = true;
+                            this.errorText = result.body.error;
+
                         } else {
                             this.$router.push('/dispatcher');
                         }
@@ -1651,7 +1654,7 @@
             </div>
 
             <div v-if="error" style="color: red; margin-top: 25px;">
-                Server error - try again
+                {{errorText}}
             </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         </div>`,
         data: function () {
@@ -1661,6 +1664,7 @@
                 vehicleOid: '',
                 plateNo: '',
                 companyName: '',
+                errorText: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
@@ -1715,6 +1719,7 @@
                     .then(result => {
                         if (result.body.error) {
                             this.error = true;
+                            this.errorText = result.body.error;
                         } else {
                             this.$router.push('/vehicles-table');
                         }
