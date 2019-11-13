@@ -815,7 +815,7 @@
                 }
             });
             appConfig.$on('filterStatus', status => {
-                let arr = [].concat(appConfig.items);
+                let arr = [].concat(appConfig.vehicles);
                 let items = arr.filter((el) => el.status === status);
                 if (status === '*') {
                     items = [].concat(appConfig.items);
@@ -874,9 +874,13 @@
                     headers: {'Authorization': appConfig.access_token}
                 })
                     .then(result => {
-                        this.items = result.data.sort(this.sort);
-                        this.filteredItems = result.data.sort(this.sort);
-                        appConfig.items = this.filteredItems.sort(this.sort);
+                        appConfig.vehicles = result.data.sort(this.sort);
+                        let items = result.data.sort(this.sort);
+                        items = items.filter(el=> el.status !=='departed');
+                        appConfig.items = items;
+                        this.items = items;
+                        this.filteredItems = items;
+
                         this.loading = false;
                         appConfig.$emit('itemsCount', this.items.length);
                     })
