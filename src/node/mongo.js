@@ -105,3 +105,15 @@ var Positions = new Schema({
 
 var PositionsModel = mongoose.model('Positions', Positions);
 module.exports.PositionsModel = PositionsModel;
+
+//---------------------------------------------------------------------------------------------
+var Targets = new Schema({
+    id: {type: String, required: true},
+    vehicle: {type: String, required: true},
+    lat: {type: String, required: true},
+    lng: {type: String, required: true},
+    date: {type: String, required: true},
+});
+
+var TargetsModel = mongoose.model('Targets', Targets);
+module.exports.TargetsModel = TargetsModel;

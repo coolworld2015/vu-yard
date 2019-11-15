@@ -50,6 +50,8 @@ const server = express()
 
     .get('/api/positions/get', Positions)
 
+    .get('/api/targets/get', Targets)
+
     .get('/api/auth', (req, res) => res.send({token: token}))
 
     .get('/api/test', TestPOST)
@@ -732,6 +734,30 @@ function Positions(req, res) {
             return PositionsModel.find(function (err, positions) {
                 if (!err) {
                     return res.send(positions);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            }).sort({date: -1});
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+function Targets(req, res) {
+    var agent = req.headers.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var TargetsModel = require('./mongo').TargetsModel;
+            return TargetsModel.find(function (err, targets) {
+                if (!err) {
+                    return res.send(targets);
                 } else {
                     res.statusCode = 500;
                     return res.send({error: 'Server error'});
