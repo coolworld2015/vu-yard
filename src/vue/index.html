@@ -371,6 +371,21 @@
                     </div>`
     };
 
+    const Targets = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-operations></top-operations>
+                        </div>
+                            <div>
+                                <targets-items-table></targets-items-table>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
+                    </div>`
+    };
+
     const GoogleMap = {
         template: `
                     <div>
@@ -2628,6 +2643,121 @@
             },
         },
     });
+    Vue.component('targets-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./img/loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 95px;margin-bottom: 50px;">
+                <div style="color: black;border:solid 1px;height: 80px;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click1="showDetails(item)">
+                    <input v-model="item.vehicle" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.lat" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.lng" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.date" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getTargets();
+            appConfig.$on('searchQueryLocations', searchQuery => {
+                let arr = [].concat(appConfig.targets);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.targets;
+                    this.filteredItems = appConfig.targets;
+                }
+            });
+        },
+        methods: {
+            getTargets() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/targets/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.targets = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(a.id) - parseInt(b.id);
+            },
+            updateItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/targets/update', {
+                    id: item.id,
+                    name: item.name,
+                    vehicle: item.vehicle,
+                    status: item.status,
+                    message: item.message,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                    });
+            },
+            deleteItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/targets/delete', {
+                    id: item.id,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            cancel() {
+                this.loading = true;
+                this.getLocations();
+            },
+        },
+    });
 
     Vue.component('googleMap', {
         template: `<div>
@@ -2954,6 +3084,7 @@
         {path: '/audit', component: Audit},
         {path: '/operations', component: Operations},
         {path: '/positions', component: Positions},
+        {path: '/targets', component: Targets},
         {path: '/map', component: GoogleMap},
     ];
 
@@ -2971,8 +3102,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
