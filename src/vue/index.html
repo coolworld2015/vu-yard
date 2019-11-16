@@ -1420,7 +1420,7 @@
                     });
             },
             updateLocation() {
-                var status;
+                var status, vehicle;
 
                 if (this.locationID === '') {
                     this.$router.push('/dispatcher');
@@ -1430,19 +1430,22 @@
                 switch (this.locationStatus) {
                     case 'booked':
                         status = 'booked';
+                        vehicle = this.plateNo;
                         break;
                     case 'docked':
                         status = 'docked';
+                        vehicle = this.plateNo;
                         break;
                     default:
                         status = 'blank';
+                        vehicle = 'none';
                 }
 
                 this.loading = true;
                 this.$http.post(appConfig.url + 'api/locations/update', {
                     id: this.locationID,
                     name: this.locationName,
-                    vehicle: this.plateNo,
+                    vehicle: vehicle,
                     status: status,
                     message: 'n/a',
 
@@ -3041,8 +3044,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            appConfig.url = 'http://localhost:3000/';
+            appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            //appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
