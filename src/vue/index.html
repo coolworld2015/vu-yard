@@ -1902,7 +1902,7 @@
             </div>
 
             <div v-if="error" style="color: red; margin-top: 25px;">
-                Server error - try again
+                {{errorText}}
             </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         </div>`,
         data: function () {
@@ -1910,6 +1910,7 @@
                 id: '',
                 title: '',
                 name: '',
+                errorText: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
@@ -1946,6 +1947,7 @@
                     .then(result => {
                         if (result.body.error) {
                             this.error = true;
+                            this.errorText = result.body.error;
                         } else {
                             this.$router.push('/locations-table');
                         }
@@ -3044,8 +3046,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');

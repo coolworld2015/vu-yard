@@ -269,21 +269,33 @@ function LocationAdd(req, res) {
             });
         } else {
             var LocationsModel = require('./mongo').LocationsModel;
-            LocationsModel.create({
-                    id: +new Date(),
-                    name: req.body.name,
-                    vehicle: 'none',
-                    status: 'blank',
-                    message: 'n/a',
-                },
-                function (err, location) {
-                    if (err) {
-                        return res.send({error: 'Server error'});
+            LocationsModel.findOne({name: req.body.name}, function (err, location) {
+                if (err) {
+                    res.send({error: err.message});
+                }
+                if (location) {
+                    if (location.name === req.body.name) {
+                        res.send({error: 'Name: ' + location.name + ' - already exist'});
                     }
-                    res.send(location);
-                });
+                } else {
+                    var LocationsModel = require('./mongo').LocationsModel;
+                    LocationsModel.create({
+                            id: +new Date(),
+                            name: req.body.name,
+                            vehicle: 'none',
+                            status: 'blank',
+                            message: 'n/a',
+                        },
+                    function (err, location) {
+                        if (err) {
+                            return res.send({error: 'Server error'});
+                        }
+                        res.send(location);
+                    });
+                }
+            });
         }
-    });
+    })
 }
 
 function LocationUpdate(req, res) {
