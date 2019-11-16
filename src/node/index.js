@@ -94,78 +94,6 @@ webSocketServer.on('connection', (ws) => {
 });
 
 //------------------------------------------------------------------------
-function TestPOST(req, res) {
-    const request = require('request');
-
-    request.post('https://213.144.11.162:10380/authentication', {
-        form:
-            {
-                'grant_type': 'password',
-                'username': 'manyvehicles@abona-erp.com',
-                'password': '1234qwerQWER,.-'
-            }
-    }, (err, resp, body) => {
-        if (err) {
-            console.log(err);
-            res.send(err)
-        }
-        res.send(body);
-    });
-}
-
-//------------------------------------------------------------------------
-function TestPOST1(req, res) {
-    const request = require('request');
-
-    request.post('https://jwt-base.herokuapp.com/api/login', {
-        form:
-            {
-                'name': '1',
-                'pass': '1',
-                'description': 'test'
-            }
-    }, (err, resp, body) => {
-        if (err) {
-            return console.log(err);
-        }
-        res.send(body);
-    });
-}
-
-//------------------------------------------------------------------------
-function TestGET_Old(req, res) {
-    const https = require('https');
-
-    https.get('https://ui-base.herokuapp.com/api/users/get', (resp) => {
-        let data = '';
-        resp.on('data', (chunk) => {
-            data += chunk;
-            console.log(data);
-        });
-
-        resp.on('end', () => {
-            console.log(JSON.parse(data));
-            res.send(data);
-        });
-
-    }).on("error", (err) => {
-        console.log("Error: " + err.message);
-    });
-}
-
-//------------------------------------------------------------------------
-function TestGET(req, res) {
-    const request = require('request');
-
-    request('https://ui-base.herokuapp.com/api/users/get', {json: true}, (err, resp, body) => {
-        if (err) {
-            return console.log(err);
-        }
-        res.send(body);
-    });
-}
-
-//------------------------------------------------------------------------
 function Login(req, res) {
     var UsersModel = require('./mongo').UsersModel;
     UsersModel.findOne({name: req.body.name}, function (err, user) {
@@ -776,6 +704,78 @@ function Targets(req, res) {
                 }
             }).sort({date: -1});
         }
+    });
+}
+
+//------------------------------------------------------------------------
+function TestPOST(req, res) {
+    const request = require('request');
+
+    request.post('https://213.144.11.162:10380/authentication', {
+        form:
+            {
+                'grant_type': 'password',
+                'username': 'manyvehicles@abona-erp.com',
+                'password': '1234qwerQWER,.-'
+            }
+    }, (err, resp, body) => {
+        if (err) {
+            console.log(err);
+            res.send(err)
+        }
+        res.send(body);
+    });
+}
+
+//------------------------------------------------------------------------
+function TestPOST1(req, res) {
+    const request = require('request');
+
+    request.post('https://jwt-base.herokuapp.com/api/login', {
+        form:
+            {
+                'name': '1',
+                'pass': '1',
+                'description': 'test'
+            }
+    }, (err, resp, body) => {
+        if (err) {
+            return console.log(err);
+        }
+        res.send(body);
+    });
+}
+
+//------------------------------------------------------------------------
+function TestGET_Old(req, res) {
+    const https = require('https');
+
+    https.get('https://ui-base.herokuapp.com/api/users/get', (resp) => {
+        let data = '';
+        resp.on('data', (chunk) => {
+            data += chunk;
+            console.log(data);
+        });
+
+        resp.on('end', () => {
+            console.log(JSON.parse(data));
+            res.send(data);
+        });
+
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
+    });
+}
+
+//------------------------------------------------------------------------
+function TestGET(req, res) {
+    const request = require('request');
+
+    request('https://ui-base.herokuapp.com/api/users/get', {json: true}, (err, resp, body) => {
+        if (err) {
+            return console.log(err);
+        }
+        res.send(body);
     });
 }
 
