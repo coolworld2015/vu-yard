@@ -157,7 +157,7 @@
             <li v-on:click="changeRoute('dispatcher')" v-bind:class="{ active: dispatcher }">
                 <i class="fas fa-user-friends"></i><span style="margin: 15px;">Dispatcher</span></li>
 
-            <li v-on:click="changeRoute('driver-reg')" v-bind:class="{ active: driver }">
+            <li v-on:click="changeRoute('registration')" v-bind:class="{ active: registration }">
                 <i class="fas fa-user"></i><span style="margin: 15px;">Driver</span></li>
 
             <li v-on:click="changeRoute('vehicles-table')" v-bind:class="{ active: vehicles }">
@@ -264,6 +264,20 @@
                         <div class="bottom"><bottom></bottom></div>
                     </div>`
     };
+    const VehiclesTableAdd = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-vehicles></top-vehicles>
+                        </div>
+                            <div>
+                                <vehicle-table-add></vehicle-table-add>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
+                    </div>`
+    };
 
     const DriverReg = {
         template: `
@@ -314,20 +328,6 @@
                         </div>
                     </div>`
     };
-    const VehiclesTableAdd = {
-        template: `
-                    <div style="width: 100%">
-                        <div class="top">
-                            <top-vehicles></top-vehicles>
-                        </div>
-                            <div>
-                                <vehicle-table-add></vehicle-table-add>
-                            </div>
-                        <div class="bottom">
-                            <bottom></bottom>
-                        </div>
-                    </div>`
-    };
 
     const Audit = {
         template: `
@@ -372,6 +372,20 @@
                         </div>
                     </div>`
     };
+    const TargetAdd = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-targets></top-targets>
+                        </div>
+                            <div>
+                                <target-add></target-add>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
+                    </div>`
+    };
 
     const Positions = {
         template: `
@@ -381,6 +395,20 @@
                         </div>
                             <div>
                                 <positions-items-table></positions-items-table>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
+                    </div>`
+    };
+    const PositionAdd = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-positions></top-positions>
+                        </div>
+                            <div>
+                                <position-add></position-add>
                             </div>
                         <div class="bottom">
                             <bottom></bottom>
@@ -665,37 +693,6 @@
             }
         },
     });
-    Vue.component('top-operations', {
-        template: `<div>
-        <div style="float: left; margin: 20px; margin-top: -3px;">
-                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
-        </div>
-        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
-            <form class="search-form" id="search" style="">
-                <label>
-                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
-                        placeholder="Search by PlateNo"
-                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView">
-                </label>
-                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;"><i class="fa fa-fw fa-search"></i></div>
-            </form>
-        </div>
-        </div>`,
-        data() {
-            return {
-                searchQuery: '',
-            };
-        },
-        methods: {
-            changeView() {
-                appConfig.$emit('searchQueryOperations', this.searchQuery);
-            },
-            searchClear() {
-                this.searchQuery = '';
-                this.changeView();
-            }
-        },
-    });
     Vue.component('top-locations', {
         template: `<div>
         <div style="float: left; margin: 20px; margin-top: -3px;">
@@ -746,183 +743,6 @@
                     appConfig.$emit('filterStatusL', status);
                 }
             }
-        },
-    });
-    Vue.component('top-targets', {
-        template: `<div>
-        <div style="float: left; margin: 20px; margin-top: -3px;">
-                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
-        </div>
-        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
-            <form class="search-form" id="search" style="">
-                <label>
-                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
-                        placeholder="Search by name"
-                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
-                </label>
-                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
-            </form>
-        </div>
-        <div style="float: right; margin: -113px 40px;">
-                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
-        </div>
-        </div>`,
-        data() {
-            return {
-                searchQuery: '',
-            };
-        },
-        methods: {
-            vehicleAdd() {
-                appConfig.$emit('route', 'location-add');
-            },
-            changeView() {
-                appConfig.$emit('searchQueryLocations', this.searchQuery);
-            },
-            searchClear() {
-                this.searchQuery = '';
-                this.changeView();
-            },
-            goSearch() {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
-                }
-            },
-            filterStatus(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatus', status);
-                }
-            },
-            filterStatusL(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatusL', status);
-                }
-            }
-        },
-    });
-    Vue.component('top-positions', {
-        template: `<div>
-        <div style="float: left; margin: 20px; margin-top: -3px;">
-                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
-        </div>
-        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
-            <form class="search-form" id="search" style="">
-                <label>
-                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
-                        placeholder="Search by name"
-                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
-                </label>
-                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
-            </form>
-        </div>
-        <div style="float: right; margin: -113px 40px;">
-                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
-        </div>
-        </div>`,
-        data() {
-            return {
-                searchQuery: '',
-            };
-        },
-        methods: {
-            vehicleAdd() {
-                appConfig.$emit('route', 'location-add');
-            },
-            changeView() {
-                appConfig.$emit('searchQueryLocations', this.searchQuery);
-            },
-            searchClear() {
-                this.searchQuery = '';
-                this.changeView();
-            },
-            goSearch() {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
-                }
-            },
-            filterStatus(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatus', status);
-                }
-            },
-            filterStatusL(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatusL', status);
-                }
-            }
-        },
-    });
-    Vue.component('top-audit', {
-        template: `<div>
-        <div style="float: left; margin: 20px; margin-top: -3px;">
-                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
-        </div>
-        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
-            <form class="search-form" id="search" style="">
-                <label>
-                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
-                        placeholder="Search by name"
-                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
-                </label>
-                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
-            </form>
-        </div>
-        </div>`,
-        data() {
-            return {
-                searchQuery: '',
-            };
-        },
-        methods: {
-            vehicleAdd() {
-                appConfig.$emit('route', 'location-add');
-            },
-            changeView() {
-                appConfig.$emit('searchQueryLocations', this.searchQuery);
-            },
-            searchClear() {
-                this.searchQuery = '';
-                this.changeView();
-            },
-            goSearch() {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
-                }
-            },
-            filterStatus(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatus', status);
-                }
-            },
-            filterStatusL(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatusL', status);
-                }
-            }
-        },
-    });
-    Vue.component('top-map', {
-        template: `<div>
-        <div style="float: left; margin: 20px; margin-top: 4px;">
-                <span style="font-size:30px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
-        </div>
-        <div style="margin-top: 15px; color: #01579B; font-size: 50px;margin-right: 100px;">
-            Google Maps API Demo
-        </div>
-        </div>`,
-        data() {
-            return {
-                searchQuery: '',
-            };
-        },
-        methods: {
-            changeView() {
-                appConfig.$emit('searchQuery', this.searchQuery);
-            },
-            searchClear() {
-                this.searchQuery = '';
-                appConfig.$emit('searchQuery', this.searchQuery);
-            },
         },
     });
 
@@ -1592,6 +1412,7 @@
             }
         },
     });
+
     Vue.component('vehicles-items-table', {
         template: `<div>
         <div v-if="loading">
@@ -2486,6 +2307,55 @@
         },
     });
 
+    Vue.component('top-audit', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Search by name"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            vehicleAdd() {
+                appConfig.$emit('route', 'location-add');
+            },
+            changeView() {
+                appConfig.$emit('searchQueryLocations', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
+            },
+            goSearch() {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
+                }
+            },
+            filterStatus(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatus', status);
+                }
+            },
+            filterStatusL(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatusL', status);
+                }
+            }
+        },
+    });
     Vue.component('audit-items', {
         template: `<div>
         <div v-if="loading">
@@ -2560,6 +2430,38 @@
                 appConfig.item = item;
                 this.$router.push('vehicle-edit');
             },
+        },
+    });
+
+    Vue.component('top-operations', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Search by PlateNo"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            changeView() {
+                appConfig.$emit('searchQueryOperations', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
+            }
         },
     });
     Vue.component('operations-items', {
@@ -2639,119 +2541,56 @@
         },
     });
 
-    Vue.component('positions-items-table', {
+    Vue.component('top-targets', {
         template: `<div>
-        <div v-if="loading">
-            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                <img src="./img/loading.gif" alt="">
-            </div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
         </div>
-        <div v-if="!loading">
-            <div style="margin-top: 95px;margin-bottom: 50px;">
-                <div style="color: black;border:solid 1px;height: 80px;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click1="showDetails(item)">
-                    <input v-model="item.vehicle" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
-                    <input v-model="item.lat" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
-                    <input v-model="item.lng" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
-                    <input v-model="item.date" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
-                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
-                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
-                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
-                </div>
-            </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Search by name"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
+            </form>
         </div>
-        <div v-if="error">
-            Server error - try again
+        <div style="float: right; margin: -113px 40px;">
+                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
         </div>
-      </div>`,
-        data: function () {
+        </div>`,
+        data() {
             return {
-                items: [],
                 searchQuery: '',
-                filteredItems: [],
-                loading: true,
-                error: false,
             };
         },
-        created() {
-            this.getPositions();
-            appConfig.$on('searchQueryLocations', searchQuery => {
-                let arr = [].concat(appConfig.positions);
-                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
-                this.filteredItems = items;
-                this.items = items;
-
-                appConfig.$emit('itemsCount', items.length);
-                if (searchQuery === '') {
-                    this.items = appConfig.positions;
-                    this.filteredItems = appConfig.positions;
-                }
-            });
-        },
         methods: {
-            getPositions() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
+            vehicleAdd() {
+                appConfig.$emit('route', 'location-add');
+            },
+            changeView() {
+                appConfig.$emit('searchQueryLocations', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
+            },
+            goSearch() {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
                 }
-
-                this.$http.get(appConfig.url + 'api/positions/get', {
-                    headers: {'Authorization': appConfig.access_token}
-                })
-                    .then(result => {
-                        this.items = result.data.sort(this.sort);
-                        this.filteredItems = result.data.sort(this.sort);
-                        appConfig.positions = this.filteredItems.sort(this.sort);
-                        this.loading = false;
-                        appConfig.$emit('itemsCount', this.items.length);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                        this.$router.push('login');
-                    });
             },
-            sort(a, b) {
-                return parseInt(a.id) - parseInt(b.id);
+            filterStatus(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatus', status);
+                }
             },
-            updateItem(item) {
-                this.loading = true;
-                this.$http.post(appConfig.url + 'api/locations/update', {
-                    id: item.id,
-                    name: item.name,
-                    vehicle: item.vehicle,
-                    status: item.status,
-                    message: item.message,
-                    authorization: appConfig.access_token
-                })
-                    .then(result => {
-                        this.loading = true;
-                        this.getLocations();
-                    })
-                    .catch(error => {
-                        this.error = true;
-                    });
-            },
-            deleteItem(item) {
-                this.loading = true;
-                this.$http.post(appConfig.url + 'api/locations/delete', {
-                    id: item.id,
-                    authorization: appConfig.access_token
-                })
-                    .then(result => {
-                        this.loading = true;
-                        this.getLocations();
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
-            cancel() {
-                this.loading = true;
-                this.getLocations();
-            },
+            filterStatusL(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatusL', status);
+                }
+            }
         },
     });
     Vue.component('targets-items-table', {
@@ -2869,7 +2708,483 @@
             },
         },
     });
+    Vue.component('target-add', {
+        template: `<div style="text-align: center;margin-top: 120px;">
+        <div style="font-size: 40px;
+                        color: black;
+                        font-weight: bolder;
+                        margin: 20px;">New record</div>
 
+            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="VehicleOid"
+            v-on:keypress="clearWarning"
+            v-model="vehicleOid" ><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="PlateNo"
+            v-on:keypress="clearWarning"
+            v-model="plateNo"><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="CompanyName"
+            v-on:keypress="clearWarning"
+            v-model="companyName" ><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                            color: white;outline:none;"
+            v-on:click="addItem">Submit</button>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                            color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">Back</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./img/loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="error" style="color: red; margin-top: 25px;">
+                {{errorText}}
+            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                vehicleOid: '',
+                plateNo: '',
+                companyName: '',
+                errorText: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1)
+                }, 100);
+            },
+            goBack() {
+                this.$router.push('/vehicles-table');
+            },
+            addItem() {
+                if (this.vehicleOid === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.plateNo === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.companyName === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/vehicles/add', {
+                    vehicleOid: this.vehicleOid,
+                    plateNo: this.plateNo,
+                    companyName: this.companyName,
+                    arrived: 'n/a',
+                    booked: 'n/a',
+                    departed: 'n/a',
+                    docked: 'n/a',
+                    undocked: 'n/a',
+                    status: 'created',
+                    standing: 'n/a',
+                    message: 'n/a',
+
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        if (result.body.error) {
+                            this.error = true;
+                            this.errorText = result.body.error;
+                        } else {
+                            this.$router.push('/vehicles-table');
+                        }
+                        this.loading = false;
+
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
+
+    Vue.component('top-positions', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Search by name"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        <div style="float: right; margin: -113px 40px;">
+                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            vehicleAdd() {
+                appConfig.$emit('route', 'location-add');
+            },
+            changeView() {
+                appConfig.$emit('searchQueryLocations', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
+            },
+            goSearch() {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
+                }
+            },
+            filterStatus(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatus', status);
+                }
+            },
+            filterStatusL(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatusL', status);
+                }
+            }
+        },
+    });
+    Vue.component('positions-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./img/loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 95px;margin-bottom: 50px;">
+                <div style="color: black;border:solid 1px;height: 80px;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click1="showDetails(item)">
+                    <input v-model="item.vehicle" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.lat" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.lng" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.date" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getPositions();
+            appConfig.$on('searchQueryLocations', searchQuery => {
+                let arr = [].concat(appConfig.positions);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.positions;
+                    this.filteredItems = appConfig.positions;
+                }
+            });
+        },
+        methods: {
+            getPositions() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/positions/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.positions = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(a.id) - parseInt(b.id);
+            },
+            updateItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/locations/update', {
+                    id: item.id,
+                    name: item.name,
+                    vehicle: item.vehicle,
+                    status: item.status,
+                    message: item.message,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                    });
+            },
+            deleteItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/locations/delete', {
+                    id: item.id,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getLocations();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            cancel() {
+                this.loading = true;
+                this.getLocations();
+            },
+        },
+    });
+    Vue.component('position-add', {
+        template: `<div style="text-align: center;margin-top: 120px;">
+        <div style="font-size: 40px;
+                        color: black;
+                        font-weight: bolder;
+                        margin: 20px;">New record</div>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="VehicleOid"
+            v-on:keypress="clearWarning"
+            v-model="vehicleOid" ><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="PlateNo"
+            v-on:keypress="clearWarning"
+            v-model="plateNo"><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="CompanyName"
+            v-on:keypress="clearWarning"
+            v-model="companyName" ><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                            color: white;outline:none;"
+            v-on:click="addItem">Submit</button>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                            color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">Back</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./img/loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="error" style="color: red; margin-top: 25px;">
+                {{errorText}}
+            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                vehicleOid: '',
+                plateNo: '',
+                companyName: '',
+                errorText: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1)
+                }, 100);
+            },
+            goBack() {
+                this.$router.push('/vehicles-table');
+            },
+            addItem() {
+                if (this.vehicleOid === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.plateNo === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.companyName === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/vehicles/add', {
+                    vehicleOid: this.vehicleOid,
+                    plateNo: this.plateNo,
+                    companyName: this.companyName,
+                    arrived: 'n/a',
+                    booked: 'n/a',
+                    departed: 'n/a',
+                    docked: 'n/a',
+                    undocked: 'n/a',
+                    status: 'created',
+                    standing: 'n/a',
+                    message: 'n/a',
+
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        if (result.body.error) {
+                            this.error = true;
+                            this.errorText = result.body.error;
+                        } else {
+                            this.$router.push('/vehicles-table');
+                        }
+                        this.loading = false;
+
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
+
+    Vue.component('top-map', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: 4px;">
+                <span style="font-size:30px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="margin-top: 15px; color: #01579B; font-size: 50px;margin-right: 100px;">
+            Google Maps API Demo
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            changeView() {
+                appConfig.$emit('searchQuery', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                appConfig.$emit('searchQuery', this.searchQuery);
+            },
+        },
+    });
     Vue.component('googleMap', {
         template: `<div>
             <img v-if="loading" style="position: absolute; margin-left: -160px; top: 300px; z-index: 100" src="./img/loading.gif" alt="">
@@ -3127,14 +3442,16 @@
         {path: '/vehicle-edit', component: VehiclesEdit},
         {path: '/vehicles-table', component: VehiclesTable},
         {path: '/vehicle-table-add', component: VehiclesTableAdd},
-        {path: '/driver-reg', component: DriverReg},
+        {path: '/registration', component: DriverReg},
         {path: '/driver', component: DriverStatus},
         {path: '/locations-table', component: LocationsTable},
         {path: '/location-add', component: LocationAdd},
         {path: '/audit', component: Audit},
         {path: '/operations', component: Operations},
-        {path: '/positions', component: Positions},
         {path: '/targets', component: Targets},
+        {path: '/target-add', component: TargetAdd},
+        {path: '/positions', component: Positions},
+        {path: '/position-add', component: PositionAdd},
         {path: '/map', component: GoogleMap},
     ];
 
@@ -3211,6 +3528,7 @@
                 this.locations = appConfig.route === 'locations-table';
                 this.operations = appConfig.route === 'operations';
                 this.audit = appConfig.route === 'audit';
+                this.registration = appConfig.route === 'registration';
                 this.driver = appConfig.route === 'driver';
                 this.positions = appConfig.route === 'positions';
                 this.targets = appConfig.route === 'targets';
