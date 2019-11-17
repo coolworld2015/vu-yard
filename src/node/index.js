@@ -51,6 +51,8 @@ const server = express()
     .get('/api/positions/get', Positions)
 
     .get('/api/targets/get', Targets)
+    .post('/api/targets/add', TargetAdd)
+    .post('/api/targets/delete', TargetDelete)
 
     .get('/api/auth', (req, res) => res.send({token: token}))
 
@@ -703,6 +705,74 @@ function Targets(req, res) {
                     return res.send({error: 'Server error'});
                 }
             }).sort({date: -1});
+        }
+    });
+}
+
+function TargetAdd(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var TargetsModel = require('./mongo').TargetsModel;
+            TargetsModel.findOne({vehicle: req.body.vehicle}, function (err, vehicle) {
+                if (err) {
+                    res.send({error: err.message});
+                }
+                if (vehicle) {
+                    if (vehicle.vehicle === req.body.vehicle) {
+                        res.send({error: 'Vehicle: ' + vehicle.vehicle + ' - already exist'});
+                    }
+                } else {
+                    var TargetsModel = require('./mongo').TargetsModel;
+                    var date = new Date().toJSON().slice(0, 10);
+                    var time = new Date().toTimeString().slice(0, 8);
+                    TargetsModel.create({
+                            id: +new Date(),
+                            vehicle: req.body.vehicle,
+                            lat: req.body.lat,
+                            lng: req.body.lng,
+                            date: date + ' ' + time,
+                        },
+                        function (err, location) {
+                            if (err) {
+                                return res.send({error: 'Server error'});
+                            }
+                            res.send(location);
+                        });
+                }
+            });
+        }
+    })
+}
+
+function TargetDelete(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var TargetsModel = require('./mongo').TargetsModel;
+            TargetsModel.remove({
+                    "id": req.body.id
+                },
+                function (err) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    } else {
+                        console.log('Target with id: ', req.body.id, ' was removed');
+                        res.send('Target with id: ' + req.body.id + ' was removed');
+                    }
+                });
         }
     });
 }

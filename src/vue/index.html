@@ -2587,7 +2587,7 @@
             <form class="search-form" id="search" style="">
                 <label>
                     <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
-                        placeholder="Search by name"
+                        placeholder="Search by PlateNo"
                         v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
                 </label>
                 <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
@@ -2604,10 +2604,10 @@
         },
         methods: {
             vehicleAdd() {
-                appConfig.$emit('route', 'location-add');
+                appConfig.$emit('route', 'target-add');
             },
             changeView() {
-                appConfig.$emit('searchQueryLocations', this.searchQuery);
+                appConfig.$emit('searchQueryTargets', this.searchQuery);
             },
             searchClear() {
                 this.searchQuery = '';
@@ -2665,9 +2665,9 @@
         },
         created() {
             this.getTargets();
-            appConfig.$on('searchQueryLocations', searchQuery => {
+            appConfig.$on('searchQueryTargets', searchQuery => {
                 let arr = [].concat(appConfig.targets);
-                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                let items = arr.filter((el) => el.vehicle.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
                 this.filteredItems = items;
                 this.items = items;
 
@@ -2732,7 +2732,7 @@
                 })
                     .then(result => {
                         this.loading = true;
-                        this.getLocations();
+                        this.getTargets();
                     })
                     .catch(error => {
                         this.error = true;
@@ -2741,7 +2741,7 @@
             },
             cancel() {
                 this.loading = true;
-                this.getLocations();
+                this.getTargets();
             },
         },
     });
@@ -2752,14 +2752,6 @@
                         font-weight: bolder;
                         margin: 20px;">New record</div>
 
-            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
-            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-            width: 450px;outline:none;margin-right: 0px;"
-            placeholder="VehicleOid"
-            v-on:keypress="clearWarning"
-            v-model="vehicleOid" ><br>
-
             <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
@@ -2768,13 +2760,21 @@
             v-on:keypress="clearWarning"
             v-model="plateNo"><br>
 
+            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Latitude"
+            v-on:keypress="clearWarning"
+            v-model="lat" ><br>
+
             <!--<span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
             width: 450px;outline:none;margin-right: 0px;"
-            placeholder="CompanyName"
+            placeholder="Longitude"
             v-on:keypress="clearWarning"
-            v-model="companyName" ><br>
+            v-model="lng" ><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
@@ -2812,9 +2812,9 @@
             return {
                 id: '',
                 title: '',
-                vehicleOid: '',
                 plateNo: '',
-                companyName: '',
+                lat: '',
+                lng: '',
                 errorText: '',
                 invalidValue: false,
                 error: false,
@@ -2832,18 +2832,18 @@
                 }, 100);
             },
             goBack() {
-                this.$router.push('/vehicles-table');
+                this.$router.push('/targets');
             },
             addItem() {
-                if (this.vehicleOid === '') {
-                    this.invalidValue = true;
-                }
-
                 if (this.plateNo === '') {
                     this.invalidValue = true;
                 }
 
-                if (this.companyName === '') {
+                if (this.lat === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.lng === '') {
                     this.invalidValue = true;
                 }
 
@@ -2852,18 +2852,10 @@
                 }
 
                 this.loading = true;
-                this.$http.post(appConfig.url + 'api/vehicles/add', {
-                    vehicleOid: this.vehicleOid,
-                    plateNo: this.plateNo,
-                    companyName: this.companyName,
-                    arrived: 'n/a',
-                    booked: 'n/a',
-                    departed: 'n/a',
-                    docked: 'n/a',
-                    undocked: 'n/a',
-                    status: 'created',
-                    standing: 'n/a',
-                    message: 'n/a',
+                this.$http.post(appConfig.url + 'api/targets/add', {
+                    vehicle: this.plateNo,
+                    lat: this.lat,
+                    lng: this.lng,
 
                     authorization: appConfig.access_token
                 })
@@ -2872,10 +2864,9 @@
                             this.error = true;
                             this.errorText = result.body.error;
                         } else {
-                            this.$router.push('/vehicles-table');
+                            this.$router.push('/targets');
                         }
                         this.loading = false;
-
                     })
                     .catch(error => {
                         this.error = true;
@@ -3200,8 +3191,8 @@
 
     Vue.component('top-map', {
         template: `<div>
-        <div style="float: left; margin: 20px; margin-top: 4px;">
-                <span style="font-size:30px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
         </div>
         <div style="margin-top: 15px; color: #01579B; font-size: 50px;margin-right: 100px;">
             Google Maps API Demo
@@ -3506,8 +3497,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
