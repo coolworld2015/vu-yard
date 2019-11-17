@@ -52,6 +52,7 @@ const server = express()
 
     .get('/api/targets/get', Targets)
     .post('/api/targets/add', TargetAdd)
+    .post('/api/targets/update', TargetUpdate)
     .post('/api/targets/delete', TargetDelete)
 
     .get('/api/auth', (req, res) => res.send({token: token}))
@@ -720,13 +721,13 @@ function TargetAdd(req, res) {
             });
         } else {
             var TargetsModel = require('./mongo').TargetsModel;
-            TargetsModel.findOne({vehicle: req.body.vehicle}, function (err, vehicle) {
+            TargetsModel.findOne({vehicle: req.body.vehicle}, function (err, target) {
                 if (err) {
                     res.send({error: err.message});
                 }
-                if (vehicle) {
-                    if (vehicle.vehicle === req.body.vehicle) {
-                        res.send({error: 'Vehicle: ' + vehicle.vehicle + ' - already exist'});
+                if (target) {
+                    if (target.vehicle === req.body.vehicle) {
+                        res.send({error: 'Vehicle: ' + target.vehicle + ' - already exist'});
                     }
                 } else {
                     var TargetsModel = require('./mongo').TargetsModel;
@@ -749,6 +750,43 @@ function TargetAdd(req, res) {
             });
         }
     })
+}
+
+function TargetUpdate(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var TargetsModel = require('./mongo').TargetsModel;
+            var date = new Date().toJSON().slice(0, 10);
+            var time = new Date().toTimeString().slice(0, 8);
+            TargetsModel.findOne({
+                id: req.body.id
+            }, function (err, target) {
+                if (err) {
+                    res.send({error: err.message});
+                } else {
+                    target.vehicle = req.body.vehicle;
+                    target.lat = req.body.lat;
+                    target.lng = req.body.lng;
+                    target.date = date + ' ' + time;
+
+                    target.save(function (err) {
+                        if (!err) {
+                            res.send(target);
+                        } else {
+                            return res.send(err);
+                        }
+                    });
+                }
+            });
+        }
+    });
 }
 
 function TargetDelete(req, res) {
