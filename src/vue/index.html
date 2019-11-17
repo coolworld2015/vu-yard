@@ -1,5 +1,7 @@
 <meta http-equiv="content-type" content="name/html; charset=UTF-8"/>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+
+<title>Yard Management System by Eduard Tkachuk</title>
 <link rel="shortcut icon" type="image/png" href="./img/yard.png"/>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
@@ -3046,8 +3048,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            appConfig.url = 'http://localhost:3000/';
+            appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            //appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
