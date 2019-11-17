@@ -358,14 +358,14 @@
                     </div>`
     };
 
-    const Positions = {
+    const Targets = {
         template: `
                     <div style="width: 100%">
                         <div class="top">
-                            <top-operations></top-operations>
+                            <top-targets></top-targets>
                         </div>
                             <div>
-                                <positions-items-table></positions-items-table>
+                                <targets-items-table></targets-items-table>
                             </div>
                         <div class="bottom">
                             <bottom></bottom>
@@ -373,14 +373,14 @@
                     </div>`
     };
 
-    const Targets = {
+    const Positions = {
         template: `
                     <div style="width: 100%">
                         <div class="top">
-                            <top-operations></top-operations>
+                            <top-positions></top-positions>
                         </div>
                             <div>
-                                <targets-items-table></targets-items-table>
+                                <positions-items-table></positions-items-table>
                             </div>
                         <div class="bottom">
                             <bottom></bottom>
@@ -697,6 +697,110 @@
         },
     });
     Vue.component('top-locations', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Search by name"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        <div style="float: right; margin: -113px 40px;">
+                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            vehicleAdd() {
+                appConfig.$emit('route', 'location-add');
+            },
+            changeView() {
+                appConfig.$emit('searchQueryLocations', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
+            },
+            goSearch() {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
+                }
+            },
+            filterStatus(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatus', status);
+                }
+            },
+            filterStatusL(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatusL', status);
+                }
+            }
+        },
+    });
+    Vue.component('top-targets', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Search by name"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        <div style="float: right; margin: -113px 40px;">
+                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            vehicleAdd() {
+                appConfig.$emit('route', 'location-add');
+            },
+            changeView() {
+                appConfig.$emit('searchQueryLocations', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
+            },
+            goSearch() {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
+                }
+            },
+            filterStatus(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatus', status);
+                }
+            },
+            filterStatusL(status) {
+                if (appConfig.route === 'dispatcher') {
+                    appConfig.$emit('filterStatusL', status);
+                }
+            }
+        },
+    });
+    Vue.component('top-positions', {
         template: `<div>
         <div style="float: left; margin: 20px; margin-top: -3px;">
                 <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
