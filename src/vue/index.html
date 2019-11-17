@@ -2904,10 +2904,10 @@
         },
         methods: {
             vehicleAdd() {
-                appConfig.$emit('route', 'location-add');
+                appConfig.$emit('route', 'position-add');
             },
             changeView() {
-                appConfig.$emit('searchQueryLocations', this.searchQuery);
+                appConfig.$emit('searchQueryPositions', this.searchQuery);
             },
             searchClear() {
                 this.searchQuery = '';
@@ -3052,14 +3052,6 @@
                         font-weight: bolder;
                         margin: 20px;">New record</div>
 
-            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
-            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-            width: 450px;outline:none;margin-right: 0px;"
-            placeholder="VehicleOid"
-            v-on:keypress="clearWarning"
-            v-model="vehicleOid" ><br>
-
             <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
@@ -3068,13 +3060,21 @@
             v-on:keypress="clearWarning"
             v-model="plateNo"><br>
 
+            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Latitude"
+            v-on:keypress="clearWarning"
+            v-model="lat" ><br>
+
             <!--<span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
             width: 450px;outline:none;margin-right: 0px;"
-            placeholder="CompanyName"
+            placeholder="Longitude"
             v-on:keypress="clearWarning"
-            v-model="companyName" ><br>
+            v-model="lng" ><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
@@ -3112,9 +3112,9 @@
             return {
                 id: '',
                 title: '',
-                vehicleOid: '',
                 plateNo: '',
-                companyName: '',
+                lat: '',
+                lng: '',
                 errorText: '',
                 invalidValue: false,
                 error: false,
@@ -3132,18 +3132,18 @@
                 }, 100);
             },
             goBack() {
-                this.$router.push('/vehicles-table');
+                this.$router.push('/positions');
             },
             addItem() {
-                if (this.vehicleOid === '') {
-                    this.invalidValue = true;
-                }
-
                 if (this.plateNo === '') {
                     this.invalidValue = true;
                 }
 
-                if (this.companyName === '') {
+                if (this.lat === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.lng === '') {
                     this.invalidValue = true;
                 }
 
@@ -3152,18 +3152,10 @@
                 }
 
                 this.loading = true;
-                this.$http.post(appConfig.url + 'api/vehicles/add', {
-                    vehicleOid: this.vehicleOid,
-                    plateNo: this.plateNo,
-                    companyName: this.companyName,
-                    arrived: 'n/a',
-                    booked: 'n/a',
-                    departed: 'n/a',
-                    docked: 'n/a',
-                    undocked: 'n/a',
-                    status: 'created',
-                    standing: 'n/a',
-                    message: 'n/a',
+                this.$http.post(appConfig.url + 'api/positions/add', {
+                    vehicle: this.plateNo,
+                    lat: this.lat,
+                    lng: this.lng,
 
                     authorization: appConfig.access_token
                 })
@@ -3172,10 +3164,9 @@
                             this.error = true;
                             this.errorText = result.body.error;
                         } else {
-                            this.$router.push('/vehicles-table');
+                            this.$router.push('/positions');
                         }
                         this.loading = false;
-
                     })
                     .catch(error => {
                         this.error = true;
