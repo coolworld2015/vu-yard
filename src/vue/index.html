@@ -1271,7 +1271,14 @@
                 this.standing = appConfig.item.standing;
                 this.status = appConfig.item.status;
                 this.message = appConfig.item.message;
-                appConfig.$emit('itemsCount', 1);
+
+                if (this.status !== 'arrived') {
+                    this.options = [];
+                }
+
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1)
+                }, 100);
             },
             goBack() {
                 this.$router.push('/dispatcher');
@@ -1293,17 +1300,13 @@
                     }
                 }
 
-                if ((status !== 'booked') && (status !== 'docked')) {
-                    this.standing = 'n/a';
-                }
-
-        //Status - created (arrived)
+                //Status - created (arrived)
                 if ((this.status === 'created') && (status !== 'arrived')) {
                     this.invalidValue = true;
                     this.invalidStandingValue = false;
                 }
 
-        //Status - arrived (booked, departed)
+                //Status - arrived (booked, departed)
                 if ((this.status === 'arrived') && (status == 'arrived')) {
                     this.invalidValue = true;
                     this.invalidStandingValue = false;
@@ -1319,7 +1322,7 @@
                     this.invalidStandingValue = false;
                 }
 
-        //Status - booked (arrived, docked)
+                //Status - booked (arrived, docked)
                 if ((this.status === 'booked') && (status == 'booked')) {
                     this.invalidValue = true;
                     this.invalidStandingValue = false;
@@ -1335,13 +1338,13 @@
                     this.invalidStandingValue = false;
                 }
 
-        //Status - docked (undocked)
+                //Status - docked (undocked)
                 if ((this.status === 'docked') && (status !== 'undocked')) {
                     this.invalidValue = true;
                     this.invalidStandingValue = false;
                 }
 
-        //Status - undocked (arrived, departed)
+                //Status - undocked (arrived, departed)
                 if ((this.status === 'undocked') && (status == 'undocked')) {
                     this.invalidValue = true;
                     this.invalidStandingValue = false;
@@ -1357,15 +1360,18 @@
                     this.invalidStandingValue = false;
                 }
 
-        //Status - departed (arrived)
+                //Status - departed (arrived)
                 if ((this.status === 'departed') && (status !== 'arrived')) {
                     this.invalidValue = true;
                     this.invalidStandingValue = false;
                 }
 
-
                 if ((this.invalidValue) || (this.invalidStandingValue)) {
                     return;
+                }
+
+                if ((status !== 'booked') && (status !== 'docked')) {
+                    this.standing = 'n/a';
                 }
 
                 this.locationStatus = status;
