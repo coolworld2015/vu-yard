@@ -582,7 +582,7 @@
         <div style="float: right; margin: -128px 140px;">
                 <span title="All" style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('*')"><i class="fas fa-filter"></i></span>
                 <span title="Created" style="color: #eee !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('created')"><i class="fas fa-filter"></i></span>
-                <span title="Arrived" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('arrived')"><i class="fas fa-filter"></i></span>
+                <span title="Standby" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('arrived')"><i class="fas fa-filter"></i></span>
                 <span title="Booked" style="color: green !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('booked')"><i class="fas fa-filter"></i></span>
                 <span title="Docked" style="color: red !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('docked')"><i class="fas fa-filter"></i></span>
                 <span title="Undocked" style="color: dodgerblue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('undocked')"><i class="fas fa-filter"></i></span>
@@ -1156,7 +1156,7 @@
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: yellow;color: blue;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
             v-on:click="updateVehicle('arrived')">
-                Arrived
+                Standby
             </button>
 
             <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: green;color: white;outline:none;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;"
@@ -1286,11 +1286,6 @@
                     this.locationName = obj[0].name;
                 }
 
-                if ((this.status === 'created') && (status !== 'arrived')) {
-                    this.invalidValue = true;
-                    this.invalidStandingValue = false;
-                }
-
                 if ((status === 'booked') || (status === 'docked')) {
                     this.invalidValue = false;
                     if (this.standing === 'n/a') {
@@ -1301,6 +1296,73 @@
                 if ((status !== 'booked') && (status !== 'docked')) {
                     this.standing = 'n/a';
                 }
+
+        //Status - created (arrived)
+                if ((this.status === 'created') && (status !== 'arrived')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+        //Status - arrived (booked, departed)
+                if ((this.status === 'arrived') && (status == 'arrived')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+                if ((this.status === 'arrived') && (status == 'docked')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+                if ((this.status === 'arrived') && (status == 'undocked')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+        //Status - booked (arrived, docked)
+                if ((this.status === 'booked') && (status == 'booked')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+                if ((this.status === 'booked') && (status == 'undocked')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+                if ((this.status === 'booked') && (status == 'departed')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+        //Status - docked (undocked)
+                if ((this.status === 'docked') && (status !== 'undocked')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+        //Status - undocked (arrived, departed)
+                if ((this.status === 'undocked') && (status == 'undocked')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+                if ((this.status === 'undocked') && (status == 'booked')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+                if ((this.status === 'undocked') && (status == 'docked')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
+        //Status - departed (arrived)
+                if ((this.status === 'departed') && (status !== 'arrived')) {
+                    this.invalidValue = true;
+                    this.invalidStandingValue = false;
+                }
+
 
                 if ((this.invalidValue) || (this.invalidStandingValue)) {
                     return;
