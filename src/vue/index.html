@@ -3593,7 +3593,7 @@
         <div v-if="!loading">
             <div style="margin-top: 95px;margin-bottom: 50px;">
                 <div style="color: black;border:solid 1px;height: 300px;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click1="showDetails(item)">
-                    <div><img :src="item.photo" style="float: left;width: 250px; height: 222px;margin: 37px 0 0 30px;border-radius: 10px;"> </div>
+                    <div><img :src="item.photo" style="float: left;width: 320px; height: 240px;margin: 29px 0 0 30px;border-radius: 10px;"> </div>
                     <div style="float: left; margin: 120px;">{{item.name}} - {{item.host}} - {{item.date}}</div>
                 </div>
             </div>
@@ -3782,13 +3782,13 @@
                     context.fillStyle = "#AAA";
                     context.fillRect(0, 0, canvas.width, canvas.height);
 
-                    width = 640;
+                    width = 320;
                     height = 0;
                     video = document.getElementById('video');
                 }, 100);
             },
             doPlay() {
-                navigator.mediaDevices.getUserMedia({video: true, audio: false})
+                navigator.mediaDevices.getUserMedia({audio: false, video: { width: 320, height: 240 }})
                     .then(function (stream) {
                         video.srcObject = stream;
                         video.play();
