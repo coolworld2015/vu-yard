@@ -58,6 +58,9 @@ const server = express()
     .post('/api/positions/update', PositionUpdate)
     .post('/api/positions/delete', PositionDelete)
 
+    .get('/api/guests/get', Guests)
+    .post('/api/guests/add', GuestAdd)
+
     .get('/api/auth', (req, res) => res.send({token: token}))
 
     .get('/api/test', TestPOST)
@@ -666,123 +669,6 @@ function Operations(req, res) {
 }
 
 //------------------------------------------------------------------------
-function Positions(req, res) {
-    var agent = req.headers.authorization;
-
-    jwt.verify(agent, secret, function (err, decoded) {
-        if (err) {
-            return res.status(403).send({
-                success: false,
-                message: 'No token provided.'
-            });
-        } else {
-            var PositionsModel = require('./mongo').PositionsModel;
-            return PositionsModel.find(function (err, positions) {
-                if (!err) {
-                    return res.send(positions);
-                } else {
-                    res.statusCode = 500;
-                    return res.send({error: 'Server error'});
-                }
-            }).sort({date: -1});
-        }
-    });
-}
-
-function PositionAdd(req, res) {
-    var agent = req.body.authorization;
-
-    jwt.verify(agent, secret, function (err, decoded) {
-        if (err) {
-            return res.status(403).send({
-                success: false,
-                message: 'No token provided.'
-            });
-        } else {
-            var PositionsModel = require('./mongo').PositionsModel;
-            var date = new Date().toJSON().slice(0, 10);
-            var time = new Date().toTimeString().slice(0, 8);
-            PositionsModel.create({
-                    id: +new Date(),
-                    vehicle: req.body.vehicle,
-                    lat: req.body.lat,
-                    lng: req.body.lng,
-                    date: date + ' ' + time,
-                },
-                function (err, position) {
-                    if (err) {
-                        return res.send({error: 'Server error'});
-                    }
-                    res.send(position);
-                });
-        }
-    });
-}
-
-function PositionUpdate(req, res) {
-    var agent = req.body.authorization;
-
-    jwt.verify(agent, secret, function (err, decoded) {
-        if (err) {
-            return res.status(403).send({
-                success: false,
-                message: 'No token provided.'
-            });
-        } else {
-            var PositionsModel = require('./mongo').PositionsModel;
-            var date = new Date().toJSON().slice(0, 10);
-            var time = new Date().toTimeString().slice(0, 8);
-            PositionsModel.findOne({
-                id: req.body.id
-            }, function (err, position) {
-                if (err) {
-                    res.send({error: err.message});
-                } else {
-                    position.vehicle = req.body.vehicle;
-                    position.lat = req.body.lat;
-                    position.lng = req.body.lng;
-                    position.date = date + ' ' + time;
-
-                    position.save(function (err) {
-                        if (!err) {
-                            res.send(position);
-                        } else {
-                            return res.send(err);
-                        }
-                    });
-                }
-            });
-        }
-    });
-}
-
-function PositionDelete(req, res) {
-    var agent = req.body.authorization;
-
-    jwt.verify(agent, secret, function (err, decoded) {
-        if (err) {
-            return res.status(403).send({
-                success: false,
-                message: 'No token provided.'
-            });
-        } else {
-            var PositionsModel = require('./mongo').PositionsModel;
-            PositionsModel.remove({
-                    "id": req.body.id
-                },
-                function (err) {
-                    if (err) {
-                        return res.send({error: 'Server error'});
-                    } else {
-                        console.log('Position with id: ', req.body.id, ' was removed');
-                        res.send('Position with id: ' + req.body.id + ' was removed');
-                    }
-                });
-        }
-    });
-}
-
-//------------------------------------------------------------------------
 function Targets(req, res) {
     var agent = req.headers.authorization;
 
@@ -906,6 +792,177 @@ function TargetDelete(req, res) {
                         console.log('Target with id: ', req.body.id, ' was removed');
                         res.send('Target with id: ' + req.body.id + ' was removed');
                     }
+                });
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+function Positions(req, res) {
+    var agent = req.headers.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var PositionsModel = require('./mongo').PositionsModel;
+            return PositionsModel.find(function (err, positions) {
+                if (!err) {
+                    return res.send(positions);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            }).sort({date: -1});
+        }
+    });
+}
+
+function PositionAdd(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var PositionsModel = require('./mongo').PositionsModel;
+            var date = new Date().toJSON().slice(0, 10);
+            var time = new Date().toTimeString().slice(0, 8);
+            PositionsModel.create({
+                    id: +new Date(),
+                    vehicle: req.body.vehicle,
+                    lat: req.body.lat,
+                    lng: req.body.lng,
+                    date: date + ' ' + time,
+                },
+                function (err, position) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    }
+                    res.send(position);
+                });
+        }
+    });
+}
+
+function PositionUpdate(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var PositionsModel = require('./mongo').PositionsModel;
+            var date = new Date().toJSON().slice(0, 10);
+            var time = new Date().toTimeString().slice(0, 8);
+            PositionsModel.findOne({
+                id: req.body.id
+            }, function (err, position) {
+                if (err) {
+                    res.send({error: err.message});
+                } else {
+                    position.vehicle = req.body.vehicle;
+                    position.lat = req.body.lat;
+                    position.lng = req.body.lng;
+                    position.date = date + ' ' + time;
+
+                    position.save(function (err) {
+                        if (!err) {
+                            res.send(position);
+                        } else {
+                            return res.send(err);
+                        }
+                    });
+                }
+            });
+        }
+    });
+}
+
+function PositionDelete(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var PositionsModel = require('./mongo').PositionsModel;
+            PositionsModel.remove({
+                    "id": req.body.id
+                },
+                function (err) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    } else {
+                        console.log('Position with id: ', req.body.id, ' was removed');
+                        res.send('Position with id: ' + req.body.id + ' was removed');
+                    }
+                });
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+function Guests(req, res) {
+    var agent = req.headers.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var GuestsModel = require('./mongo').GuestsModel;
+            return GuestsModel.find(function (err, guests) {
+                if (!err) {
+                    return res.send(guests);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            }).sort({date: -1});
+        }
+    });
+}
+
+function GuestAdd(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var GuestsModel = require('./mongo').GuestsModel;
+            var date = new Date().toJSON().slice(0, 10);
+            var time = new Date().toTimeString().slice(0, 8);
+            GuestsModel.create({
+                    id: +new Date(),
+                    photo: req.body.photo,
+                    name: req.body.name,
+                    host: req.body.host,
+                    date: date + ' ' + time,
+                },
+                function (err, guest) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    }
+                    res.send(guest);
                 });
         }
     });

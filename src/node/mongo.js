@@ -95,6 +95,18 @@ var OperationsModel = mongoose.model('Operations', Operations);
 module.exports.OperationsModel = OperationsModel;
 
 //---------------------------------------------------------------------------------------------
+var Targets = new Schema({
+    id: {type: String, required: true},
+    vehicle: {type: String, required: true},
+    lat: {type: String, required: true},
+    lng: {type: String, required: true},
+    date: {type: String, required: true},
+});
+
+var TargetsModel = mongoose.model('Targets', Targets);
+module.exports.TargetsModel = TargetsModel;
+
+//---------------------------------------------------------------------------------------------
 var Positions = new Schema({
     id: {type: String, required: true},
     vehicle: {type: String, required: true},
@@ -107,13 +119,13 @@ var PositionsModel = mongoose.model('Positions', Positions);
 module.exports.PositionsModel = PositionsModel;
 
 //---------------------------------------------------------------------------------------------
-var Targets = new Schema({
+var Guests = new Schema({
     id: {type: String, required: true},
-    vehicle: {type: String, required: true},
-    lat: {type: String, required: true},
-    lng: {type: String, required: true},
+    photo: {type: String, required: true},
+    name: {type: String, required: true},
+    host: {type: String, required: true},
     date: {type: String, required: true},
 });
 
-var TargetsModel = mongoose.model('Targets', Targets);
-module.exports.TargetsModel = TargetsModel;
+var GuestsModel = mongoose.model('Guests', Guests);
+module.exports.GuestsModel = GuestsModel;

@@ -421,14 +421,27 @@
                     </div>`
     };
 
+    const Guests = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-guests></top-guests>
+                        </div>
+                            <div>
+                                <guests-items-table></guests-items-table>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
+    };
     const GuestReg = {
         template: `
                     <div style="width: 100%">
                         <div class="top">
-                            <top-guest></top-guest>
+                            <top-guests></top-guests>
                         </div>
                             <div>
-                                <guest-reg></guest-reg>
+                                <guest-add></guest-add>
                             </div>`
     };
 
@@ -3533,13 +3546,23 @@
         },
     });
 
-    Vue.component('top-guest', {
+    Vue.component('top-guests', {
         template: `<div>
         <div style="float: left; margin: 20px; margin-top: -3px;">
                 <span title="Show menu" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
         </div>
-        <div style="margin-top: 15px; color: #01579B; font-size: 50px;margin-right: 100px;">
-            UGD - Demo
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Search by name"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="changeView">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="changeView"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        <div style="float: right; margin: -113px 40px;">
+                <span title="Add item" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
         </div>
         </div>`,
         data() {
@@ -3549,33 +3572,132 @@
         },
         methods: {
             vehicleAdd() {
-                appConfig.$emit('route', 'location-add');
+                appConfig.$emit('route', 'guest-add');
             },
             changeView() {
-                appConfig.$emit('searchQueryLocations', this.searchQuery);
+                appConfig.$emit('searchQueryGuests', this.searchQuery);
             },
             searchClear() {
                 this.searchQuery = '';
                 this.changeView();
             },
-            goSearch() {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('searchQueryDispatcher', this.searchQuery);
-                }
-            },
-            filterStatus(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatus', status);
-                }
-            },
-            filterStatusL(status) {
-                if (appConfig.route === 'dispatcher') {
-                    appConfig.$emit('filterStatusL', status);
-                }
-            }
         },
     });
-    Vue.component('guest-reg', {
+    Vue.component('guests-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./img/loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 95px;margin-bottom: 50px;">
+                <div style="color: black;border:solid 1px;height: 80px;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click1="showDetails(item)">
+                    <input v-model="item.name" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.lat" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.lng" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <input v-model="item.date" style="border-radius: 5px;height: 40px;margin: 20px;font-size: 20px;width: 200px;"/>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
+                    <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getGuests();
+            appConfig.$on('searchQueryGuests', searchQuery => {
+                let arr = [].concat(appConfig.guests);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.guests;
+                    this.filteredItems = appConfig.guests;
+                }
+            });
+        },
+        methods: {
+            getGuests() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/guests/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.guests = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            updateItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/positions/update', {
+                    id: item.id,
+                    vehicle: item.vehicle,
+                    lat: item.lat,
+                    lng: item.lng,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getPositions();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                    });
+            },
+            deleteItem(item) {
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/positions/delete', {
+                    id: item.id,
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        this.loading = true;
+                        this.getPositions();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            cancel() {
+                this.loading = true;
+                this.getPositions();
+            },
+        },
+    });
+    Vue.component('guest-add', {
         template: `<div style="text-align: center;margin-top: 120px;">
             <div style="font-size: 40px;color: #01579B;font-weight: bolder;margin: 30px;margin-top: 50px"
                 v-on:click="doPlay()">
@@ -3803,7 +3925,7 @@
         {path: '/positions', component: Positions},
         {path: '/position-add', component: PositionAdd},
         {path: '/map', component: GoogleMap},
-        {path: '/guests', component: GuestReg},
+        {path: '/guests', component: Guests},
     ];
 
     const router = new VueRouter({
@@ -3820,8 +3942,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://jwt-yard.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
