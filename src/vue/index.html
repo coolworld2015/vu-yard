@@ -181,6 +181,9 @@
             <li v-on:click="changeRoute('audit')" v-bind:class="{ active: audit }">
                 <i class="fas fa-shield-alt"></i><span style="margin: 15px;">Security log</span></li>
 
+            <li v-on:click="changeRoute('guests')" v-bind:class="{ active: guests }">
+                <i class="fas fa-id-card"></i><span style="margin: 15px;">Guests</span></li>
+
             <li v-on:click="logout()" v-bind:class="{ active: driver }">
                 <i class="fas fa-sign-out-alt"></i><span style="margin: 15px;">Logout</span></li>
 
@@ -416,6 +419,17 @@
                         <div class="top"><top-map></top-map></div>
                         <div style="margin-top: 96px;"><google-map></google-map></div>
                     </div>`
+    };
+
+    const GuestReg = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-driver></top-driver>
+                        </div>
+                            <div>
+                                <guest-reg></guest-reg>
+                            </div>`
     };
 
     Vue.component('login', {
@@ -3519,6 +3533,215 @@
         },
     });
 
+    Vue.component('guest-reg', {
+        template: `<div style="text-align: center;margin-top: 120px;">
+            <div style="font-size: 40px;color: #01579B;font-weight: bolder;margin: 30px;margin-top: 50px"
+                v-on:click="doPlay()">
+                    Guest registration
+            </div>
+
+            <div id="container" style="position: relative;" v-on:click="takePicture()">
+                <div class="camera" style="position: absolute;top: 0;left:0;width: 100%;height: 100%;">
+                    <video id="video" >Video stream not available.</video>
+                </div>
+                <div>
+                    <canvas id="canvas" style="z-index: 10;width: 600px;height: 450px;"></canvas>
+                </div>
+            </div>
+            <hr>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Name"
+            v-on:keypress="clearWarning"
+            v-on:keypress.enter="doReg"
+            v-model="name"><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;"
+            v-on:click="doReg">Submit</button>
+
+            <button style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;margin-top: 20px;"
+            v-on:click="doClear">Cancel</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./img/loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="massage" style="color: red; margin-top: 25px;">
+                Can't register this PlateNo - try another one
+            </div>
+
+            <div v-if="error" style="color: red; margin-top: 25px;">
+                Server error - try again
+            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                vehicleOid: '',
+                name: '',
+                companyName: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+                massage: false
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1);
+
+                    canvas = document.getElementById('canvas');
+                    context = canvas.getContext('2d');
+                    context.fillStyle = "#AAA";
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+
+                    width = 640;
+                    height = 0;
+                    video = document.getElementById('video');
+                }, 100);
+
+            },
+            doPlay() {
+                navigator.mediaDevices.getUserMedia({video: true, audio: false})
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                        video.play();
+                        height = video.videoHeight / (video.videoWidth / width);
+                        height = width / (4 / 3);
+                        video.setAttribute("style","display:block;width:100%;height: 100%;");
+                    })
+                    .catch(function (err) {
+                        console.log("An error occurred: " + err);
+                    });
+            },
+            doStop() {
+                video.srcObject.getTracks()[0].stop();
+            },
+            takePicture() {
+                canvas = document.getElementById('canvas');
+                photo = document.getElementById('photo');
+                var context = canvas.getContext('2d');
+
+                canvas.width = width;
+                canvas.height = height;
+                context.drawImage(video, 0, 0, width, height);
+
+                var data = canvas.toDataURL('image/png');
+                //photo.setAttribute('src', data);
+                console.log(data);
+                video.srcObject.getTracks()[0].stop();
+                video.setAttribute("style","display:none;width:100%;height: 100%;");
+            },
+            goBack() {
+                this.$router.push('/dispatcher');
+            },
+            doClear() {
+                this.plateNo = '';
+                this.massage = false;
+                this.invalidValue = false;
+            },
+            doReg() {
+                if (this.name === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.getToken();
+                    return;
+                }
+
+                this.loading = true;
+                this.massage = false;
+
+                this.$http.get(appConfig.url + 'api/vehicles/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data;
+                        let arr = this.items.filter((el) => el.plateNo.toLowerCase() === this.plateNo.toLowerCase());
+                        if (arr[0]) {
+                            if (arr[0].plateNo.toLowerCase() === this.plateNo.toLowerCase()) {
+                                appConfig.driver = arr[0];
+                                appConfig.driver.reg = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString();
+
+                                this.$http.post(appConfig.url + 'api/audit/add', {
+                                    name: this.plateNo,
+                                    description: 'Driver - Web',
+                                    authorization: appConfig.access_token
+                                })
+                                    .then(result => {
+                                        this.loading = false;
+                                        this.$router.push('/driver');
+                                    })
+                                    .catch(error => {
+                                        this.error = true;
+                                        this.loading = false;
+                                    });
+                            }
+
+                        } else {
+                            this.massage = true;
+                            this.loading = false;
+                        }
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('/login');
+                    });
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body.token;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+                this.massage = false;
+            },
+        },
+    });
+
     const routes = [
         {path: '/', component: Login},
         {path: '*', component: Login},
@@ -3538,6 +3761,7 @@
         {path: '/positions', component: Positions},
         {path: '/position-add', component: PositionAdd},
         {path: '/map', component: GoogleMap},
+        {path: '/guests', component: GuestReg},
     ];
 
     const router = new VueRouter({
@@ -3618,6 +3842,7 @@
                 this.positions = appConfig.route === 'positions';
                 this.targets = appConfig.route === 'targets';
                 this.map = appConfig.route === 'map';
+                this.guests = appConfig.route === 'guests';
             },
             changeRoute(route) {
                 closeNav();
