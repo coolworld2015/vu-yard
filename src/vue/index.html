@@ -3704,7 +3704,7 @@
                     <video id="video" >Video stream not available.</video>
                 </div>
                 <div>
-                    <canvas id="canvas" style="z-index: 10;width: 600px;height: 450px;"></canvas>
+                    <canvas id="canvas" style="z-index: 10;width: 645px;height: 430px;"></canvas>
                 </div>
             </div>
             <hr>
@@ -3782,13 +3782,13 @@
                     context.fillStyle = "#AAA";
                     context.fillRect(0, 0, canvas.width, canvas.height);
 
-                    width = 320;
+                    width = 240;
                     height = 0;
                     video = document.getElementById('video');
                 }, 100);
             },
             doPlay() {
-                navigator.mediaDevices.getUserMedia({audio: false, video: { width: 320, height: 240 }})
+                navigator.mediaDevices.getUserMedia({audio: false, video: { width: 240, height: 160 }})
                     .then(function (stream) {
                         video.srcObject = stream;
                         video.play();
