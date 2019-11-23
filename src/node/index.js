@@ -956,6 +956,7 @@ function GuestAdd(req, res) {
                     photo: req.body.photo,
                     name: req.body.name,
                     host: req.body.host,
+                    status: req.body.status,
                     date: date + ' ' + time,
                 },
                 function (err, guest) {

@@ -444,6 +444,16 @@
                                 <guest-add></guest-add>
                             </div>`
     };
+    const GuestEdit = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-guests></top-guests>
+                        </div>
+                            <div>
+                                <guest-edit></guest-edit>
+                            </div>`
+    };
 
     Vue.component('login', {
         template: `<div style="background: #01579B;width: 100%;height: 100%;position: absolute;">
@@ -3591,10 +3601,14 @@
             </div>
         </div>
         <div v-if="!loading">
-            <div style="margin-top: 95px;margin-bottom: 50px;">
-                <div style="color: black;border:solid 1px;height: 300px;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click1="showDetails(item)">
-                    <div><img :src="item.photo" style="float: left;width: 320px; height: 240px;margin: 29px 0 0 30px;border-radius: 10px;"> </div>
-                    <div style="float: left; margin: 120px;">{{item.name}} - {{item.host}} - {{item.date}}</div>
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div v-bind:style=renderStatus(item) style="height: 150px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
+                    <div style="float: left;width: 20%;border-radius: 10px; margin-top: 15px;">
+                        <img :src="'./img/no-img.png'" style="height: 120px">
+                    </div>
+                    <div style="float: left; width: 80%; margin-top: 55px;">
+                        {{item.name}} - {{item.host}} - {{item.date}} - {{item.status}}
+                    </div>
                 </div>
             </div>
         </div>
@@ -3627,6 +3641,40 @@
             });
         },
         methods: {
+            renderStatus(item) {
+                switch (item.status) {
+                    case 'arrived':
+                        return {
+                            background: 'yellow',
+                            color: 'blue'
+                        };
+                        break;
+                    case 'booked':
+                        return {
+                            background: 'green',
+                            color: 'white'
+                        };
+                        break;
+                    case 'docked':
+                        return {
+                            background: 'red',
+                            color: 'white'
+                        };
+                        break;
+                    case 'undocked':
+                        return {
+                            background: 'dodgerblue',
+                            color: 'white'
+                        };
+                        break;
+                    case 'departed':
+                        return {
+                            background: 'gray',
+                            color: 'white'
+                        };
+                        break;
+                }
+            },
             getGuests() {
                 appConfig.getAccessToken();
 
@@ -3693,6 +3741,160 @@
         },
     });
     Vue.component('guest-add', {
+        template: `<div style="text-align: center;margin-top: 120px;">
+            <div style="font-size: 40px;color: #01579B;font-weight: bolder;margin: 30px;margin-top: 50px"
+                v-on:click="doPlay()">
+                    Guest registration
+            </div>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Name"
+            v-on:keypress="clearWarning"
+            v-on:keypress.enter="doReg"
+            v-model="name"><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Host"
+            v-on:keypress="clearWarning"
+            v-on:keypress.enter="doReg"
+            v-model="host"><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;"
+            v-on:click="addItem">Submit</button>
+
+            <button style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">Back</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./img/loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="massage" style="color: red; margin-top: 25px;">
+                Can't register this PlateNo - try another one
+            </div>
+
+            <div v-if="error" style="color: red; margin-top: 25px;">
+                Server error - try again
+            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                name: '',
+                photo: '',
+                host: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+                massage: false
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1);
+                }, 100);
+            },
+            goBack() {
+                video.srcObject.getTracks()[0].stop();
+                this.$router.push('/guests');
+            },
+            doClear() {
+                this.name = '';
+                this.massage = false;
+                this.invalidValue = false;
+            },
+            addItem() {
+                if (this.name === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.host === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.getToken();
+                    return;
+                }
+
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/guests/add', {
+                    photo: 'blank',
+                    name: this.name,
+                    host: this.host,
+                    status: 'created',
+
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        if (result.body.error) {
+                            this.error = true;
+                            this.errorText = result.body.error;
+                        } else {
+                            this.$router.push('/guests');
+                        }
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body.token;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+                this.massage = false;
+            },
+        },
+    });
+    Vue.component('guest-edit', {
         template: `<div style="text-align: center;margin-top: 120px;">
             <div style="font-size: 40px;color: #01579B;font-weight: bolder;margin: 30px;margin-top: 50px"
                 v-on:click="doPlay()">
@@ -3907,6 +4109,7 @@
         {path: '/map', component: GoogleMap},
         {path: '/guests', component: Guests},
         {path: '/guest-add', component: GuestAdd},
+        {path: '/guest-edit', component: GuestEdit},
     ];
 
     const router = new VueRouter({

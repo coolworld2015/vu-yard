@@ -124,6 +124,7 @@ var Guests = new Schema({
     photo: {type: String, required: true},
     name: {type: String, required: true},
     host: {type: String, required: true},
+    status: {type: String, required: true},
     date: {type: String, required: true},
 });
 
