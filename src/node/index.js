@@ -115,8 +115,10 @@ function Login(req, res) {
 
                 // Audit start
                 var AuditModel = require('./mongo').AuditModel;
-                var date = new Date().toJSON().slice(0, 10);
-                var time = new Date().toTimeString().slice(0, 8);
+                var d = new Date();
+                d.setHours(d.getHours() + 2);
+                var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
+                var time = d.toTimeString().slice(0, 8);
                 AuditModel.create({
                         id: +new Date(),
                         name: req.body.name,
