@@ -184,6 +184,9 @@
             <li v-on:click="changeRoute('guests')" v-bind:class="{ active: guests }">
                 <i class="fas fa-id-card"></i><span style="margin: 15px;">Guests</span></li>
 
+            <li v-on:click="changeRoute('journal')" v-bind:class="{ active: journal }">
+                <i class="fas fa-book"></i><span style="margin: 15px;">Journal</span></li>
+
             <li v-on:click="logout()" v-bind:class="{ active: driver }">
                 <i class="fas fa-sign-out-alt"></i><span style="margin: 15px;">Logout</span></li>
 
@@ -453,6 +456,20 @@
                             <div>
                                 <guest-edit></guest-edit>
                             </div>`
+    };
+
+    const Journal = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-guests></top-guests>
+                        </div>
+                            <div>
+                                <journal-items></journal-items>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
     };
 
     Vue.component('login', {
@@ -4118,6 +4135,111 @@
         },
     });
 
+    Vue.component('journal-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./img/loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
+                    {{ item.name }} - {{ item.date }} - {{ item.host }} - {{ item.status }}
+                    <span v-if="item.status=='booked' || item.status=='docked'"> - {{ item.vehicle }}</span>
+                </div>
+            </div>
+        </div>
+        <div v-if="error" style="color: red">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getLocations();
+            appConfig.$on('searchQueryDispatcher', searchQuery => {
+                let arr = [].concat(appConfig.locations);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                if (searchQuery === '') {
+                    this.items = appConfig.journal;
+                    this.filteredItems = appConfig.journal;
+                }
+            });
+            appConfig.$on('filterStatusL', status => {
+                let arr = [].concat(appConfig.journal);
+                let items = arr.filter((el) => el.status === status);
+                if (status === '*') {
+                    items = [].concat(appConfig.journal);
+                }
+                this.filteredItems = items;
+                this.items = items;
+            });
+        },
+        methods: {
+            renderStatus(item) {
+                switch (item.status) {
+                    case 'arrived':
+                        return {background: 'white', color: 'blue'};
+                        break;
+                    case 'booked':
+                        return {background: 'green', color: 'white'};
+                        break;
+                    case 'docked':
+                        return {background: 'red', color: 'white'};
+                        break;
+                    case 'undocked':
+                        return {background: 'dodgerblue', color: 'white'};
+                        break;
+                    case 'departed':
+                        return {background: 'gray', color: 'white'};
+                        break;
+                }
+            },
+            getLocations() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/journal/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.journal = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('vehicle-edit');
+            },
+        },
+    });
+
     const routes = [
         {path: '/', component: Login},
         {path: '*', component: Login},
@@ -4140,6 +4262,7 @@
         {path: '/guests', component: Guests},
         {path: '/guest-add', component: GuestAdd},
         {path: '/guest-edit', component: GuestEdit},
+        {path: '/journal', component: Journal},
     ];
 
     const router = new VueRouter({
@@ -4221,6 +4344,7 @@
                 this.targets = appConfig.route === 'targets';
                 this.map = appConfig.route === 'map';
                 this.guests = appConfig.route === 'guests';
+                this.journal = appConfig.route === 'journal';
             },
             changeRoute(route) {
                 closeNav();
