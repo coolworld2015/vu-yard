@@ -3606,7 +3606,7 @@
                         <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 120px;height: 120px;border-radius: 16px;">
                     </div>
                     <div style="float: left; width: 80%; margin-top: 55px;">
-                        {{item.name}} - {{item.host}} - {{item.date}} - {{item.status}}
+                        {{item.name}} - {{item.date}} - {{item.host}}
                     </div>
                 </div>
             </div>
@@ -3711,14 +3711,14 @@
         template: `<div style="text-align: center;margin-top: 120px;">
             <div style="font-size: 40px;color: #01579B;font-weight: bolder;margin: 30px;margin-top: 50px"
                 v-on:click="doPlay()">
-                    Guest registration
+                    Заявка на охрану
             </div>
 
             <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
             width: 450px;outline:none;margin-right: 0px;"
-            placeholder="Name"
+            placeholder="ФИО"
             v-on:keypress="clearWarning"
             v-on:keypress.enter="doReg"
             v-model="name"><br>
@@ -3727,13 +3727,13 @@
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
             width: 450px;outline:none;margin-right: 0px;"
-            placeholder="Host"
+            placeholder="Кто принимает"
             v-on:keypress="clearWarning"
             v-on:keypress.enter="doReg"
             v-model="host"><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
-                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+                <span v-show="invalidValue" style="margin-left: 0px;">Введите данные</span>
             </div>
 
             <button style="font-size: 24px;
@@ -3743,7 +3743,7 @@
                 background: #01579B;
                 box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                 color: white;outline:none;"
-            v-on:click="addItem">Submit</button>
+            v-on:click="addItem">Добавить</button>
 
             <button style="font-size: 24px;
                 height: 50px;
@@ -3752,7 +3752,7 @@
                 background: #01579B;
                 box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                 color: white;outline:none;margin-top: 20px;"
-            v-on:click="goBack">Back</button>
+            v-on:click="goBack">Назад</button>
 
             <div v-if="loading">
                 <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
@@ -3877,10 +3877,9 @@
                 <div id='photo' style="position: absolute;top: 0;left:0;width: 100%;height: 100%;border-radius: 10px;">
                     <img :src="this.photo" style="z-index: 10;width: 645px;height: 430px;border-radius: 10px;">
                 </div>
-            </div>
-            <hr>
+            </div><br>
 
-            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Кто принимает:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
             width: 450px;outline:none;margin-right: 0px; "
@@ -3890,18 +3889,47 @@
             v-on:keypress.enter="doReg"
             v-model="host"><br>
 
+<!--            &lt;!&ndash;<span style="font-size: 24px; color: black;margin-left: -41px;">Статус:</span>&ndash;&gt;
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px; "
+            placeholder="Status"
+            readonly
+            v-on:keypress="clearWarning"
+            v-on:keypress.enter="doReg"
+            v-model="status"><br>
+
+            &lt;!&ndash;<span style="font-size: 24px; color: black;margin-left: -41px;">Когда:</span>&ndash;&gt;
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px; "
+            placeholder="Date"
+            readonly
+            v-on:keypress="clearWarning"
+            v-on:keypress.enter="doReg"
+            v-model="date"><br>-->
+
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
-                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+                <span v-show="invalidValue" style="margin-left: 0px;">Сделайте фото</span>
             </div>
 
-            <button style="font-size: 24px;
+            <button v-if="input" style="font-size: 24px;
                 height: 50px;
                 width: 150px;
                 border-radius: 5px;
                 background: #01579B;
                 box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                 color: white;outline:none;"
-            v-on:click="addItem">Submit</button>
+            v-on:click="addItem">Зашел</button>
+
+            <button v-if="output" style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;"
+            v-on:click="addItem">Вышел</button>
 
             <button style="font-size: 24px;
                 height: 50px;
@@ -3910,7 +3938,7 @@
                 background: #01579B;
                 box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                 color: white;outline:none;margin-top: 20px;"
-            v-on:click="goBack">Back</button>
+            v-on:click="goBack">Назад</button>
 
             <div v-if="loading">
                 <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
@@ -3934,10 +3962,13 @@
                 photo: '',
                 host: '',
                 status: '',
+                date: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
-                massage: false
+                massage: false,
+                input: false,
+                output: false
             };
         },
         created() {
@@ -3959,6 +3990,7 @@
                 this.name = appConfig.item.name;
                 this.host = appConfig.item.host;
                 this.status = appConfig.item.status;
+                this.date = appConfig.item.date;
 
                 setTimeout(function () {
                     appConfig.$emit('itemsCount', 1);
@@ -3975,10 +4007,18 @@
                 }, 100);
 
                 if (this.status === 'created') {
+                    this.input = true;
                     var that = this;
                     setTimeout(function () {
                         that.doPlay();
                     }, 100);
+                } else {
+                    this.output = true;
+                }
+
+                if (this.status === 'departed') {
+                    this.input = true;
+                    this.output = false;
                 }
             },
             doPlay() {
@@ -4010,6 +4050,7 @@
                 this.photo = canvas.toDataURL('image/png');
                 video.srcObject.getTracks()[0].stop();
                 video.setAttribute("style", "display:none;width:100%;height: 100%;");
+                this.invalidValue = false;
             },
             goBack() {
                 if (video.srcObject) {
@@ -4022,12 +4063,14 @@
                 this.massage = false;
                 this.invalidValue = false;
             },
-            addItem() {
+            updateItem(status) {
+                this.invalidValue = false;
+
                 if (this.name === '') {
                     this.invalidValue = true;
                 }
 
-                if (this.photo === '') {
+                if (this.photo === 'blank' || this.photo === './img/no-img.png') {
                     this.invalidValue = true;
                 }
 
@@ -4047,7 +4090,7 @@
                     photo: this.photo,
                     name: this.name,
                     host: this.host,
-                    status: 'arrived',
+                    status: status,
 
                     authorization: appConfig.access_token
                 })
