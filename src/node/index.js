@@ -980,13 +980,9 @@ function GuestAdd(req, res) {
 
             // Journal start
             var JournalModel = require('./mongo').JournalModel;
-            var d = new Date();
-            d.setHours(d.getHours() + 2);
-            var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
-            var time = d.toTimeString().slice(0, 8);
             JournalModel.create({
                     id: +new Date(),
-                    name: req.body.plateNo,
+                    name: req.body.name,
                     host: req.body.host,
                     status: req.body.status,
                     date: date + ' ' + time
@@ -995,7 +991,6 @@ function GuestAdd(req, res) {
                     if (err) {
                         return res.send({error: 'Server error'});
                     }
-                    res.send(journal);
                 });
             // Journal end
         }
@@ -1039,13 +1034,9 @@ function GuestUpdate(req, res) {
 
                     // Journal start
                     var JournalModel = require('./mongo').JournalModel;
-                    var d = new Date();
-                    d.setHours(d.getHours() + 2);
-                    var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
-                    var time = d.toTimeString().slice(0, 8);
                     JournalModel.create({
                             id: +new Date(),
-                            name: req.body.plateNo,
+                            name: req.body.name,
                             host: req.body.host,
                             status: req.body.status,
                             date: date + ' ' + time
@@ -1054,7 +1045,6 @@ function GuestUpdate(req, res) {
                             if (err) {
                                 return res.send({error: 'Server error'});
                             }
-                            res.send(journal);
                         });
                     // Journal end
                 }
