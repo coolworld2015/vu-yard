@@ -977,6 +977,27 @@ function GuestAdd(req, res) {
                     }
                     res.send(guest);
                 });
+
+            // Journal start
+            var JournalModel = require('./mongo').JournalModel;
+            var d = new Date();
+            d.setHours(d.getHours() + 2);
+            var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
+            var time = d.toTimeString().slice(0, 8);
+            JournalModel.create({
+                    id: +new Date(),
+                    name: req.body.plateNo,
+                    host: req.body.host,
+                    status: req.body.status,
+                    date: date + ' ' + time
+                },
+                function (err, journal) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    }
+                    res.send(journal);
+                });
+            // Journal end
         }
     });
 }
@@ -1015,6 +1036,27 @@ function GuestUpdate(req, res) {
                             return res.send(err);
                         }
                     });
+
+                    // Journal start
+                    var JournalModel = require('./mongo').JournalModel;
+                    var d = new Date();
+                    d.setHours(d.getHours() + 2);
+                    var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
+                    var time = d.toTimeString().slice(0, 8);
+                    JournalModel.create({
+                            id: +new Date(),
+                            name: req.body.plateNo,
+                            host: req.body.host,
+                            status: req.body.status,
+                            date: date + ' ' + time
+                        },
+                        function (err, journal) {
+                            if (err) {
+                                return res.send({error: 'Server error'});
+                            }
+                            res.send(journal);
+                        });
+                    // Journal end
                 }
             });
         }
