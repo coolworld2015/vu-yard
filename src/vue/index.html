@@ -435,7 +435,7 @@
                             <top-guests></top-guests>
                         </div>
                             <div>
-                                <guests-items></guests-items>
+                                <guests-items-table></guests-items-table>
                             </div>
                         <div class="bottom">
                             <bottom></bottom>
@@ -3757,6 +3757,135 @@
                         appConfig.guests = result.data.sort(this.sort);
                         let items = result.data.sort(this.sort);
                         items = items.filter(el => el.status !== 'departed');
+                        appConfig.items = items;
+                        this.items = items;
+                        this.filteredItems = items;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('guest-edit');
+            }
+        },
+    });
+    Vue.component('guests-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./img/loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div v-bind:style=renderStatus(item) style="height: 150px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
+                    <div style="float: left;width: 20%;border-radius: 10px; margin-top: 15px;">
+                        <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 120px;height: 120px;border-radius: 16px;">
+                    </div>
+                    <div style="float: left; width: 80%; margin-top: 55px;">
+                        {{item.name}} - {{item.date}} - {{item.host}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getGuests();
+            appConfig.$on('searchQueryGuests', searchQuery => {
+                let arr = [].concat(appConfig.guests);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+
+            appConfig.$on('filterStatusGuests', status => {
+                let arr = [].concat(appConfig.guests);
+                let items = arr.filter((el) => el.status === status);
+                if (status === '*') {
+                    items = [].concat(appConfig.items);
+                }
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+            });
+        },
+        methods: {
+            renderStatus(item) {
+                switch (item.status) {
+                    case 'arrived':
+                        return {
+                            background: 'white',
+                            color: 'blue'
+                        };
+                        break;
+                    case 'booked':
+                        return {
+                            background: 'green',
+                            color: 'white'
+                        };
+                        break;
+                    case 'docked':
+                        return {
+                            background: 'red',
+                            color: 'white'
+                        };
+                        break;
+                    case 'undocked':
+                        return {
+                            background: 'dodgerblue',
+                            color: 'white'
+                        };
+                        break;
+                    case 'departed':
+                        return {
+                            background: 'gray',
+                            color: 'white'
+                        };
+                        break;
+                }
+            },
+            getGuests() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/guests/all', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        appConfig.guests = result.data.sort(this.sort);
+                        let items = result.data.sort(this.sort);
                         appConfig.items = items;
                         this.items = items;
                         this.filteredItems = items;

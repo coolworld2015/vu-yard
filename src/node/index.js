@@ -59,6 +59,7 @@ const server = express()
     .post('/api/positions/delete', PositionDelete)
 
     .get('/api/guests/get', Guests)
+    .get('/api/guests/all', GuestsAll)
     .post('/api/guests/add', GuestAdd)
     .post('/api/guests/update', GuestUpdate)
     .post('/api/guests/delete', GuestDelete)
@@ -926,6 +927,33 @@ function PositionDelete(req, res) {
 
 //------------------------------------------------------------------------
 function Guests(req, res) {
+    var agent = req.headers.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var GuestsModel = require('./mongo').GuestsModel;
+            var d = new Date();
+            d.setHours(d.getHours() + 2);
+            var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
+            return GuestsModel.find(function (err, guests) {
+                if (!err) {
+                    let items = guests.filter(item => item.date.split(' ')[0] === date);
+                    return res.send(items);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            }).sort({date: -1});
+        }
+    });
+}
+
+function GuestsAll(req, res) {
     var agent = req.headers.authorization;
 
     jwt.verify(agent, secret, function (err, decoded) {
