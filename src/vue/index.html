@@ -3604,7 +3604,7 @@
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
                 <div v-bind:style=renderStatus(item) style="height: 150px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
                     <div style="float: left;width: 20%;border-radius: 10px; margin-top: 15px;">
-                        <img :src="'./img/no-img.png'" style="height: 120px">
+                        <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 120px;height: 120px">
                     </div>
                     <div style="float: left; width: 80%; margin-top: 55px;">
                         {{item.name}} - {{item.host}} - {{item.date}} - {{item.status}}
@@ -3702,42 +3702,10 @@
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
             },
-            updateItem(item) {
-                this.loading = true;
-                this.$http.post(appConfig.url + 'api/positions/update', {
-                    id: item.id,
-                    vehicle: item.vehicle,
-                    lat: item.lat,
-                    lng: item.lng,
-                    authorization: appConfig.access_token
-                })
-                    .then(result => {
-                        this.loading = true;
-                        this.getPositions();
-                    })
-                    .catch(error => {
-                        this.error = true;
-                    });
-            },
-            deleteItem(item) {
-                this.loading = true;
-                this.$http.post(appConfig.url + 'api/positions/delete', {
-                    id: item.id,
-                    authorization: appConfig.access_token
-                })
-                    .then(result => {
-                        this.loading = true;
-                        this.getPositions();
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
-            cancel() {
-                this.loading = true;
-                this.getPositions();
-            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('guest-edit');
+            }
         },
     });
     Vue.component('guest-add', {
