@@ -61,6 +61,7 @@ const server = express()
     .get('/api/guests/get', Guests)
     .post('/api/guests/add', GuestAdd)
     .post('/api/guests/update', GuestUpdate)
+    .post('/api/guests/delete', GuestDelete)
 
     .get('/api/auth', (req, res) => res.send({token: token}))
 
@@ -1014,6 +1015,32 @@ function GuestUpdate(req, res) {
                     });
                 }
             });
+        }
+    });
+}
+
+function GuestDelete(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var GuestsModel = require('./mongo').GuestsModel;
+            GuestsModel.remove({
+                    "id": req.body.id
+                },
+                function (err) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    } else {
+                        console.log('Guests with id: ', req.body.id, ' was removed');
+                        res.send('Guests with id: ' + req.body.id + ' was removed');
+                    }
+                });
         }
     });
 }
