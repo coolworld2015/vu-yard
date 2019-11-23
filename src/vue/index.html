@@ -3603,7 +3603,7 @@
             <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
                 <div v-bind:style=renderStatus(item) style="height: 150px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
                     <div style="float: left;width: 20%;border-radius: 10px; margin-top: 15px;">
-                        <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 120px;height: 120px">
+                        <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 120px;height: 120px;border-radius: 16px;">
                     </div>
                     <div style="float: left; width: 80%; margin-top: 55px;">
                         {{item.name}} - {{item.host}} - {{item.date}} - {{item.status}}
@@ -3644,7 +3644,7 @@
                 switch (item.status) {
                     case 'arrived':
                         return {
-                            background: 'yellow',
+                            background: 'white',
                             color: 'blue'
                         };
                         break;
@@ -3874,7 +3874,7 @@
                 <div>
                     <canvas id="canvas" style="z-index: 10;width: 645px;height: 430px;border-radius: 10px;"></canvas>
                 </div>
-                <div style="position: absolute;top: 0;left:0;width: 100%;height: 100%;border-radius: 10px;">
+                <div id='photo' style="position: absolute;top: 0;left:0;width: 100%;height: 100%;border-radius: 10px;">
                     <img :src="this.photo" style="z-index: 10;width: 645px;height: 430px;border-radius: 10px;">
                 </div>
             </div>
@@ -3933,6 +3933,7 @@
                 name: '',
                 photo: '',
                 host: '',
+                status: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
@@ -3944,19 +3945,25 @@
                 this.$router.push('/guests');
             } else {
                 this.init();
-                //this.doPlay();
             }
         },
         methods: {
             init() {
                 appConfig.getAccessToken();
+
                 this.photo = appConfig.item.photo;
+                if (this.photo === 'blank') {
+                    this.photo = './img/no-img.png';
+                }
+
                 this.name = appConfig.item.name;
                 this.host = appConfig.item.host;
+                this.status = appConfig.item.status;
 
                 setTimeout(function () {
                     appConfig.$emit('itemsCount', 1);
 
+                    photo = document.getElementById('photo');
                     canvas = document.getElementById('canvas');
                     context = canvas.getContext('2d');
                     context.fillStyle = "#AAA";
@@ -3966,15 +3973,23 @@
                     height = 0;
                     video = document.getElementById('video');
                 }, 100);
+
+                if (this.status === 'created') {
+                    var that = this;
+                    setTimeout(function () {
+                        that.doPlay();
+                    }, 100);
+                }
             },
             doPlay() {
-                navigator.mediaDevices.getUserMedia({audio: false, video: { width: 240, height: 160 }})
+                photo.setAttribute("style", "display:none;width:100%;height: 100%;");
+                navigator.mediaDevices.getUserMedia({audio: false, video: {width: 240, height: 160}})
                     .then(function (stream) {
                         video.srcObject = stream;
                         video.play();
                         height = video.videoHeight / (video.videoWidth / width);
                         height = width / (4 / 3);
-                        video.setAttribute("style","display:block;width:100%;height: 100%;");
+                        video.setAttribute("style", "display:block;width:100%;height: 100%;");
                     })
                     .catch(function (err) {
                         console.log("An error occurred: " + err);
@@ -3994,7 +4009,7 @@
 
                 this.photo = canvas.toDataURL('image/png');
                 video.srcObject.getTracks()[0].stop();
-                video.setAttribute("style","display:none;width:100%;height: 100%;");
+                video.setAttribute("style", "display:none;width:100%;height: 100%;");
             },
             goBack() {
                 if (video.srcObject) {
