@@ -951,6 +951,7 @@ function GuestAdd(req, res) {
         } else {
             var GuestsModel = require('./mongo').GuestsModel;
             var d = new Date();
+            d.setHours(d.getHours() + 2);
             var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
             var time = d.toTimeString().slice(0, 8);
             GuestsModel.create({
@@ -983,6 +984,7 @@ function GuestUpdate(req, res) {
         } else {
             var GuestsModel = require('./mongo').GuestsModel;
             var d = new Date();
+            d.setHours(d.getHours() + 2);
             var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
             var time = d.toTimeString().slice(0, 8);
             GuestsModel.findOne({

@@ -3720,7 +3720,7 @@
             width: 450px;outline:none;margin-right: 0px;"
             placeholder="ФИО"
             v-on:keypress="clearWarning"
-            v-on:keypress.enter="doReg"
+            v-on:keypress.enter="addItem"
             v-model="name"><br>
 
             <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
@@ -3729,7 +3729,7 @@
             width: 450px;outline:none;margin-right: 0px;"
             placeholder="Кто принимает"
             v-on:keypress="clearWarning"
-            v-on:keypress.enter="doReg"
+            v-on:keypress.enter="addItem"
             v-model="host"><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
