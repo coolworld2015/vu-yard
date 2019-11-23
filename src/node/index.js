@@ -367,8 +367,10 @@ function VehicleAdd(req, res) {
 
                         // Operations start
                         var OperationsModel = require('./mongo').OperationsModel;
-                        var date = new Date().toJSON().slice(0, 10);
-                        var time = new Date().toTimeString().slice(0, 8);
+                        var d = new Date();
+                        d.setHours(d.getHours() + 2);
+                        var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
+                        var time = d.toTimeString().slice(0, 8);
                         OperationsModel.create({
                                 id: +new Date(),
                                 plateNo: req.body.plateNo,
@@ -444,8 +446,10 @@ function VehicleUpdate(req, res) {
 
                     // Operations start
                     var OperationsModel = require('./mongo').OperationsModel;
-                    var date = new Date().toJSON().slice(0, 10);
-                    var time = new Date().toTimeString().slice(0, 8);
+                    var d = new Date();
+                    d.setHours(d.getHours() + 2);
+                    var date = d.toJSON().split('T')[0].split('-')[2] + '.' + d.toJSON().split('T')[0].split('-')[1] + '.' + d.toJSON().split('T')[0].split('-')[0];
+                    var time = d.toTimeString().slice(0, 8);
                     OperationsModel.create({
                             id: +new Date(),
                             plateNo: req.body.plateNo,
