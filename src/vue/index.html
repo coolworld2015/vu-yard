@@ -3938,6 +3938,7 @@
             return {
                 id: '',
                 title: '',
+                id: '',
                 name: '',
                 photo: '',
                 host: '',
@@ -3962,15 +3963,16 @@
             init() {
                 appConfig.getAccessToken();
 
-                this.photo = appConfig.item.photo;
-                if (this.photo === 'blank') {
-                    this.photo = './img/no-img.png';
-                }
-
+                this.id = appConfig.item.id;
                 this.name = appConfig.item.name;
                 this.host = appConfig.item.host;
                 this.status = appConfig.item.status;
                 this.date = appConfig.item.date;
+
+                this.photo = appConfig.item.photo;
+                if (this.photo === 'blank') {
+                    this.photo = './img/no-img.png';
+                }
 
                 setTimeout(function () {
                     appConfig.$emit('itemsCount', 1);
@@ -4019,6 +4021,10 @@
                 video.srcObject.getTracks()[0].stop();
             },
             takePicture() {
+                if (!video.srcObject) {
+                    return
+                }
+
                 canvas = document.getElementById('canvas');
                 photo = document.getElementById('photo');
                 var context = canvas.getContext('2d');
@@ -4066,7 +4072,8 @@
                 }
 
                 this.loading = true;
-                this.$http.post(appConfig.url + 'api/guests/add', {
+                this.$http.post(appConfig.url + 'api/guests/update', {
+                    id: this.id,
                     photo: this.photo,
                     name: this.name,
                     host: this.host,

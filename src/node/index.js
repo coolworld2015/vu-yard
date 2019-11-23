@@ -60,6 +60,7 @@ const server = express()
 
     .get('/api/guests/get', Guests)
     .post('/api/guests/add', GuestAdd)
+    .post('/api/guests/update', GuestUpdate)
 
     .get('/api/auth', (req, res) => res.send({token: token}))
 
@@ -965,6 +966,44 @@ function GuestAdd(req, res) {
                     }
                     res.send(guest);
                 });
+        }
+    });
+}
+
+function GuestUpdate(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var GuestsModel = require('./mongo').GuestsModel;
+            var date = new Date().toJSON().slice(0, 10);
+            var time = new Date().toTimeString().slice(0, 8);
+            GuestsModel.findOne({
+                id: req.body.id
+            }, function (err, guest) {
+                if (err) {
+                    res.send({error: err.message});
+                } else {
+                    guest.photo = req.body.photo;
+                    guest.name = req.body.name;
+                    guest.host = req.body.host;
+                    guest.status = req.body.status;
+                    guest.date = date + ' ' + time;
+
+                    guest.save(function (err) {
+                        if (!err) {
+                            res.send(guest);
+                        } else {
+                            return res.send(err);
+                        }
+                    });
+                }
+            });
         }
     });
 }
