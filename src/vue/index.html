@@ -1254,7 +1254,6 @@
             } else {
                 this.init();
             }
-
         },
         methods: {
             init() {
@@ -3767,7 +3766,7 @@
 
             <div v-if="error" style="color: red; margin-top: 25px;">
                 Server error - try again
-            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            </div><br><br><br>
         </div>`,
         data: function () {
             return {
@@ -3793,7 +3792,6 @@
                 }, 100);
             },
             goBack() {
-                video.srcObject.getTracks()[0].stop();
                 this.$router.push('/guests');
             },
             doClear() {
@@ -3866,7 +3864,7 @@
         template: `<div style="text-align: center;margin-top: 120px;">
             <div style="font-size: 40px;color: #01579B;font-weight: bolder;margin: 30px;margin-top: 50px"
                 v-on:click="doPlay()">
-                    Guest registration
+                    {{name}}
             </div>
 
             <div id="container" style="position: relative;" v-on:click="takePicture()">
@@ -3876,17 +3874,21 @@
                 <div>
                     <canvas id="canvas" style="z-index: 10;width: 645px;height: 430px;border-radius: 10px;"></canvas>
                 </div>
+                <div style="position: absolute;top: 0;left:0;width: 100%;height: 100%;border-radius: 10px;">
+                    <img :src="this.photo" style="z-index: 10;width: 645px;height: 430px;border-radius: 10px;">
+                </div>
             </div>
             <hr>
 
             <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-            width: 450px;outline:none;margin-right: 0px;"
-            placeholder="Name"
+            width: 450px;outline:none;margin-right: 0px; "
+            placeholder="Host"
+            readonly
             v-on:keypress="clearWarning"
             v-on:keypress.enter="doReg"
-            v-model="name"><br>
+            v-model="host"><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
@@ -3922,7 +3924,7 @@
 
             <div v-if="error" style="color: red; margin-top: 25px;">
                 Server error - try again
-            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            </div><br><br>
         </div>`,
         data: function () {
             return {
@@ -3930,7 +3932,7 @@
                 title: '',
                 name: '',
                 photo: '',
-                host: 'host',
+                host: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
@@ -3938,12 +3940,20 @@
             };
         },
         created() {
-            this.init();
-            this.doPlay();
+            if (!appConfig.item) {
+                this.$router.push('/guests');
+            } else {
+                this.init();
+                //this.doPlay();
+            }
         },
         methods: {
             init() {
                 appConfig.getAccessToken();
+                this.photo = appConfig.item.photo;
+                this.name = appConfig.item.name;
+                this.host = appConfig.item.host;
+
                 setTimeout(function () {
                     appConfig.$emit('itemsCount', 1);
 
@@ -3987,7 +3997,9 @@
                 video.setAttribute("style","display:none;width:100%;height: 100%;");
             },
             goBack() {
-                video.srcObject.getTracks()[0].stop();
+                if (video.srcObject) {
+                    video.srcObject.getTracks()[0].stop();
+                }
                 this.$router.push('/guests');
             },
             doClear() {
@@ -4020,6 +4032,7 @@
                     photo: this.photo,
                     name: this.name,
                     host: this.host,
+                    status: 'arrived',
 
                     authorization: appConfig.access_token
                 })
@@ -4028,6 +4041,9 @@
                             this.error = true;
                             this.errorText = result.body.error;
                         } else {
+                            if (video.srcObject) {
+                                video.srcObject.getTracks()[0].stop();
+                            }
                             this.$router.push('/guests');
                         }
                         this.loading = false;
