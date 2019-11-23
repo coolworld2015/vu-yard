@@ -192,7 +192,9 @@
 
             <li v-on:click="logout()" v-bind:class="{ active: driver }">
                 <i class="fas fa-sign-out-alt"></i><span style="margin: 15px;">Logout</span></li>
-
+            <li></li>
+            <li></li>
+            <li></li>
         </ul>
     </div>
 
@@ -201,7 +203,6 @@
             <router-view></router-view>
         </div>
     </div>
-</div>
 </div>
 
 <script>
@@ -444,21 +445,37 @@
         template: `
                     <div style="width: 100%">
                         <div class="top">
-                            <top-guests></top-guests>
+                            <top-ugd></top-ugd>
                         </div>
                             <div>
-                                <guest-add></guest-add>
-                            </div>`
+                                <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <guest-add></guest-add>
+                                </div>
+                                <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <journal-items></journal-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
     };
     const GuestEdit = {
         template: `
                     <div style="width: 100%">
                         <div class="top">
-                            <top-guests></top-guests>
+                            <top-ugd></top-ugd>
                         </div>
                             <div>
-                                <guest-edit></guest-edit>
-                            </div>`
+                                <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <guest-edit></guest-edit>
+                                </div>
+                                <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <journal-items></journal-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
     };
 
     const Journal = {
@@ -608,7 +625,7 @@
                         localStorage.setItem('access_token', result.body.token);
                         this.loading = false;
                         this.error = false;
-                        this.$router.push('dispatcher');
+                        this.$router.push('ugd');
                     })
                     .catch((error) => {
                         this.loading = false;
@@ -3831,7 +3848,7 @@
                 }, 100);
             },
             goBack() {
-                this.$router.push('/guests');
+                this.$router.push('/ugd');
             },
             doClear() {
                 this.name = '';
@@ -3872,7 +3889,7 @@
                             this.error = true;
                             this.errorText = result.body.error;
                         } else {
-                            this.$router.push('/guests');
+                            this.$router.push('/ugd');
                         }
                         this.loading = false;
                     })
@@ -4081,7 +4098,7 @@
                 if (video.srcObject) {
                     video.srcObject.getTracks()[0].stop();
                 }
-                this.$router.push('/guests');
+                this.$router.push('/ugd');
             },
             doClear() {
                 this.name = '';
@@ -4128,7 +4145,7 @@
                             if (video.srcObject) {
                                 video.srcObject.getTracks()[0].stop();
                             }
-                            this.$router.push('/guests');
+                            this.$router.push('/ugd');
                         }
                         this.loading = false;
                     })
@@ -4434,10 +4451,6 @@
             },
             changeRoute(route) {
                 closeNav();
-
-                if (route === 'gatekeeper' || route === 'driver') {
-                    return;
-                }
 
                 appConfig.route = route;
                 this.init();
