@@ -63,6 +63,8 @@ const server = express()
     .post('/api/guests/update', GuestUpdate)
     .post('/api/guests/delete', GuestDelete)
 
+    .get('/api/journal/get', Journal)
+
     .get('/api/auth', (req, res) => res.send({token: token}))
 
     .get('/api/test', TestPOST)
@@ -1041,6 +1043,30 @@ function GuestDelete(req, res) {
                         res.send('Guests with id: ' + req.body.id + ' was removed');
                     }
                 });
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+function Journal(req, res) {
+    var agent = req.headers.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var JournalModel = require('./mongo').JournalModel;
+            return JournalModel.find(function (err, journal) {
+                if (!err) {
+                    return res.send(journal);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            }).sort({date: -1});
         }
     });
 }

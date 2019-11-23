@@ -130,3 +130,15 @@ var Guests = new Schema({
 
 var GuestsModel = mongoose.model('Guests', Guests);
 module.exports.GuestsModel = GuestsModel;
+
+//---------------------------------------------------------------------------------------------
+var Journal = new Schema({
+    id: {type: String, required: true},
+    name: {type: String, required: true},
+    host: {type: String, required: true},
+    status: {type: String, required: true},
+    date: {type: String, required: true},
+});
+
+var JournalModel = mongoose.model('Journal', Journal);
+module.exports.JournalModel = JournalModel;
