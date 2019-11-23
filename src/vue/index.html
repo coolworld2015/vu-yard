@@ -462,7 +462,7 @@
                     margin: 160px auto; border-radius: 3px;
                     color: #000; background: #fff;
                     box-shadow: 0px 2px 15px 0px rgba(0,0,0,0.5); text-align: center;">
-                <div class="col-sm-12 d-flex flex-column justify-content-around">
+                <div style="color:#01579B;">
 
                         <p class="h5" style="font-weight: bold;">Yard Management System</p>
                         <img src="./img/yard.png" style="margin-top: -20px;margin-bottom: 20px; width: 150px;">
@@ -3886,28 +3886,8 @@
             placeholder="Host"
             readonly
             v-on:keypress="clearWarning"
-            v-on:keypress.enter="doReg"
+            v-on:keypress.enter="updateItem"
             v-model="host"><br>
-
-<!--            &lt;!&ndash;<span style="font-size: 24px; color: black;margin-left: -41px;">Статус:</span>&ndash;&gt;
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
-            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-            width: 450px;outline:none;margin-right: 0px; "
-            placeholder="Status"
-            readonly
-            v-on:keypress="clearWarning"
-            v-on:keypress.enter="doReg"
-            v-model="status"><br>
-
-            &lt;!&ndash;<span style="font-size: 24px; color: black;margin-left: -41px;">Когда:</span>&ndash;&gt;
-            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
-            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-            width: 450px;outline:none;margin-right: 0px; "
-            placeholder="Date"
-            readonly
-            v-on:keypress="clearWarning"
-            v-on:keypress.enter="doReg"
-            v-model="date"><br>-->
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Сделайте фото</span>
@@ -3920,7 +3900,7 @@
                 background: #01579B;
                 box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                 color: white;outline:none;"
-            v-on:click="addItem">Зашел</button>
+            v-on:click="updateItem('arrived')">Зашел</button>
 
             <button v-if="output" style="font-size: 24px;
                 height: 50px;
@@ -3929,7 +3909,7 @@
                 background: #01579B;
                 box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
                 color: white;outline:none;"
-            v-on:click="addItem">Вышел</button>
+            v-on:click="updateItem('departed')">Вышел</button>
 
             <button style="font-size: 24px;
                 height: 50px;
@@ -4109,6 +4089,7 @@
                     .catch(error => {
                         this.error = true;
                         this.loading = false;
+                        this.$router.push('login');
                     });
             },
             getToken() {
