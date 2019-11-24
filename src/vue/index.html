@@ -3641,6 +3641,7 @@
             },
             changeView() {
                 appConfig.$emit('searchQueryGuests', this.searchQuery);
+                appConfig.$emit('searchQueryJournal', this.searchQuery);
             },
             searchClear() {
                 this.searchQuery = '';
