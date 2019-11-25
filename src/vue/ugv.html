@@ -387,18 +387,6 @@
                         this.error = true;
                     })
             },
-            getToken() {
-                this.error = false;
-                this.$http.get(appConfig.url + 'api/auth')
-                    .then(result => {
-                        appConfig.access_token = result.body.token;
-                        localStorage.setItem('access_token', result.body);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
             clearWarning() {
                 this.invalidValue = false;
                 this.massage = false;
@@ -852,18 +840,6 @@
                         this.loading = false;
                     });
             },
-            getToken() {
-                this.error = false;
-                this.$http.get(appConfig.url + 'api/auth')
-                    .then(result => {
-                        appConfig.access_token = result.body.token;
-                        localStorage.setItem('access_token', result.body);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
             clearWarning() {
                 this.invalidValue = false;
                 this.massage = false;
@@ -1109,18 +1085,6 @@
                         this.$router.push('login');
                     });
             },
-            getToken() {
-                this.error = false;
-                this.$http.get(appConfig.url + 'api/auth')
-                    .then(result => {
-                        appConfig.access_token = result.body.token;
-                        localStorage.setItem('access_token', result.body);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
             clearWarning() {
                 this.invalidValue = false;
                 this.massage = false;
@@ -1324,47 +1288,6 @@
             appConfig.$on('route', route => {
                 this.changeRoute(route);
             });
-
-            if (window.ws === undefined) {
-                window.ws = new WebSocket('wss://jwt-yard.herokuapp.com');
-                //window.ws = new WebSocket('ws://localhost:3000/');
-            }
-
-            ws.onmessage = (e) => {
-                let messageObject = e.data;
-                console.log(messageObject);
-                if (messageObject.split('###')[0] !== 'still alive') {
-                    this.items.unshift({
-                        id: +new Date(),
-                        name: messageObject.split('###')[1],
-                        date: messageObject.split('###')[2],
-                        message: messageObject.split('###')[0]
-                    });
-
-                    let notification = new Notification('VU-Demo', {
-                        icon: './img/yard.png',
-                        body: messageObject.split('###')[0] + ' ' + messageObject.split('###')[1] + ' ' + messageObject.split('###')[2] + ' at ' + messageObject.split('###')[3].split('.')[0]
-                    });
-
-                    switch (messageObject.split('###')[0].toLowerCase()) {
-                        case 'reload':
-                            appConfig.$emit('init', {});
-                            break;
-                        case 'set':
-                            appConfig.$emit('set', {});
-                            break;
-                        case 'show':
-                            appConfig.$emit('show', {});
-                            break;
-                        case 'get':
-                            appConfig.$emit('get', {});
-                            break;
-                        case 'yard':
-                            appConfig.$emit('yard', {});
-                            break;
-                    }
-                }
-            };
         },
         methods: {
             init() {
