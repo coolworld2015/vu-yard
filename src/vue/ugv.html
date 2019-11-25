@@ -1,0 +1,1413 @@
+<meta http-equiv="content-type" content="name/html; charset=UTF-8"/>
+<!--<meta name="viewport" content="initial-scale=1.0, user-scalable=no">-->
+
+<title>УГВ - Посетитель Демо</title>
+<link rel="shortcut icon" type="image/png" href="./img/ugv.png"/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.0.3/vue-resource.min.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+
+<style>
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    html {
+        background: #f6f6f6;
+        overflow: hidden;
+    }
+
+    body {
+        background: white;
+        margin: 0;
+        padding: 0;
+    }
+
+    .top {
+        position: fixed;
+        top: 0px;
+        width: 100%;
+        display: block;
+        background: white;
+        padding: 5px;
+        height: 85px;
+        color: #ef835d;
+        font-size: 200%;
+        text-align: center;
+        border-bottom: 1px solid #d1d1d1;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    }
+
+    .middle {
+        background: #f6f6f6;
+        /*        margin-left: -5px;
+                margin-right: 5px;*/
+        width: 100%;
+        height: 100%;
+        color: black;
+        font-size: 200%;
+        text-align: center;
+        overflow-y: scroll;
+        border-top: 1px solid #d1d1d1;
+    }
+
+    .bottom {
+        position: fixed;
+        bottom: 0px;
+        width: 100%;
+        /*background: red;*/
+        background: #01579B;
+        padding: 5px;
+        height: 40px;
+        color: white;
+        font-size: 30px;
+        text-align: center;
+        border-top: 1px solid #d1d1d1;
+    }
+
+    .sidenav {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        transition: 0.2s;
+        padding-top: 60px;
+        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+    }
+
+    .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.2s;
+    }
+
+    .sidenav a:hover {
+        color: #f1f1f1;
+    }
+
+    .sidenav .closebtn {
+        position: absolute;
+        top: 0;
+        right: 5px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
+
+    #main {
+        transition: margin-left .2s;
+    / / padding: 16 px;
+    }
+
+    @media screen and (max-height: 450px) {
+        .sidenav {
+            padding-top: 15px;
+        }
+
+        .sidenav a {
+            font-size: 18px;
+        }
+    }
+
+    ul {
+        padding-inline-start: 0;
+        font-size: 25px;
+        /*text-shadow: #000 0.15em 0.15em 0.15em;*/
+    }
+
+    li {
+        list-style-type: none;
+        color: white;
+        padding: 20px;
+        border-bottom: solid 1px black;
+    }
+
+    li:hover {
+        background: whitesmoke;
+        color: black;
+    }
+
+    .active {
+        background: white;
+        color: black;
+    }
+</style>
+
+<div id="app">
+    <div id="mySidenav" class="sidenav">
+        <div style="color: white;margin-top: -48px;margin-left: 12px;font-size: 30px;width: 200px;">
+            УГВ Посетитель
+        </div>
+        <div style="color: white;margin-top: 20px;margin-left: 15px;font-size: 20px;width: 200px;">
+            Демо версия
+        </div>
+        <ul>
+            <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
+
+            <li v-on:click="changeRoute('ugd')" v-bind:class="{ active: ugd }">
+                <i class="fas fa-user-friends"></i><span style="margin: 15px;">УГВ</span></li>
+
+            <li v-on:click="changeRoute('guests')" v-bind:class="{ active: guests }">
+                <i class="fas fa-id-card"></i><span style="margin: 15px;">Посетители</span></li>
+
+            <li v-on:click="changeRoute('journal')" v-bind:class="{ active: journal }">
+                <i class="fas fa-history"></i><span style="margin: 15px;">Журнал</span></li>
+
+            <li v-on:click="logout()">
+                <i class="fas fa-sign-out-alt"></i><span style="margin: 15px;">Выход</span></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <div id="main">
+        <div class="middle">
+            <router-view></router-view>
+        </div>
+    </div>
+</div>
+
+<script>
+    const appConfig = new Vue();
+    appConfig.route = 'ugd';
+
+    const Login = {template: '<login></login>'};
+
+    const Guests = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-guests></top-guests>
+                        </div>
+                            <div>
+                                <guests-items-table></guests-items-table>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
+    };
+    const GuestAdd = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-ugd></top-ugd>
+                        </div>
+                            <div>
+                                <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <guest-add></guest-add>
+                                </div>
+                                <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <journal-items></journal-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
+    };
+    const GuestEdit = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-ugd></top-ugd>
+                        </div>
+                            <div>
+                                <div style="margin-top:100px; width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <guest-edit></guest-edit>
+                                </div>
+                                <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <journal-items></journal-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
+    };
+
+    const Journal = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-guests></top-guests>
+                        </div>
+                            <div>
+                                <journal-items></journal-items>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>`
+    };
+    const UGD = {
+        template: `
+                    <div style="width: 100%">
+                        <div class="top">
+                            <top-ugd></top-ugd>
+                        </div>
+                            <div>
+                                <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <guests-items></guests-items>
+                                </div>
+                                <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                                    <journal-items></journal-items>
+                                </div>
+                            </div>
+                        <div class="bottom">
+                            <bottom></bottom>
+                        </div>
+                    </div>`
+    };
+
+    Vue.component('login', {
+        template: `<div style="background: #01579B;width: 100%;height: 100%;position: absolute;">
+            <div class="content" style="background: #01579B">
+                <div style="width: 400px; padding: 45px 90px 30px;
+                    margin: 160px auto; border-radius: 3px;
+                    color: #000; background: #fff;
+                    box-shadow: 0px 2px 15px 0px rgba(0,0,0,0.5); text-align: center;">
+                <div style="color:#01579B;">
+
+                        <p class="h5" style="font-weight: bold;margin-left: 25px">УГВ - Посетитель</p>
+                        <img src="./img/ugv.png" style="margin-top: -20px;margin-bottom: 20px; width: 250px;">
+
+
+                    <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+                        border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+                        width: 450px;outline:none;margin-right: 0px;"
+                        placeholder="Логин"
+                        v-on:keypress="clearWarning"
+                        v-on:keypress.enter="doLogin"
+                    v-model="login"><br>
+
+                    <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+                        border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+                        width: 450px;outline:none;margin-right: 0px;"
+                        type="password"
+                        placeholder="Пароль"
+                        v-on:keypress="clearWarning"
+                        v-on:keypress.enter="doLogin"
+                    v-model="password"><br>
+
+                    <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                        <span v-show="invalidValue" style="margin-left: 0px;">Введите данные в форму</span>
+                        <span v-show="error" style="margin-left: 0px;">Нет доступа</span>
+                    </div>
+
+                    <button style="font-size: 24px;
+                        height: 50px;
+                        width: 150px;
+                        border-radius: 5px;
+                        background: #01579B;
+                        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                        color: white;outline:none;"
+                    v-on:click="doLogin">Вход</button>
+
+                    <button style="font-size: 24px;
+                        height: 50px;
+                        width: 150px;
+                        border-radius: 5px;
+                        background: #01579B;
+                        box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                        margin-bottom: 100px;
+                        color: white;outline:none;margin-top: 20px;"
+                    v-on:click="doClear">Отмена</button>
+
+                        <div>
+                            <img v-show="loading" src="./img/loading.gif" style="margin-bottom: -50px; margin-top: -120px;height: 150px;">
+                        </div>
+                </div>
+                </div>
+            </div>
+        </div> `,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                login: '',
+                password: '',
+                companyName: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+                massage: false
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+            },
+            doClear() {
+                this.login = '';
+                this.password = '';
+                this.error = false;
+            },
+            doLogin() {
+                if (this.login === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.password === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                this.loading = true;
+                this.massage = false;
+
+                this.loading = true;
+                this.error = false;
+                this.$http.post(appConfig.url + 'api/login', {
+                    name: this.login,
+                    pass: this.password,
+                    description: 'Web'
+                })
+                    .then(result => {
+                        appConfig.access_token = result.body.token;
+                        localStorage.setItem('access_token', result.body.token);
+                        this.loading = false;
+                        this.error = false;
+                        this.$router.push('ugd');
+                    })
+                    .catch((error) => {
+                        this.loading = false;
+                        this.error = true;
+                    })
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body.token;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+                this.massage = false;
+            },
+        },
+    });
+
+    Vue.component('bottom', {
+        template: `<div style="margin-top: 3px;">Записи: {{count}}</div>`,
+        data() {
+            return {
+                count: 0,
+            };
+        },
+        created() {
+            appConfig.$on('itemsCount', itemsCount => {
+                this.count = itemsCount;
+            });
+
+
+        },
+        methods: {},
+    });
+
+    Vue.component('top-guests', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Показать меню" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -30px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Поиск ФИО"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="changeView">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="changeView"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        <div style="float: right; margin: -113px 40px;">
+                <span title="Новая запись" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            vehicleAdd() {
+                appConfig.$emit('route', 'guest-add');
+            },
+            changeView() {
+                appConfig.$emit('searchQueryGuests', this.searchQuery);
+                appConfig.$emit('searchQueryJournal', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
+            },
+        },
+    });
+    Vue.component('guests-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./img/loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div v-bind:style=renderStatus(item) style="height: 150px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
+                    <div style="float: left;width: 20%;border-radius: 10px; margin-top: 15px;">
+                        <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 120px;height: 120px;border-radius: 16px;">
+                    </div>
+                    <div style="float: left; width: 80%; margin-top: 55px;">
+                        {{item.name}} - {{item.date}} - {{item.host}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getGuests();
+            appConfig.$on('searchQueryGuests', searchQuery => {
+                let arr = [].concat(appConfig.guests);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+
+            appConfig.$on('filterStatusGuests', status => {
+                let arr = [].concat(appConfig.guests);
+                let items = arr.filter((el) => el.status === status);
+                if (status === '*') {
+                    items = [].concat(appConfig.items);
+                }
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+            });
+        },
+        methods: {
+            renderStatus(item) {
+                switch (item.status) {
+                    case 'arrived':
+                        return {
+                            background: 'white',
+                            color: 'blue'
+                        };
+                        break;
+                    case 'booked':
+                        return {
+                            background: 'green',
+                            color: 'white'
+                        };
+                        break;
+                    case 'docked':
+                        return {
+                            background: 'red',
+                            color: 'white'
+                        };
+                        break;
+                    case 'undocked':
+                        return {
+                            background: 'dodgerblue',
+                            color: 'white'
+                        };
+                        break;
+                    case 'departed':
+                        return {
+                            background: 'gray',
+                            color: 'white'
+                        };
+                        break;
+                }
+            },
+            getGuests() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/guests/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        appConfig.guests = result.data.sort(this.sort);
+                        let items = result.data.sort(this.sort);
+                        items = items.filter(el => el.status !== 'departed');
+                        appConfig.items = items;
+                        this.items = items;
+                        this.filteredItems = items;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('guest-edit');
+            }
+        },
+    });
+    Vue.component('guests-items-table', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./img/loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div v-bind:style=renderStatus(item) style="height: 150px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black; box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click="showDetails(item)">
+                    <div style="float: left;width: 20%;border-radius: 10px; margin-top: 15px;">
+                        <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 120px;height: 120px;border-radius: 16px;">
+                    </div>
+                    <div style="float: left; width: 80%; margin-top: 55px;">
+                        {{item.name}} - {{item.date}} - {{item.host}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+      </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getGuests();
+            appConfig.$on('searchQueryGuests', searchQuery => {
+                let arr = [].concat(appConfig.guests);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+
+            appConfig.$on('filterStatusGuests', status => {
+                let arr = [].concat(appConfig.guests);
+                let items = arr.filter((el) => el.status === status);
+                if (status === '*') {
+                    items = [].concat(appConfig.items);
+                }
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+            });
+        },
+        methods: {
+            renderStatus(item) {
+                switch (item.status) {
+                    case 'arrived':
+                        return {
+                            background: 'white',
+                            color: 'blue'
+                        };
+                        break;
+                    case 'booked':
+                        return {
+                            background: 'green',
+                            color: 'white'
+                        };
+                        break;
+                    case 'docked':
+                        return {
+                            background: 'red',
+                            color: 'white'
+                        };
+                        break;
+                    case 'undocked':
+                        return {
+                            background: 'dodgerblue',
+                            color: 'white'
+                        };
+                        break;
+                    case 'departed':
+                        return {
+                            background: 'gray',
+                            color: 'white'
+                        };
+                        break;
+                }
+            },
+            getGuests() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/guests/all', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        appConfig.guests = result.data.sort(this.sort);
+                        let items = result.data.sort(this.sort);
+                        appConfig.items = items;
+                        this.items = items;
+                        this.filteredItems = items;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('guest-edit');
+            }
+        },
+    });
+    Vue.component('guest-add', {
+        template: `<div style="text-align: center;margin-top: 120px;">
+            <div style="font-size: 40px;color: #01579B;font-weight: bolder;margin: 30px;margin-top: 50px"
+                v-on:click="doPlay()">
+                    Заявка на охрану
+            </div>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="ФИО"
+            v-on:keypress="clearWarning"
+            v-on:keypress.enter="addItem"
+            v-model="name"><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Кто принимает"
+            v-on:keypress="clearWarning"
+            v-on:keypress.enter="addItem"
+            v-model="host"><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Введите данные</span>
+            </div>
+
+            <button style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;"
+            v-on:click="addItem">Добавить</button>
+
+            <button style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">Назад</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./img/loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="massage" style="color: red; margin-top: 25px;">
+                Can't register this PlateNo - try another one
+            </div>
+
+            <div v-if="error" style="color: red; margin-top: 25px;">
+                Server error - try again
+            </div><br><br><br>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                name: '',
+                photo: '',
+                host: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+                massage: false
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1);
+                }, 100);
+            },
+            goBack() {
+                this.$router.push('/ugd');
+            },
+            doClear() {
+                this.name = '';
+                this.massage = false;
+                this.invalidValue = false;
+            },
+            addItem() {
+                if (this.name === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.host === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.getToken();
+                    return;
+                }
+
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/guests/add', {
+                    photo: 'blank',
+                    name: this.name,
+                    host: this.host,
+                    status: 'created',
+
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        if (result.body.error) {
+                            this.error = true;
+                            this.errorText = result.body.error;
+                        } else {
+                            this.$router.push('/ugd');
+                        }
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body.token;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+                this.massage = false;
+            },
+        },
+    });
+    Vue.component('guest-edit', {
+        template: `<div style="text-align: center;margin-top: 0px;">
+            <div style="font-size: 40px;color: #01579B;font-weight: bolder;margin: 30px;margin-top: 50px"
+                v-on:click="doPlay()">
+                    {{name}}
+            </div>
+
+            <div id="container" style="position: relative;" v-on:click="takePicture()">
+                <div class="camera" style="position: absolute;top: 0;left:0;width: 100%;height: 100%;border-radius: 10px;">
+                    <video id="video" style="border-radius: 10px;">Video stream not available.</video>
+                </div>
+                <div>
+                    <canvas id="canvas" style="z-index: 10;width: 645px;height: 430px;border-radius: 10px;"></canvas>
+                </div>
+                <div id='photo' style="position: absolute;top: 0;left:0;width: 100%;height: 100%;border-radius: 10px;">
+                    <img :src="this.photo" style="z-index: 10;width: 645px;height: 430px;border-radius: 10px;">
+                </div>
+            </div><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Кто принимает:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px; "
+            placeholder="Host"
+            readonly
+            v-on:keypress="clearWarning"
+            v-on:keypress.enter="updateItem"
+            v-model="host"><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Сделайте фото</span>
+            </div>
+
+            <button v-if="input" style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;"
+            v-on:click="updateItem('arrived')">Зашел</button>
+
+            <button v-if="output" style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;"
+            v-on:click="updateItem('departed')">Вышел</button>
+
+            <button style="font-size: 24px;
+                height: 50px;
+                width: 150px;
+                border-radius: 5px;
+                background: #01579B;
+                box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;
+                color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">Назад</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./img/loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="massage" style="color: red; margin-top: 25px;">
+                Can't register this PlateNo - try another one
+            </div>
+
+            <div v-if="error" style="color: red; margin-top: 25px;">
+                Server error - try again
+            </div><br><br>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                id: '',
+                name: '',
+                photo: '',
+                host: '',
+                status: '',
+                date: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+                massage: false,
+                input: false,
+                output: false
+            };
+        },
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/ugd');
+            } else {
+                this.init();
+            }
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+
+                this.id = appConfig.item.id;
+                this.name = appConfig.item.name;
+                this.host = appConfig.item.host;
+                this.status = appConfig.item.status;
+                this.date = appConfig.item.date;
+
+                this.photo = appConfig.item.photo;
+                if (this.photo === 'blank') {
+                    this.photo = './img/no-img.png';
+                }
+
+                setTimeout(function () {
+                    appConfig.$emit('itemsCount', 1);
+
+                    photo = document.getElementById('photo');
+                    canvas = document.getElementById('canvas');
+                    context = canvas.getContext('2d');
+                    context.fillStyle = "#AAA";
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+
+                    width = 240;
+                    height = 0;
+                    video = document.getElementById('video');
+                }, 100);
+
+                if (this.status === 'created') {
+                    this.input = true;
+                    var that = this;
+                    setTimeout(function () {
+                        that.doPlay();
+                    }, 100);
+                } else {
+                    this.output = true;
+                }
+
+                if (this.status === 'departed') {
+                    this.input = true;
+                    this.output = false;
+                }
+            },
+            doPlay() {
+                photo.setAttribute("style", "display:none;width:100%;height: 100%;");
+                navigator.mediaDevices.getUserMedia({audio: false, video: {width: 240, height: 160}})
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                        video.play();
+                        height = video.videoHeight / (video.videoWidth / width);
+                        height = width / (4 / 3);
+                        video.setAttribute("style", "display:block;width:100%;height: 100%;");
+                    })
+                    .catch(function (err) {
+                        console.log("An error occurred: " + err);
+                    });
+            },
+            doStop() {
+                video.srcObject.getTracks()[0].stop();
+            },
+            takePicture() {
+                if (!video.srcObject) {
+                    return
+                }
+
+                canvas = document.getElementById('canvas');
+                photo = document.getElementById('photo');
+                var context = canvas.getContext('2d');
+
+                canvas.width = width;
+                canvas.height = height;
+                context.drawImage(video, 0, 0, width, height);
+
+                this.photo = canvas.toDataURL('image/png');
+                video.srcObject.getTracks()[0].stop();
+                video.setAttribute("style", "display:none;width:100%;height: 100%;");
+                this.invalidValue = false;
+            },
+            goBack() {
+                if (video.srcObject) {
+                    video.srcObject.getTracks()[0].stop();
+                }
+                this.$router.push('/ugd');
+            },
+            doClear() {
+                this.name = '';
+                this.massage = false;
+                this.invalidValue = false;
+            },
+            updateItem(status) {
+                this.invalidValue = false;
+
+                if (this.name === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.photo === 'blank' || this.photo === './img/no-img.png') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.getToken();
+                    return;
+                }
+
+                this.loading = true;
+                this.$http.post(appConfig.url + 'api/guests/update', {
+                    id: this.id,
+                    photo: this.photo,
+                    name: this.name,
+                    host: this.host,
+                    status: status,
+
+                    authorization: appConfig.access_token
+                })
+                    .then(result => {
+                        if (result.body.error) {
+                            this.error = true;
+                            this.errorText = result.body.error;
+                        } else {
+                            if (video.srcObject) {
+                                video.srcObject.getTracks()[0].stop();
+                            }
+                            this.$router.push('/ugd');
+                        }
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            getToken() {
+                this.error = false;
+                this.$http.get(appConfig.url + 'api/auth')
+                    .then(result => {
+                        appConfig.access_token = result.body.token;
+                        localStorage.setItem('access_token', result.body);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+                this.massage = false;
+            },
+        },
+    });
+
+    Vue.component('journal-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./img/loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 96px;margin-bottom: 50px; font-size: 30px">
+                <div v-bind:style=renderStatus(item) style="height: 50px; padding-top: 15px;border: 1px solid #d1d1d1; border-top: 1px solid #eee; color: black;box-shadow: rgba(0, 0, 0, 0.35) 3px 0px 10px 0px;" v-for="item in items" v-on:click1="showDetails(item)">
+                    {{ item.name }} - {{ item.date }} - {{ item.host }}
+                </div>
+            </div>
+        </div>
+        <div v-if="error" style="color: red">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.getJournal();
+            appConfig.$on('searchQueryJournal', searchQuery => {
+                let arr = [].concat(appConfig.journal);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                if (searchQuery === '') {
+                    this.items = appConfig.journal;
+                    this.filteredItems = appConfig.journal;
+                }
+            });
+            appConfig.$on('filterStatusJournal', status => {
+                let arr = [].concat(appConfig.journal);
+                let items = arr.filter((el) => el.status === status);
+                if (status === '*') {
+                    items = [].concat(appConfig.journal);
+                }
+                this.filteredItems = items;
+                this.items = items;
+            });
+        },
+        methods: {
+            renderStatus(item) {
+                switch (item.status) {
+                    case 'arrived':
+                        return {background: 'white', color: 'blue'};
+                        break;
+                    case 'booked':
+                        return {background: 'green', color: 'white'};
+                        break;
+                    case 'docked':
+                        return {background: 'red', color: 'white'};
+                        break;
+                    case 'undocked':
+                        return {background: 'dodgerblue', color: 'white'};
+                        break;
+                    case 'departed':
+                        return {background: 'gray', color: 'white'};
+                        break;
+                }
+            },
+            getJournal() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/journal/get', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.journal = this.filteredItems.sort(this.sort);
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('vehicle-edit');
+            },
+        },
+    });
+    Vue.component('top-ugd', {
+        template: `<div>
+        <div style="float: left; margin: 20px; margin-top: -3px;">
+                <span title="Показать меню" style="font-size:40px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
+        </div>
+        <div style="float: left; margin: -34px 0px 0px 50px;">
+                <span title="Все" style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('*')"><i class="fas fa-filter"></i></span>
+                <span title="Заявки" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('created')"><i class="fas fa-filter"></i></span>
+                <span title="Зашли" style="color: blue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('arrived')"><i class="fas fa-filter"></i></span>
+                <span title="Вышли" style="color: gray !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('departed')"><i class="fas fa-filter"></i></span>
+        </div>
+        <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
+            <form class="search-form" id="search" style="">
+                <label>
+                    <input type="text" style="margin-left: -180px;font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
+                        placeholder="Поиск по ФИО"
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="changeView">
+                </label>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="changeView"><i class="fa fa-fw fa-search"></i></div>
+            </form>
+        </div>
+        <div style="float: right; margin: -128px 140px;">
+                <span title="Все" style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('*')"><i class="fas fa-filter"></i></span>
+                <span title="Заявки" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('created')"><i class="fas fa-filter"></i></span>
+                <span title="Зашли" style="color: blue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('arrived')"><i class="fas fa-filter"></i></span>
+                <span title="Вышли" style="color: gray !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('departed')"><i class="fas fa-filter"></i></span>
+        </div>
+        <div style="float: right; margin: -113px 40px;">
+                <span title="Новая запись" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
+        </div>
+        </div>`,
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            vehicleAdd() {
+                appConfig.$emit('route', 'guest-add');
+            },
+            changeView() {
+                appConfig.$emit('searchQueryGuests', this.searchQuery);
+                appConfig.$emit('searchQueryJournal', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                this.changeView();
+            },
+            filterStatus(status) {
+                appConfig.$emit('filterStatusGuests', status);
+
+            },
+            filterStatusL(status) {
+                appConfig.$emit('filterStatusJournal', status);
+            }
+        },
+    });
+
+    const routes = [
+        {path: '/', component: Login},
+        {path: '*', component: Login},
+
+        {path: '/ugd', component: UGD},
+        {path: '/guests', component: Guests},
+        {path: '/guest-add', component: GuestAdd},
+        {path: '/guest-edit', component: GuestEdit},
+        {path: '/journal', component: Journal},
+    ];
+
+    const router = new VueRouter({
+        routes,
+    });
+
+    new Vue({
+        el: '#app',
+        router,
+        data: {
+            items: [],
+        },
+        created() {
+            this.init();
+            appConfig.route = this.$route.path.split('/')[1];
+
+            appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            //appConfig.url = 'http://localhost:3000/';
+
+            appConfig.getAccessToken = () => {
+                appConfig.access_token = localStorage.getItem('access_token');
+            };
+
+            appConfig.$on('route', route => {
+                this.changeRoute(route);
+            });
+
+            if (window.ws === undefined) {
+                window.ws = new WebSocket('wss://jwt-yard.herokuapp.com');
+                //window.ws = new WebSocket('ws://localhost:3000/');
+            }
+
+            ws.onmessage = (e) => {
+                let messageObject = e.data;
+                console.log(messageObject);
+                if (messageObject.split('###')[0] !== 'still alive') {
+                    this.items.unshift({
+                        id: +new Date(),
+                        name: messageObject.split('###')[1],
+                        date: messageObject.split('###')[2],
+                        message: messageObject.split('###')[0]
+                    });
+
+                    let notification = new Notification('VU-Demo', {
+                        icon: './img/yard.png',
+                        body: messageObject.split('###')[0] + ' ' + messageObject.split('###')[1] + ' ' + messageObject.split('###')[2] + ' at ' + messageObject.split('###')[3].split('.')[0]
+                    });
+
+                    switch (messageObject.split('###')[0].toLowerCase()) {
+                        case 'reload':
+                            appConfig.$emit('init', {});
+                            break;
+                        case 'set':
+                            appConfig.$emit('set', {});
+                            break;
+                        case 'show':
+                            appConfig.$emit('show', {});
+                            break;
+                        case 'get':
+                            appConfig.$emit('get', {});
+                            break;
+                        case 'yard':
+                            appConfig.$emit('yard', {});
+                            break;
+                    }
+                }
+            };
+        },
+        methods: {
+            init() {
+                this.ugd = appConfig.route === 'ugd';
+                this.guests = appConfig.route === 'guests';
+                this.journal = appConfig.route === 'journal';
+            },
+            changeRoute(route) {
+                closeNav();
+
+                appConfig.route = route;
+                this.init();
+
+                if (this.$router.currentRoute.path === '/' + route) {
+                    return false;
+                }
+
+                this.$router.push('/' + route);
+                return false;
+            },
+            emitEvent(event) {
+                appConfig.$emit(event, {});
+                this.map = true;
+                closeNav();
+            },
+            logout() {
+                localStorage.setItem('access_token', null);
+                this.changeRoute('login');
+                closeNav();
+            }
+        },
+    });
+
+    function openNav() {
+        document.getElementById('mySidenav').style.width = '250px';
+    }
+
+    function closeNav() {
+        document.getElementById('mySidenav').style.width = '0';
+        return false;
+    }
+</script>
+
