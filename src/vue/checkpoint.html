@@ -1,8 +1,8 @@
 <meta http-equiv="content-type" content="name/html; charset=UTF-8"/>
 <!--<meta name="viewport" content="initial-scale=1.0, user-scalable=no">-->
 
-<title>УГВ - Посетитель Демо</title>
-<link rel="shortcut icon" type="image/png" href="./img/ugv.png"/>
+<title>Проходная Демо</title>
+<link rel="shortcut icon" type="image/png" href="./img/checkpoint.png"/>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.0.3/vue-resource.min.js"></script>
@@ -145,7 +145,7 @@
 <div id="app">
     <div id="mySidenav" class="sidenav">
         <div style="color: white;margin-top: -48px;margin-left: 12px;font-size: 30px;width: 200px;">
-            УГВ Посетитель
+            Проходная
         </div>
         <div style="color: white;margin-top: 20px;margin-left: 15px;font-size: 20px;width: 200px;">
             Демо версия
@@ -154,7 +154,7 @@
             <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
 
             <li v-on:click="changeRoute('ugd')" v-bind:class="{ active: ugd }">
-                <i class="fas fa-user-friends"></i><span style="margin: 15px;">УГВ</span></li>
+                <i class="fas fa-user-shield"></i><span style="margin: 15px;">Проходная</span></li>
 
             <li v-on:click="changeRoute('guests')" v-bind:class="{ active: guests }">
                 <i class="fas fa-id-card"></i><span style="margin: 15px;">Посетители</span></li>
