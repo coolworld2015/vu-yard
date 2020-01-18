@@ -269,14 +269,14 @@
     Vue.component('login', {
         template: `<div style="background: #01579B;width: 100%;height: 100%;position: absolute;">
             <div class="content" style="background: #01579B">
-                <div style="width: 400px; padding: 45px 90px 30px;
-                    margin: 160px auto; border-radius: 3px;
+                <div style="width: 400px; padding: 20px 90px 0px;
+                    margin: 90px auto; border-radius: 3px;
                     color: #000; background: #fff;
                     box-shadow: 0px 2px 15px 0px rgba(0,0,0,0.5); text-align: center;">
                 <div style="color:#01579B;">
 
                         <p class="h5" style="font-weight: bold;margin-left: 0px">Проходная</p>
-                        <img src="./img/checkpoint.png" style="margin-left:50px;margin-top: -20px;margin-bottom: 20px; width: 250px;">
+                        <img src="./img/checkpoint.png" style="margin-left:50px;margin-top: -20px;margin-bottom: 20px; width: 220px;">
 
 
                     <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
@@ -460,7 +460,7 @@
                         <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 120px;height: 120px;border-radius: 16px;">
                     </div>
                     <div style="float: left; width: 80%; margin-top: 55px;">
-                        {{item.name}} - {{item.date}} - {{item.host}}
+                        {{item.name}} - {{item.date}} - {{item.host}} - {{item.status}}
                     </div>
                 </div>
             </div>
@@ -508,36 +508,36 @@
         methods: {
             renderStatus(item) {
                 switch (item.status) {
-                    case 'arrived':
+                    case 'created':
                         return {
-                            background: 'white',
-                            color: 'blue'
-                        };
-                        break;
-                    case 'booked':
-                        return {
-                            background: 'green',
+                            background: 'dodgerblue',
                             color: 'white'
                         };
-                        break;
+                    case 'arrived':
+                        return {
+                            background: 'red',
+                            color: 'white'
+                        };
+                    case 'booked':
+                        return {
+                            background: 'red',
+                            color: 'white'
+                        };
                     case 'docked':
                         return {
                             background: 'red',
                             color: 'white'
                         };
-                        break;
                     case 'undocked':
                         return {
                             background: 'dodgerblue',
                             color: 'white'
                         };
-                        break;
                     case 'departed':
                         return {
-                            background: 'gray',
-                            color: 'white'
+                            background: 'yellow',
+                            color: 'blue'
                         };
-                        break;
                 }
             },
             getGuests() {
@@ -554,7 +554,7 @@
                     .then(result => {
                         appConfig.guests = result.data.sort(this.sort);
                         let items = result.data.sort(this.sort);
-                        items = items.filter(el => el.status !== 'departed');
+                        //items = items.filter(el => el.status !== 'departed');
                         appConfig.items = items;
                         this.items = items;
                         this.filteredItems = items;
@@ -1140,26 +1140,25 @@
                 }
                 this.filteredItems = items;
                 this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
             });
         },
         methods: {
             renderStatus(item) {
                 switch (item.status) {
+                    case 'created':
+                        return {background: 'dodgerblue', color: 'white'};
                     case 'arrived':
-                        return {background: 'white', color: 'blue'};
-                        break;
+                        return {background: 'red', color: 'white'};
                     case 'booked':
                         return {background: 'green', color: 'white'};
-                        break;
                     case 'docked':
                         return {background: 'red', color: 'white'};
-                        break;
                     case 'undocked':
                         return {background: 'dodgerblue', color: 'white'};
-                        break;
                     case 'departed':
-                        return {background: 'gray', color: 'white'};
-                        break;
+                        return {background: 'yellow', color: 'blue'};
                 }
             },
             getJournal() {
@@ -1202,9 +1201,9 @@
         </div>
         <div style="float: left; margin: -34px 0px 0px 50px;">
                 <span title="Все" style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('*')"><i class="fas fa-filter"></i></span>
-                <span title="Заявки" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('created')"><i class="fas fa-filter"></i></span>
-                <span title="Зашли" style="color: blue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('arrived')"><i class="fas fa-filter"></i></span>
-                <span title="Вышли" style="color: gray !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('departed')"><i class="fas fa-filter"></i></span>
+                <span title="Заявки" style="color: dodgerblue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('created')"><i class="fas fa-filter"></i></span>
+                <span title="Зашли" style="color: red !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('arrived')"><i class="fas fa-filter"></i></span>
+                <span title="Вышли" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatusL('departed')"><i class="fas fa-filter"></i></span>
         </div>
         <div style="margin-top: 15px; color: red; font-size: 50px;margin-right: 100px;">
             <form class="search-form" id="search" style="">
@@ -1218,9 +1217,9 @@
         </div>
         <div style="float: right; margin: -128px 140px;">
                 <span title="Все" style="font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('*')"><i class="fas fa-filter"></i></span>
-                <span title="Заявки" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('created')"><i class="fas fa-filter"></i></span>
-                <span title="Зашли" style="color: blue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('arrived')"><i class="fas fa-filter"></i></span>
-                <span title="Вышли" style="color: gray !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('departed')"><i class="fas fa-filter"></i></span>
+                <span title="Заявки" style="color: dodgerblue !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('created')"><i class="fas fa-filter"></i></span>
+                <span title="Зашли" style="color: red !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('arrived')"><i class="fas fa-filter"></i></span>
+                <span title="Вышли" style="color: yellow !important;font-size:25px;cursor:pointer; color: black" v-on:click="filterStatus('departed')"><i class="fas fa-filter"></i></span>
         </div>
         <div style="float: right; margin: -113px 40px;">
                 <span title="Новая запись" style="font-size:70px;cursor:pointer; color: black" v-on:click="vehicleAdd()">&#43;</span>
