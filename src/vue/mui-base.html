@@ -15,8 +15,6 @@
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-
-
 </head>
 
 <style>
@@ -124,6 +122,15 @@
 
 </style>
 
+</body>
+</html>
+
+
+
+
+
+
+
 <script>
     const appConfig = new Vue();
 
@@ -155,7 +162,8 @@
               <div style="display: none">{{ searched.length }}</div>
 
 			  <md-table-empty-state>
-                <md-progress-spinner :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+			    <div v-if="!loading"> No items</div>
+			    <md-progress-spinner v-show="loading" :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
 			  </md-table-empty-state>
 
 			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
@@ -175,6 +183,7 @@
             positionY: 0,
             search: null,
             searched: [],
+            loading: true
         }),
         created() {
             this.getItems();
@@ -187,6 +196,7 @@
                         this.items = result.data.splice(0, 100);
                         this.filteredItems = result.data.splice(0, 100);
                         this.searched = this.items;
+                        this.loading = false;
                         setTimeout(() => {
                             //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
                         }, 100)
@@ -827,7 +837,8 @@
               <div style="display: none">{{ searched.length }}</div>
 
 			  <md-table-empty-state>
-                <md-progress-spinner :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+			    <div v-if="!loading"> No items</div>
+			    <md-progress-spinner v-show="loading" :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
 			  </md-table-empty-state>
 
 			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
@@ -843,6 +854,7 @@
             search: null,
             count: 0,
             searched: [],
+            loading: true
         }),
         created() {
             this.getItems();
@@ -855,6 +867,7 @@
                         this.items = result.data.sort(this.sort);
                         this.filteredItems = result.data.sort(this.sort);
                         this.searched = this.items;
+                        this.loading = false;
                     })
                     .catch(error => {
                     });
@@ -1045,5 +1058,3 @@
     // https://mrtomato-qa.dev.trustsourcing.com/standarts-categories
     // sprint16tomato@mailinator.com
 </script>
-</body>
-</html>
