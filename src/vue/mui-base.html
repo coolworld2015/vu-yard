@@ -125,12 +125,6 @@
 </body>
 </html>
 
-
-
-
-
-
-
 <script>
     const appConfig = new Vue();
 
@@ -907,54 +901,42 @@
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="id">ID</label>
-                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="sending" />
+                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="true" />
                           </md-field>
                         </div>
 
-                        <div class="md-layout-item md-small-size-100">
+                        <div class="messageClassName">
                           <md-field>
-                            <label for="name">Name</label>
+                            <label for="name">Login</label>
                             <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
                           </md-field>
                         </div>
 
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="phone">Phone</label>
-                            <md-input name="phone" id="phone" autocomplete="phone" v-model="form.phone" :disabled="sending" />
-                          </md-field>
-                        </div>
+                        <md-field :class="messageClassName">
+                          <label>Name</label>
+                          <md-input v-model="name" required v-on:keypress="hasMessagesName=false"></md-input>
+                          <span class="md-error">Value is requred</span>
+                        </md-field>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
-                            <label for="street">Street</label>
-                            <md-input name="street" id="street" autocomplete="street" v-model="form.street" :disabled="sending" />
+                            <label for="phone">Password</label>
+                            <md-input name="pass" id="pass" autocomplete="pass" v-model="form.pass" :disabled="sending" />
                           </md-field>
                         </div>
 
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="house">house</label>
-                            <md-input name="house" id="house" autocomplete="house" v-model="form.house" :disabled="sending" />
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="apt">Apt</label>
-                            <md-input name="apt" id="apt" autocomplete="apt" v-model="form.apt" :disabled="sending" />
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="index">Postal Codes</label>
-                            <md-input name="index" id="index" autocomplete="index" v-model="form.index" :disabled="sending" />
-                          </md-field>
-                        </div>
+                        <md-field :class="messageClass">
+                          <label>Description</label>
+                          <md-textarea v-model="form.description" required v-on:keypress="hasMessages=false" md-autogrow :disabled="sending"></md-textarea>
+                          <span class="md-error">There is an error</span>
+                        </md-field>
                     </md-card-content>
 
                     <md-progress-bar md-mode="indeterminate" v-if="sending" />
+
+<!--                    <md-field :class="messageClassName">
+                        <span class="md-error">There is an error</span>
+                    </md-field>-->
 
                     <md-card-actions style="margin-bottom: 20px;">
                       <md-button class="md-raised md-primary" v-on:click="userEdit">Submit</md-button>
@@ -973,12 +955,12 @@
                 title: 'Add new item',
                 id: null,
                 name: null,
-                phone: null,
-                street: null,
-                house: null,
-                apt: null,
-                index: null,
+                pass: null,
+                description: null,
             },
+            name: null,
+            hasMessages: false,
+            hasMessagesName: false,
             userSaved: true,
             sending: false,
             lastUser: null
@@ -990,6 +972,18 @@
                 this.init();
             }
         },
+        computed: {
+            messageClass () {
+                return {
+                    'md-invalid': this.hasMessages
+                }
+            },
+            messageClassName () {
+                return {
+                    'md-invalid': this.hasMessagesName
+                }
+            }
+        },
         methods: {
             init() {
                 this.form = appConfig.item;
@@ -999,7 +993,11 @@
                 }, 2000)
             },
             userEdit() {
-                this.$router.push('/users-items');
+                this.sending = true;
+                if (!this.name) {
+                    this.hasMessagesName = true;
+                };
+                //this.$router.push('/users-items');
             },
             back() {
                 this.$router.push('/users-items');
