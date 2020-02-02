@@ -21,11 +21,7 @@
 
 <style>
     ::-webkit-scrollbar {
-        display: none;
-    }
-    html {
-        background: #f6f6f6;
-        overflow: hidden;
+        /*display: none;*/
     }
 </style>
 
@@ -87,12 +83,6 @@
                 </md-app-content>
             </md-app>
 
-            <!--            <md-bottom-bar md-type="shift">
-                            <md-bottom-bar-item to="/" id="bottom-bar-item-home" md-label="Home" md-icon="home"></md-bottom-bar-item>
-                            <md-bottom-bar-item to="/table" id="bottom-bar-item-pages" md-label="Pictures" md-icon="pages"></md-bottom-bar-item>
-                            <md-bottom-bar-item to="/list" id="bottom-bar-item-posts" md-label="List" md-icon="menu"></md-bottom-bar-item>
-                            <md-bottom-bar-item to="/base-item-show" id="bottom-bar-item-favorites" md-label="Other" md-icon="favorite"></md-bottom-bar-item>
-                        </md-bottom-bar>-->
         </div>
     </template>
 </div>
@@ -100,7 +90,6 @@
 <style lang="scss" scoped>
     .md-app {
         height: 100vh;
-        /*max-height: 920px;*/
     }
 
     .md-drawer {
@@ -109,27 +98,24 @@
     }
 
     .md-table {
-        height: 87vh;
+        height: 88vh;
     }
 
     .md-table-content {
-        height: 87vh !important;
-        max-height: 87vh !important;
+        height: 85vh !important;
+        max-height: 85vh !important;
     }
     .md-tabs-navigation {
         background: rgb(238, 238, 238) !important;
     }
-    .md-table-cell-container {
-        overflow-wrap: break-word !important;
-        width: 270px;
-        max-width: 270px;
-    }
-    .md-app-scroller {
-        background: rgb(238, 238, 238) !important;
-    }
 
     .md-table-cell-container {
+        overflow-wrap: break-word !important;
         width: 220px !important;
+    }
+
+    .md-app-scroller {
+        background: rgb(238, 238, 238) !important;
     }
 
     .md-table-head-container {
@@ -139,14 +125,12 @@
 </style>
 
 <script>
-    document.cookie = '.AspNetCore.Identity.Application=CfDJ8EEYfbHumMlOvTgWyaJgM1Kp6JbPmuird4F75OgtGVAZZqPpcEizz1ywssS-XYF0p8_z86pHcPKzEUopVBmra6dTTRBOFd_HtKcOW6D1KFhMV3Rs_8rCtjJH43vJqwBaO6j3ETBnjMpnhCSawKEH4iY73hpyzvx4krhZacfaug9cedEPJspd_7mGirjUrTf0pVrjmSu3BSayKwQrDrVMO6NwuGaPpFpaIuhnZQ7dFBc0bsuDdG40X-B9hgmBUV8HaHoCFl61YJLdczJyXwAy-6iOjLiVDNOtg_qNMdeqdpRYEKJXh5If588-CITyTpchLGyD_nlarYYGEiZhTMqqa3rMukzA2AOJFiVpdj3ASNWJl15r7HxGryZU7IkpSWDbV58lGWR0LtRekqJmNbHACp3_66nbv-0uzCHmWDWd6Tc6aKqdoRnaMAiWdUqERZ48AqgKDEZpUvlkn8VnMpgvbXPVmRbBinu9SAq8uPTPyYvesMADe9JgzVVanezrVReUlCqvaCphrAsIhSg7lfucrMtLfMmAQaw9z6XiJkaSdMqraBeR3OaQd-K4EseeZB1alEP5FRSq_hwkNqi0iYpuIeImP6_zHUIuyKchm8BsdY-u0XEdKuKnNFfG-LdZ2wcW6R5R4cS18Ae6e5VQ6iJZFvfwEISXNLr8JuXQXO18R8e1F3un2S73cLarzpzfvXm67E_3YPc_wf2HIjNCqBFpLds'
-
     const appConfig = new Vue();
 
     const List = {template: '<listUI></listUI>'};
     const Table = {template: '<tableUI></tableUI>'};
-    const Base = {template: '<baseUI></baseUI>'};
-    const BaseItemShow = {template: '<baseItemShow></baseItemShow>'};
+    const Phones = {template: '<phones-items></phones-items>'};
+    const BaseItemShow = {template: '<phone-edit></phone-edit>'};
 
     const UsersItems = {template: '<users-items></users-items>'};
     const UserAdd = {template: '<user-edit></user-edit>'};
@@ -155,35 +139,27 @@
     const CertificationItems = {template: '<certification-items></certification-items>'};
     const SelectItems = {template: '<select-items></select-items>'};
 
-    Vue.component('baseUI', {
+    Vue.component('phones-items', {
         template: `
 		  <div>
 			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
 			  <md-table-toolbar>
 				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Base 09</h1>
+				  <h1 class="md-title">Phones ({{ searched.length }})</h1>
 				</div>
 
 				<md-field md-clearable class="md-toolbar-section-end">
 				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
 				</md-field>
 			  </md-table-toolbar>
-
-<!--		  <md-table-empty-state
-				md-label="No users found"
-				:md-description="\`No user found for this '' query. Try a different search term or create a new user.\`">
-				<md-button class="md-primary md-raised" @click="newUser">Create New User</md-button>
-			  </md-table-empty-state>
--->
+              <div style="display: none">{{ searched.length }}</div>
 
 			  <md-table-empty-state>
                 <md-progress-spinner :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
 			  </md-table-empty-state>
 
 			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-<!--				<md-table-cell md-label="ID" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>-->
 				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-
 				<md-table-cell md-label="Phone" md-sort-by="phone">{{ item.phone }}</md-table-cell>
 				<md-table-cell md-label="Street" md-sort-by="street">{{ item.street }}</md-table-cell>
 				<md-table-cell md-label="House" md-sort-by="house">{{ item.house }}</md-table-cell>
@@ -226,7 +202,6 @@
                 let items, positionY, recordsCount;
                 recordsCount = this.recordsCount;
                 positionY = this.positionY;
-                //console.log(positionY, ' - ' ,recordsCount)
                 items = this.filteredItems.slice(0, recordsCount);
                 if (position > positionY) {
                     this.items = items;
@@ -234,9 +209,6 @@
                     this.recordsCount = recordsCount + 10;
                     this.positionY = positionY + 200;
                 }
-            },
-            newUser() {
-                window.alert('Noop')
             },
             searchOnTable() {
                 this.searched = this.searchByName(this.filteredItems, this.search)
@@ -257,67 +229,16 @@
         }
     });
 
-    Vue.component('baseItemShow', {
+    Vue.component('phone-edit', {
         template: `
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
-                <form novalidate class="md-layout" @submit.prevent="saveUser">
+                <form novalidate class="md-layout">
                   <md-card class="md-layout-item md-size-100 md-small-size-50">
                     <md-card-header>
                       <div class="md-title">{{ form.title }}</div>
                     </md-card-header>
-<!--
-                    <md-card-content>
-                      <div class="md-layout md-gutter">
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="first-name">First Name</label>
-                            <md-input name="first-name" id="first-name" autocomplete="given-name" v-model="form.firstName" :disabled="sending" />
 
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="last-name">Last Name</label>
-                            <md-input name="last-name" id="last-name" autocomplete="family-name" v-model="form.lastName" :disabled="sending" />
-
-                          </md-field>
-                        </div>
-                      </div>
-
-                      <div class="md-layout md-gutter">
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="gender">Gender</label>
-                            <md-select name="gender" id="gender" v-model="form.gender" md-dense :disabled="sending">
-                              <md-option></md-option>
-                              <md-option value="M">M</md-option>
-                              <md-option value="F">F</md-option>
-                            </md-select>
-                            <span class="md-error">The gender is required</span>
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="age">Age</label>
-                            <md-input type="number" id="age" name="age" autocomplete="age" v-model="form.age" :disabled="sending" />
-
-
-                          </md-field>
-                        </div>
-                      </div>
-
-                      <md-field>
-                        <label for="email">Email</label>
-                        <md-input type="email" name="email" id="email" autocomplete="email" v-model="form.email" :disabled="sending" />
-
-
-                      </md-field>
-                    </md-card-content>
--->
-
-                    <md-card-content>
+                    <md-card-content style="padding-bottom: 0px;">
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="id">ID</label>
@@ -370,13 +291,15 @@
 
                     <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
-                    <md-card-actions>
-                     <!-- <md-button type="submit" class="md-primary" :disabled="sending">Create user</md-button>-->
-                      <md-button type="button" class="md-primary" v-on:click="back">Back</md-button>
+                    <md-card-actions style="margin-bottom: 20px;">
+                      <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
                     </md-card-actions>
                   </md-card>
 
-                  <md-snackbar :md-active.sync="userSaved" md-position="left">The user {{ lastUser }} was saved with success!</md-snackbar>
+                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
+                    The phone {{ form.phone }} is shown!
+                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
+                  </md-snackbar>
                 </form>
   		</div>`,
         data: () => ({
@@ -392,7 +315,7 @@
             },
             userSaved: true,
             sending: false,
-            lastUser: null
+            lastUser: null,
         }),
         created() {
             if (!appConfig.item) {
@@ -405,30 +328,13 @@
             init() {
                 this.form = appConfig.item;
                 this.form.title = appConfig.item.name;
+                window.setTimeout(() => {
+                    this.userSaved = false;
+                }, 2000)
             },
             back() {
                 this.$router.push('/base');
             },
-            clearForm() {
-                this.$v.$reset()
-                this.form.firstName = null
-                this.form.lastName = null
-                this.form.age = null
-                this.form.gender = null
-                this.form.email = null
-            },
-            saveUser() {
-                this.sending = true
-
-                // Instead of this timeout, here you can call your API
-                window.setTimeout(() => {
-                    this.lastUser = `${this.form.firstName} ${this.form.lastName}`
-                    this.userSaved = true
-                    this.sending = false
-                    this.clearForm()
-                }, 1500)
-            },
-
         }
     });
 
@@ -918,7 +824,7 @@
 				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable"/>
 				</md-field>
 			  </md-table-toolbar>
-              {{ count }}
+              <div style="display: none">{{ searched.length }}</div>
 
 			  <md-table-empty-state>
                 <md-progress-spinner :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
@@ -984,7 +890,7 @@
                       <div class="md-title">{{ form.title }}</div>
                     </md-card-header>
 
-                    <md-card-content>
+                    <md-card-content style="padding-bottom: 0px;">
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="id">ID</label>
@@ -1043,8 +949,11 @@
                     </md-card-actions>
                   </md-card>
 
-                  <md-snackbar :md-active.sync="userSaved" md-position="left">The user {{ lastUser }} was saved with success!</md-snackbar>
-                </form>
+                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
+                    The user {{ form.name }} is shown!
+                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
+                  </md-snackbar>
+            </form>
   		</div>`,
         data: () => ({
             form: {
@@ -1072,6 +981,9 @@
             init() {
                 this.form = appConfig.item;
                 this.form.title = appConfig.item.name;
+                window.setTimeout(() => {
+                    this.userSaved = false;
+                }, 2000)
             },
             userEdit() {
                 this.$router.push('/users-items');
@@ -1105,11 +1017,11 @@
     Vue.use(VueMaterial.default);
 
     const routes = [
-        {path: '/', component: Base},
-        {path: '*', component: Base},
+        {path: '/', component: Phones},
+        {path: '*', component: Phones},
         {path: '/list', component: List},
         {path: '/table', component: Table},
-        {path: '/base', component: Base},
+        {path: '/base', component: Phones},
         {path: '/base-item-show', component: BaseItemShow},
         {path: '/certification-items', component: CertificationItems},
         {path: '/select-items', component: SelectItems},
