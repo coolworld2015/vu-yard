@@ -425,11 +425,11 @@
 		<div>
 		<md-card class="md-layout-item " style="position: fixed; z-index: 5; width1: 100%; margin: 0px; padding: 0px; margin-top: -12px;">
 		 <md-card-header>
-          <div class="md-title">Pictures ({{ filtered.length }})</div>
+          <div class="md-title">Pictures ({{ searched.length }})</div>
         </md-card-header>
             <md-card-content style="padding-bottom: 0px;">
 				<md-field md-clearable class="md-toolbar-section-end" style="width:250px">
-				  <md-input placeholder="Search by name..." />
+				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
 				</md-field>
             </md-card-content>
 
@@ -443,7 +443,7 @@
                 <md-progress-spinner :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
             </md-empty-state>
 
-			<md-list v-if="!loading" class="md-triple-line" v-for="item in items" v-bind:key="item.id" style="background: rgb(238, 238, 238);">
+			<md-list v-if="!loading" class="md-triple-line" v-for="item in searched" v-bind:key="item.id" style="background: rgb(238, 238, 238);">
 			  <md-list-item style="background: rgb(238, 238, 238);">
                   <md-card md-with-hover style="width: 400px; margin: auto;">
                         <md-card-header>
@@ -463,18 +463,32 @@
         data: () => ({
             items: [],
             loading: true,
-            filtered: []
+            filteredItems: [],
+            search: null,
+            searched: [],
         }),
         created() {
             this.getItems();
-
+            this.getItemsAll();
         },
         methods: {
             getItems() {
                 this.$http.get('http://ui-collection.herokuapp.com/api/items/get')
                     .then(result => {
                         this.items = result.data.filter((item) => item.pic);
-                        this.filtered = result.data.filter((item) => item.pic);
+                        this.filteredItems = result.data.filter((item) => item.pic);
+                        this.searched = this.items;
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                    });
+            },
+            getItemsAll() {
+                this.$http.get('http://ui-collection.herokuapp.com/api/items/getAll')
+                    .then(result => {
+                        this.items = result.data.filter((item) => item.pic);
+                        this.filteredItems = result.data.filter((item) => item.pic);
+                        this.searched = this.items;
                         this.loading = false;
                     })
                     .catch(error => {
@@ -482,6 +496,18 @@
             },
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
+            },
+            searchOnTable() {
+                this.searched = this.searchByName(this.filteredItems, this.search)
+            },
+            searchByName(items, term) {
+                if (term) {
+                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                }
+                return items
+            },
+            toLower(text) {
+                return text.toString().toLowerCase()
             },
         }
     });
