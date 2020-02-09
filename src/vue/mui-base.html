@@ -55,15 +55,15 @@
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
-                        <md-list-item to="/table">
+ <!--                       <md-list-item to="/table">
                             <md-icon style="color: white">camera_alt</md-icon>
                             <span class="md-list-item-text" style="color: white">Pictures</span>
                         </md-list-item>
-                        <md-divider style="background: white"></md-divider>
+                        <md-divider style="background: white"></md-divider>-->
 
-                        <md-list-item to="/list">
-                            <md-icon style="color: white">camera</md-icon>
-                            <span class="md-list-item-text" style="color: white">List</span>
+                        <md-list-item to="/pictures">
+                            <md-icon style="color: white">camera_alt</md-icon>
+                            <span class="md-list-item-text" style="color: white">Pictures</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
@@ -99,6 +99,10 @@
         height: 88vh;
     }
 
+    .md-title {
+        overflow: hidden;
+    }
+
     .md-table-content {
         height: 85vh !important;
         max-height: 85vh !important;
@@ -128,7 +132,7 @@
 <script>
     const appConfig = new Vue();
 
-    const List = {template: '<listUI></listUI>'};
+    const Pictures = {template: '<pictures-items></pictures-items>'};
     const Table = {template: '<tableUI></tableUI>'};
     const Phones = {template: '<phones-items></phones-items>'};
     const BaseItemShow = {template: '<phone-edit></phone-edit>'};
@@ -416,14 +420,30 @@
         }
     });
 
-    Vue.component('listUI', {
+    Vue.component('pictures-items', {
         template: `
 		<div>
+		<md-card class="md-layout-item " style="position: fixed; z-index: 5; width1: 100%; margin: 0px; padding: 0px; margin-top: -12px;">
+		 <md-card-header>
+          <div class="md-title">Pictures ({{ filtered.length }})</div>
+        </md-card-header>
+            <md-card-content style="padding-bottom: 0px;">
+				<md-field md-clearable class="md-toolbar-section-end" style="width:250px">
+				  <md-input placeholder="Search by name..." />
+				</md-field>
+            </md-card-content>
+
+            <md-card-actions style="margin-bottom: 20px;">
+                   <!--   <md-button type="button" class="md-raised md-primary">Back</md-button>-->
+                    </md-card-actions>
+            </md-card>
+
+
             <md-empty-state v-if="loading" style="padding-top: 35vh;">
                 <md-progress-spinner :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
             </md-empty-state>
 
-			<md-list class="md-triple-line" v-for="item in items" v-bind:key="item.id" style="background: rgb(238, 238, 238);">
+			<md-list v-if="!loading" class="md-triple-line" v-for="item in items" v-bind:key="item.id" style="background: rgb(238, 238, 238);">
 			  <md-list-item style="background: rgb(238, 238, 238);">
                   <md-card md-with-hover style="width: 400px; margin: auto;">
                         <md-card-header>
@@ -442,7 +462,8 @@
   		</div>`,
         data: () => ({
             items: [],
-            loading: true
+            loading: true,
+            filtered: []
         }),
         created() {
             this.getItems();
@@ -453,6 +474,7 @@
                 this.$http.get('http://ui-collection.herokuapp.com/api/items/get')
                     .then(result => {
                         this.items = result.data.filter((item) => item.pic);
+                        this.filtered = result.data.filter((item) => item.pic);
                         this.loading = false;
                     })
                     .catch(error => {
@@ -1030,7 +1052,7 @@
     const routes = [
         {path: '/', component: Phones},
         {path: '*', component: Phones},
-        {path: '/list', component: List},
+        {path: '/pictures', component: Pictures},
         {path: '/table', component: Table},
         {path: '/base', component: Phones},
         {path: '/base-item-show', component: BaseItemShow},
