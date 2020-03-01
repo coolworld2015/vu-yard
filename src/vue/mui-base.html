@@ -28,7 +28,7 @@
     <template>
         <div class="page-container" class="sidenav">
             <md-app md-mode="fixed">
-                <md-app-toolbar class="md-primary">
+                <md-app-toolbar class="md-primary" v-show="login">
                     <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
                         <md-icon>menu</md-icon>
                     </md-button>
@@ -64,6 +64,12 @@
                         <md-list-item to="/pictures">
                             <md-icon style="color: white">camera_alt</md-icon>
                             <span class="md-list-item-text" style="color: white">Pictures</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-list-item v-on:click="logout()">
+                            <md-icon style="color: white">camera_alt</md-icon>
+                            <span class="md-list-item-text" style="color: white">Logout</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
@@ -133,6 +139,9 @@
 
 <script>
     const appConfig = new Vue();
+    appConfig.login = false;
+
+    const Login = {template: '<login></login>'};
 
     const Pictures = {template: '<pictures-items></pictures-items>'};
     const Table = {template: '<tableUI></tableUI>'};
@@ -145,6 +154,143 @@
 
     const CertificationItems = {template: '<certification-items></certification-items>'};
     const SelectItems = {template: '<select-items></select-items>'};
+
+    Vue.component('login', {
+        template: `
+		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
+                <form novalidate class="md-layout" @submit.prevent="saveUser">
+                  <md-card class="md-layout-item md-size-100 md-small-size-50">
+                    <md-card-header>
+                      <div class="md-title">{{ form.title }}</div>
+                    </md-card-header>
+
+                    <md-card-content style="padding-bottom: 0px;">
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="id">ID</label>
+                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="true" />
+                          </md-field>
+                        </div>
+
+                        <div class="messageClassName">
+                          <md-field>
+                            <label for="name">Login</label>
+                            <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
+                          </md-field>
+                        </div>
+
+                        <md-field :class="messageClassName">
+                          <label>Name</label>
+                          <md-input v-model="name" required v-on:keypress="hasMessagesName=false"></md-input>
+                          <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="phone">Password</label>
+                            <md-input name="pass" id="pass" autocomplete="pass" v-model="form.pass" :disabled="sending" />
+                          </md-field>
+                        </div>
+
+                        <md-field :class="messageClass">
+                          <label>Description</label>
+                          <md-textarea v-model="form.description" required v-on:keypress="hasMessages=false" md-autogrow :disabled="sending"></md-textarea>
+                          <span class="md-error">There is an error</span>
+                        </md-field>
+                    </md-card-content>
+
+                    <md-progress-bar md-mode="indeterminate" v-if="sending" />
+
+<!--                    <md-field :class="messageClassName">
+                        <span class="md-error">There is an error</span>
+                    </md-field>-->
+
+                    <md-card-actions style="margin-bottom: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="userEdit">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="back">Delete</md-button>
+                    </md-card-actions>
+                  </md-card>
+
+                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
+                    The user {{ form.name }} is shown!
+                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
+                  </md-snackbar>
+            </form>
+  		</div>`,
+        data: () => ({
+            form: {
+                title: 'Add new item',
+                id: null,
+                name: null,
+                pass: null,
+                description: null,
+            },
+            name: null,
+            hasMessages: false,
+            hasMessagesName: false,
+            userSaved: true,
+            sending: false,
+            lastUser: null
+        }),
+        created() {
+            if (!appConfig.item) {
+                //this.$router.push('/users-items');
+            } else {
+                this.init();
+            }
+        },
+        computed: {
+            messageClass () {
+                return {
+                    'md-invalid': this.hasMessages
+                }
+            },
+            messageClassName () {
+                return {
+                    'md-invalid': this.hasMessagesName
+                }
+            }
+        },
+        methods: {
+            init() {
+                this.form = appConfig.item;
+                this.form.title = appConfig.item.name;
+                window.setTimeout(() => {
+                    this.userSaved = false;
+                }, 2000)
+            },
+            userEdit() {
+                this.sending = true;
+                if (!this.name) {
+                    this.hasMessagesName = true;
+                };
+                //this.$router.push('/users-items');
+            },
+            back() {
+                this.$router.push('/users-items');
+            },
+            clearForm() {
+                this.$v.$reset()
+                this.form.firstName = null
+                this.form.lastName = null
+                this.form.age = null
+                this.form.gender = null
+                this.form.email = null
+            },
+            saveUser() {
+                this.sending = true
+
+                // Instead of this timeout, here you can call your API
+                window.setTimeout(() => {
+                    this.lastUser = `${this.form.firstName} ${this.form.lastName}`
+                    this.userSaved = true
+                    this.sending = false
+                    this.clearForm()
+                }, 1500)
+            },
+
+        }
+    });
 
     Vue.component('phones-items', {
         template: `
@@ -187,7 +333,8 @@
         }),
         created() {
             this.getItems();
-            this.searched = this.items
+            this.searched = this.items;
+            appConfig.$emit('login', {});
         },
         methods: {
             getItems() {
@@ -1078,8 +1225,9 @@
     Vue.use(VueMaterial.default);
 
     const routes = [
-        {path: '/', component: Phones},
-        {path: '*', component: Phones},
+        {path: '/', component: Login},
+        {path: '*', component: Login},
+        {path: '/login', component: Login},
         {path: '/pictures', component: Pictures},
         {path: '/table', component: Table},
         {path: '/base', component: Phones},
@@ -1100,7 +1248,62 @@
         router,
         data: () => ({
             menuVisible: false,
-        })
+            login: appConfig.login,
+        }),
+        created() {
+            this.init();
+            appConfig.route = this.$route.path.split('/')[1];
+
+            appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            //appConfig.url = 'http://localhost:3000/';
+
+            appConfig.getAccessToken = () => {
+                appConfig.access_token = localStorage.getItem('access_token');
+            };
+
+            appConfig.$on('route', route => {
+                this.changeRoute(route);
+            });
+
+            appConfig.$on('login', () => {
+                this.login = true;
+            });
+
+            appConfig.$on('logout', () => {
+                this.login = false;
+            });
+        },
+        methods: {
+            init() {
+                this.ugd = appConfig.route === 'ugd';
+                this.guests = appConfig.route === 'guests';
+                this.journal = appConfig.route === 'journal';
+            },
+            changeRoute(route) {
+                //closeNav();
+
+                appConfig.route = route;
+                this.init();
+
+                if (this.$router.currentRoute.path === '/' + route) {
+                    return false;
+                }
+
+                this.$router.push('/' + route);
+                return false;
+            },
+            emitEvent(event) {
+                appConfig.$emit(event, {});
+                this.map = true;
+                closeNav();
+            },
+            logout() {
+                localStorage.setItem('access_token', null);
+                this.changeRoute('login');
+                appConfig.$emit('logout', {});
+                //closeNav();
+            }
+        },
     })
 
     // https://mrtomato-qa.dev.trustsourcing.com/standarts-categories
