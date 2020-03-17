@@ -158,135 +158,93 @@
     Vue.component('login', {
         template: `
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
-                <form novalidate class="md-layout" @submit.prevent="saveUser">
+                <form class="md-layout">
                   <md-card class="md-layout-item md-size-100 md-small-size-50">
-                    <md-card-header>
-                      <div class="md-title">{{ form.title }}</div>
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">Base 09</div>
                     </md-card-header>
 
                     <md-card-content style="padding-bottom: 0px;">
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="id">ID</label>
-                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="true" />
-                          </md-field>
-                        </div>
 
-                        <div class="messageClassName">
-                          <md-field>
-                            <label for="name">Login</label>
-                            <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
-                          </md-field>
-                        </div>
 
-                        <md-field :class="messageClassName">
-                          <label>Name</label>
-                          <md-input v-model="name" required v-on:keypress="hasMessagesName=false"></md-input>
-                          <span class="md-error">Value is requred</span>
-                        </md-field>
+                      <md-field :class="messageClassLogin">
+                        <label>Login</label>
+                        <md-input v-model="login" required v-on:keypress="hasMessagesLogin=false" :disabled="sending"></md-input>
+                        <span class="md-error">Value is requred</span>
+                      </md-field>
 
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="phone">Password</label>
-                            <md-input name="pass" id="pass" autocomplete="pass" v-model="form.pass" :disabled="sending" />
-                          </md-field>
-                        </div>
+                      <md-field :class="messageClassPassword">
+                        <label>Password</label>
+                        <md-input v-model="password" type="password" required v-on:keypress="hasMessagesPassword=false" :disabled="sending"></md-input>
+                        <span class="md-error">Value is requred</span>
+                      </md-field>
 
-                        <md-field :class="messageClass">
-                          <label>Description</label>
-                          <md-textarea v-model="form.description" required v-on:keypress="hasMessages=false" md-autogrow :disabled="sending"></md-textarea>
-                          <span class="md-error">There is an error</span>
-                        </md-field>
                     </md-card-content>
 
-                    <md-progress-bar md-mode="indeterminate" v-if="sending" />
+                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="sending" />
 
-<!--                    <md-field :class="messageClassName">
-                        <span class="md-error">There is an error</span>
-                    </md-field>-->
-
-                    <md-card-actions style="margin-bottom: 20px;">
-                      <md-button class="md-raised md-primary" v-on:click="userEdit">Submit</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="back">Delete</md-button>
+                    <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="login" :disabled="sending">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="clear" :disabled="sending">Clear</md-button>
                     </md-card-actions>
                   </md-card>
 
-                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
-                    The user {{ form.name }} is shown!
-                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
+                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
+                    The login form is shown!
+                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
                   </md-snackbar>
             </form>
   		</div>`,
         data: () => ({
-            form: {
-                title: 'Add new item',
-                id: null,
-                name: null,
-                pass: null,
-                description: null,
-            },
             name: null,
-            hasMessages: false,
-            hasMessagesName: false,
-            userSaved: true,
+            login: null,
+            password: null,
+            hasMessagesLogin: false,
+            hasMessagesPassword: false,
+            snackbar: true,
             sending: false,
-            lastUser: null
         }),
         created() {
-            if (!appConfig.item) {
-                //this.$router.push('/users-items');
-            } else {
-                this.init();
-            }
+            this.init();
         },
         computed: {
-            messageClass () {
+            messageClassLogin () {
                 return {
-                    'md-invalid': this.hasMessages
+                    'md-invalid': this.hasMessagesLogin
                 }
             },
-            messageClassName () {
+            messageClassPassword () {
                 return {
-                    'md-invalid': this.hasMessagesName
+                    'md-invalid': this.hasMessagesPassword
                 }
             }
         },
         methods: {
             init() {
-                this.form = appConfig.item;
-                this.form.title = appConfig.item.name;
                 window.setTimeout(() => {
-                    this.userSaved = false;
+                    this.snackbar = false;
                 }, 2000)
             },
-            userEdit() {
-                this.sending = true;
-                if (!this.name) {
-                    this.hasMessagesName = true;
-                };
+            login() {
+                if (!this.login) {
+                    this.hasMessagesLogin = true;
+                }
+                if (!this.password) {
+                    this.hasMessagesPassword = true;
+                }
+                if (this.login && this.password) {
+                    this.sending = true;
+                }
                 //this.$router.push('/users-items');
+            },
+            clear() {
+                this.login = '';
+                this.hasMessagesLogin = false;
+                this.password = '';
+                this.hasMessagesPassword = false;
             },
             back() {
                 this.$router.push('/users-items');
-            },
-            clearForm() {
-                this.$v.$reset()
-                this.form.firstName = null
-                this.form.lastName = null
-                this.form.age = null
-                this.form.gender = null
-                this.form.email = null
-            },
-            saveUser() {
-                this.sending = true
-
-                // Instead of this timeout, here you can call your API
-                window.setTimeout(() => {
-                    this.lastUser = `${this.form.firstName} ${this.form.lastName}`
-                    this.userSaved = true
-                    this.sending = false
-                    this.clearForm()
-                }, 1500)
             },
 
         }
