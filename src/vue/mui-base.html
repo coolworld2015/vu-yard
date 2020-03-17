@@ -68,18 +68,10 @@
                         <md-divider style="background: white"></md-divider>
 
                         <md-list-item v-on:click="logout()">
-                            <md-icon style="color: white">camera_alt</md-icon>
+                            <md-icon style="color: white">logout</md-icon>
                             <span class="md-list-item-text" style="color: white">Logout</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
-
-<!--
-                        <md-list-item to="/certification-items">
-                            <md-icon style="color: white">notifications_active</md-icon>
-                            <span class="md-list-item-text" style="color: white">Notifications</span>
-                        </md-list-item>
-                        <md-divider style="background: white"></md-divider>
--->
 
                     </md-list>
                 </md-app-drawer>
@@ -166,26 +158,28 @@
 
                     <md-card-content style="padding-bottom: 0px;">
 
+                        <md-field :class="messageClassLogin">
+                            <label>Login</label>
+                            <md-input v-model="login" required v-on:keypress="hasMessagesLogin=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
 
-                      <md-field :class="messageClassLogin">
-                        <label>Login</label>
-                        <md-input v-model="login" required v-on:keypress="hasMessagesLogin=false" :disabled="sending"></md-input>
-                        <span class="md-error">Value is requred</span>
-                      </md-field>
+                        <md-field :class="messageClassPassword">
+                            <label>Password</label>
+                            <md-input v-model="password" type="password" required v-on:keypress="hasMessagesPassword=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
 
-                      <md-field :class="messageClassPassword">
-                        <label>Password</label>
-                        <md-input v-model="password" type="password" required v-on:keypress="hasMessagesPassword=false" :disabled="sending"></md-input>
-                        <span class="md-error">Value is requred</span>
-                      </md-field>
-
+                        <div style="text-align: right; margin-top: 40px;">
+                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold">Server response - access denied</span>
+                        </div>
                     </md-card-content>
 
-                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="sending" />
+                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
 
                     <md-card-actions style="margin: 20px;">
-                      <md-button class="md-raised md-primary" v-on:click="login" :disabled="sending">Submit</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="clear" :disabled="sending">Clear</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onLogin" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onClear" :disabled="loading">Clear</md-button>
                     </md-card-actions>
                   </md-card>
 
@@ -202,7 +196,8 @@
             hasMessagesLogin: false,
             hasMessagesPassword: false,
             snackbar: true,
-            sending: false,
+            loading: false,
+            error: false
         }),
         created() {
             this.init();
@@ -225,28 +220,44 @@
                     this.snackbar = false;
                 }, 2000)
             },
-            login() {
+            onLogin() {
                 if (!this.login) {
                     this.hasMessagesLogin = true;
                 }
+
                 if (!this.password) {
                     this.hasMessagesPassword = true;
                 }
+
                 if (this.login && this.password) {
-                    this.sending = true;
+                    this.loading = true;
+                    this.error = false;
+
+                    this.$http.post(appConfig.url + 'api/login', {
+                        name: this.login,
+                        pass: this.password,
+                        description: 'Web'
+                    })
+                        .then(result => {
+                            appConfig.access_token = result.body.token;
+                            localStorage.setItem('access_token', result.body.token);
+                            this.loading = false;
+                            this.error = false;
+                            this.$router.push('base');
+                        })
+                        .catch((error) => {
+                            this.loading = false;
+                            this.error = true;
+                        })
                 }
-                //this.$router.push('/users-items');
             },
-            clear() {
+            onClear() {
                 this.login = '';
                 this.hasMessagesLogin = false;
                 this.password = '';
                 this.hasMessagesPassword = false;
+                this.error = false;
             },
-            back() {
-                this.$router.push('/users-items');
-            },
-
         }
     });
 
@@ -267,7 +278,7 @@
 
 			  <md-table-empty-state>
 			    <div v-if="!loading"> No items</div>
-			    <md-progress-spinner v-show="loading" :md-diameter="100" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
 			  </md-table-empty-state>
 
 			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
@@ -287,7 +298,7 @@
             positionY: 0,
             search: null,
             searched: [],
-            loading: true
+            loading: true,
         }),
         created() {
             this.getItems();
@@ -349,64 +360,64 @@
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
                 <form novalidate class="md-layout">
                   <md-card class="md-layout-item md-size-100 md-small-size-50">
-                    <md-card-header>
-                      <div class="md-title">{{ form.title }}</div>
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
                     </md-card-header>
 
                     <md-card-content style="padding-bottom: 0px;">
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="id">ID</label>
-                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="sending" />
+                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="true" />
                           </md-field>
                         </div>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="name">Name</label>
-                            <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
+                            <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="true" />
                           </md-field>
                         </div>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="phone">Phone</label>
-                            <md-input name="phone" id="phone" autocomplete="phone" v-model="form.phone" :disabled="sending" />
+                            <md-input name="phone" id="phone" autocomplete="phone" v-model="form.phone" :disabled="true" />
                           </md-field>
                         </div>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="street">Street</label>
-                            <md-input name="street" id="street" autocomplete="street" v-model="form.street" :disabled="sending" />
+                            <md-input name="street" id="street" autocomplete="street" v-model="form.street" :disabled="true" />
                           </md-field>
                         </div>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
-                            <label for="house">house</label>
-                            <md-input name="house" id="house" autocomplete="house" v-model="form.house" :disabled="sending" />
+                            <label for="house">House</label>
+                            <md-input name="house" id="house" autocomplete="house" v-model="form.house" :disabled="true" />
                           </md-field>
                         </div>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="apt">Apt</label>
-                            <md-input name="apt" id="apt" autocomplete="apt" v-model="form.apt" :disabled="sending" />
+                            <md-input name="apt" id="apt" autocomplete="apt" v-model="form.apt" :disabled="true" />
                           </md-field>
                         </div>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="index">Postal Codes</label>
-                            <md-input name="index" id="index" autocomplete="index" v-model="form.index" :disabled="sending" />
+                            <md-input name="index" id="index" autocomplete="index" v-model="form.index" :disabled="true" />
                           </md-field>
                         </div>
                     </md-card-content>
 
                     <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
-                    <md-card-actions style="margin-bottom: 20px;">
+                    <md-card-actions style="margin: 20px;">
                       <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
                     </md-card-actions>
                   </md-card>
@@ -1048,8 +1059,8 @@
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
                 <form novalidate class="md-layout" @submit.prevent="saveUser">
                   <md-card class="md-layout-item md-size-100 md-small-size-50">
-                    <md-card-header>
-                      <div class="md-title">{{ form.title }}</div>
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
                     </md-card-header>
 
                     <md-card-content style="padding-bottom: 0px;">
@@ -1212,7 +1223,7 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://jwt-yard.herokuapp.com/';
+            appConfig.url = 'https://jwt-base.herokuapp.com/';
             //appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
