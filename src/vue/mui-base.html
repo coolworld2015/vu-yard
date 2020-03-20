@@ -309,7 +309,14 @@
         },
         methods: {
             getItems() {
-                this.$http.get('http://ui-base.herokuapp.com/api/items/get')
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/items/get', {headers: {'Authorization': appConfig.access_token}})
                     .then(result => {
                         this.items = result.data.splice(0, 100);
                         this.filteredItems = result.data.splice(0, 100);
