@@ -55,11 +55,11 @@
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
- <!--                       <md-list-item to="/table">
-                            <md-icon style="color: white">camera_alt</md-icon>
-                            <span class="md-list-item-text" style="color: white">Pictures</span>
-                        </md-list-item>
-                        <md-divider style="background: white"></md-divider>-->
+                        <!--                       <md-list-item to="/table">
+                                                   <md-icon style="color: white">camera_alt</md-icon>
+                                                   <span class="md-list-item-text" style="color: white">Pictures</span>
+                                               </md-list-item>
+                                               <md-divider style="background: white"></md-divider>-->
 
                         <md-list-item to="/pictures">
                             <md-icon style="color: white">camera_alt</md-icon>
@@ -107,6 +107,7 @@
         height: 85vh !important;
         max-height: 85vh !important;
     }
+
     .md-tabs-navigation {
         background: rgb(238, 238, 238) !important;
     }
@@ -121,7 +122,7 @@
     }
 
     .md-table-head-container {
-        width: 220px  !important;
+        width: 220px !important;
     }
 
 </style>
@@ -138,7 +139,7 @@
     const Pictures = {template: '<pictures-items></pictures-items>'};
     const Table = {template: '<tableUI></tableUI>'};
     const Phones = {template: '<phones-items></phones-items>'};
-    const BaseItemShow = {template: '<phone-edit></phone-edit>'};
+    const PhoneEdit = {template: '<phone-edit></phone-edit>'};
 
     const UsersItems = {template: '<users-items></users-items>'};
     const UserAdd = {template: '<user-edit></user-edit>'};
@@ -204,12 +205,12 @@
             appConfig.$emit('logout', {});
         },
         computed: {
-            messageClassLogin () {
+            messageClassLogin() {
                 return {
                     'md-invalid': this.hasMessagesLogin
                 }
             },
-            messageClassPassword () {
+            messageClassPassword() {
                 return {
                     'md-invalid': this.hasMessagesPassword
                 }
@@ -324,7 +325,7 @@
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
             },
-            handleScroll () {
+            handleScroll() {
                 let position = document.querySelector('.md-table-content').scrollTop;
                 let items, positionY, recordsCount;
                 recordsCount = this.recordsCount;
@@ -351,7 +352,7 @@
             },
             showDetails(item) {
                 appConfig.item = item;
-                this.$router.push('base-item-show');
+                this.$router.push('phone-edit');
             },
         }
     });
@@ -757,18 +758,18 @@
                 'United Kingdom',
                 'United States'
             ],
-            employees:[],
-            employeesObject:[],
-            employees0:[
-                { id: 1, name: "Jim Halpert" },
-                { id: 2, name: "Dwight Schrute" },
-                { id: 3, name: "Michael Scott" },
-                { id: 4, name: "Pam Beesly" },
-                { id: 5, name: "Angela Martin" },
-                { id: 6, name: "Kelly Kapoor" },
-                { id: 7, name: "Ryan Howard" },
-                { id: 8, name: "Kevin Malone" },
-                { id: 9, name: "Creed Bratton" },
+            employees: [],
+            employeesObject: [],
+            employees0: [
+                {id: 1, name: "Jim Halpert"},
+                {id: 2, name: "Dwight Schrute"},
+                {id: 3, name: "Michael Scott"},
+                {id: 4, name: "Pam Beesly"},
+                {id: 5, name: "Angela Martin"},
+                {id: 6, name: "Kelly Kapoor"},
+                {id: 7, name: "Ryan Howard"},
+                {id: 8, name: "Kevin Malone"},
+                {id: 9, name: "Creed Bratton"},
             ],
             employees1: [
                 'Jim Halpert',
@@ -795,12 +796,12 @@
             hasMessagesName: false
         }),
         computed: {
-            messageClass () {
+            messageClass() {
                 return {
                     'md-invalid': this.hasMessages
                 }
             },
-            messageClassName () {
+            messageClassName() {
                 return {
                     'md-invalid': this.hasMessagesName
                 }
@@ -936,11 +937,20 @@
                             date = moment(item.dateUtcMs).format('DD.MM.YYYY hh:mm:ss');
 
                             switch (item.recipient.type) {
-                                case 1: role = 'User'; break;
-                                case 2: role = 'AllUsers'; break;
-                                case 3: role = 'Restaurant'; break;
-                                case 4: role = 'Chain'; break;
-                                default: break;
+                                case 1:
+                                    role = 'User';
+                                    break;
+                                case 2:
+                                    role = 'AllUsers';
+                                    break;
+                                case 3:
+                                    role = 'Restaurant';
+                                    break;
+                                case 4:
+                                    role = 'Chain';
+                                    break;
+                                default:
+                                    break;
                             }
                             return {
                                 ...item,
@@ -1025,7 +1035,14 @@
         },
         methods: {
             getItems() {
-                this.$http.get('http://ui-base.herokuapp.com/api/users/get')
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/users/get', {headers: {'Authorization': appConfig.access_token}})
                     .then(result => {
                         this.items = result.data.sort(this.sort);
                         this.filteredItems = result.data.sort(this.sort);
@@ -1060,79 +1077,68 @@
     Vue.component('user-edit', {
         template: `
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
-                <form novalidate class="md-layout" @submit.prevent="saveUser">
+                <form class="md-layout">
                   <md-card class="md-layout-item md-size-100 md-small-size-50">
                     <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
                       <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
                     </md-card-header>
 
                     <md-card-content style="padding-bottom: 0px;">
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="id">ID</label>
-                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="true" />
-                          </md-field>
-                        </div>
-
-                        <div class="messageClassName">
-                          <md-field>
-                            <label for="name">Login</label>
-                            <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
-                          </md-field>
-                        </div>
 
                         <md-field :class="messageClassName">
-                          <label>Name</label>
-                          <md-input v-model="name" required v-on:keypress="hasMessagesName=false"></md-input>
-                          <span class="md-error">Value is requred</span>
+                            <label>Name</label>
+                            <md-input v-model="form.name" required v-on:keypress="hasMessagesName=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
                         </md-field>
 
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="phone">Password</label>
-                            <md-input name="pass" id="pass" autocomplete="pass" v-model="form.pass" :disabled="sending" />
-                          </md-field>
+                        <md-field :class="messageClassPassword">
+                            <label>Password</label>
+                            <md-input v-model="form.pass" required v-on:keypress="hasMessagesPassword=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassDescription">
+                            <label>Description</label>
+                            <md-input v-model="form.description" required v-on:keypress="hasMessagesDescription=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <div style="text-align: right; margin-top: 40px;">
+                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
+                                Something went wrong
+                            </span>
                         </div>
-
-                        <md-field :class="messageClass">
-                          <label>Description</label>
-                          <md-textarea v-model="form.description" required v-on:keypress="hasMessages=false" md-autogrow :disabled="sending"></md-textarea>
-                          <span class="md-error">There is an error</span>
-                        </md-field>
                     </md-card-content>
 
-                    <md-progress-bar md-mode="indeterminate" v-if="sending" />
+                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
 
-<!--                    <md-field :class="messageClassName">
-                        <span class="md-error">There is an error</span>
-                    </md-field>-->
-
-                    <md-card-actions style="margin-bottom: 20px;">
-                      <md-button class="md-raised md-primary" v-on:click="userEdit">Submit</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="back">Delete</md-button>
+                    <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="onUserEdit" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onClear" :disabled="loading">Delete</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
                     </md-card-actions>
                   </md-card>
 
-                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
-                    The user {{ form.name }} is shown!
-                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
+                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
+                    The login form is shown!
+                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
                   </md-snackbar>
             </form>
   		</div>`,
         data: () => ({
             form: {
-                title: 'Add new item',
+                title: null,
                 id: null,
                 name: null,
                 pass: null,
                 description: null,
             },
-            name: null,
-            hasMessages: false,
             hasMessagesName: false,
-            userSaved: true,
-            sending: false,
-            lastUser: null
+            hasMessagesPassword: false,
+            hasMessagesDescription: false,
+            snackbar: true,
+            loading: false,
+            error: false
         }),
         created() {
             if (!appConfig.item) {
@@ -1142,14 +1148,19 @@
             }
         },
         computed: {
-            messageClass () {
-                return {
-                    'md-invalid': this.hasMessages
-                }
-            },
-            messageClassName () {
+            messageClassName() {
                 return {
                     'md-invalid': this.hasMessagesName
+                }
+            },
+            messageClassPassword() {
+                return {
+                    'md-invalid': this.hasMessagesPassword
+                }
+            },
+            messageClassDescription() {
+                return {
+                    'md-invalid': this.hasMessagesDescription
                 }
             }
         },
@@ -1158,39 +1169,54 @@
                 this.form = appConfig.item;
                 this.form.title = appConfig.item.name;
                 window.setTimeout(() => {
-                    this.userSaved = false;
+                    this.snackbar = false;
                 }, 2000)
             },
-            userEdit() {
-                this.sending = true;
-                if (!this.name) {
+            onUserEdit() {
+                if (!this.form.name) {
                     this.hasMessagesName = true;
-                };
-                //this.$router.push('/users-items');
+                }
+
+                if (!this.form.pass) {
+                    this.hasMessagesPassword = true;
+                }
+
+                if (!this.form.description) {
+                    this.hasMessagesDescription = true;
+                }
+
+                if (this.form.name && this.form.pass && this.form.description) {
+                    this.loading = true;
+                    this.error = false;
+
+                    this.$http.post(appConfig.url + 'api/users/update', {
+                        id: this.form.id,
+                        name: this.form.name,
+                        pass: this.form.pass,
+                        description: this.form.description,
+                        authorization: appConfig.access_token,
+                    })
+                        .then(result => {
+                            this.loading = false;
+                            this.error = false;
+                            this.$router.push('users-items');
+                        })
+                        .catch((error) => {
+                            this.loading = false;
+                            this.error = true;
+                        })
+                }
             },
-            back() {
+            onBack() {
                 this.$router.push('/users-items');
             },
-            clearForm() {
-                this.$v.$reset()
-                this.form.firstName = null
-                this.form.lastName = null
-                this.form.age = null
-                this.form.gender = null
-                this.form.email = null
+            onClear() {
+                this.login = '';
+                this.hasMessagesLogin = false;
+                this.password = '';
+                this.hasMessagesPassword = false;
+                this.error = false;
             },
-            saveUser() {
-                this.sending = true
-
-                // Instead of this timeout, here you can call your API
-                window.setTimeout(() => {
-                    this.lastUser = `${this.form.firstName} ${this.form.lastName}`
-                    this.userSaved = true
-                    this.sending = false
-                    this.clearForm()
-                }, 1500)
-            },
-
         }
     });
 
@@ -1203,7 +1229,7 @@
         {path: '/pictures', component: Pictures},
         {path: '/table', component: Table},
         {path: '/phones-items', component: Phones},
-        {path: '/base-item-show', component: BaseItemShow},
+        {path: '/phone-edit', component: PhoneEdit},
         {path: '/certification-items', component: CertificationItems},
         {path: '/select-items', component: SelectItems},
         {path: '/users-items', component: UsersItems},
