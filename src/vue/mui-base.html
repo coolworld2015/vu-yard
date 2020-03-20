@@ -1050,6 +1050,7 @@
                         this.loading = false;
                     })
                     .catch(error => {
+                        this.$router.push('login');
                     });
             },
             sort(a, b) {
@@ -1112,9 +1113,17 @@
 
                     <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
 
+                    <md-dialog-confirm
+                          :md-active.sync="dialog"
+                          md-title="Delete user?"
+                          :md-content=form.title
+                          md-confirm-text="Delete"
+                          md-cancel-text="Cancel"
+                          @md-confirm="onDelete" />
+
                     <md-card-actions style="margin: 20px;">
                       <md-button class="md-raised md-primary" v-on:click="onUserEdit" :disabled="loading">Submit</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="onClear" :disabled="loading">Delete</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onDeleteDialog" :disabled="loading">Delete</md-button>
                       <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
                     </md-card-actions>
                   </md-card>
@@ -1138,7 +1147,8 @@
             hasMessagesDescription: false,
             snackbar: true,
             loading: false,
-            error: false
+            error: false,
+            dialog: false
         }),
         created() {
             if (!appConfig.item) {
@@ -1206,6 +1216,24 @@
                             this.error = true;
                         })
                 }
+            },
+            onDeleteDialog() {
+                this.dialog = true;
+            },
+            onDelete() {
+                this.$http.post(appConfig.url + 'api/users/delete', {
+                    id: this.form.id,
+                    authorization: appConfig.access_token,
+                })
+                    .then(result => {
+                        this.loading = false;
+                        this.error = false;
+                        this.$router.push('users-items');
+                    })
+                    .catch((error) => {
+                        this.loading = false;
+                        this.error = true;
+                    })
             },
             onBack() {
                 this.$router.push('/users-items');
