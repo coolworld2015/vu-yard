@@ -55,11 +55,11 @@
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
-                        <!--                       <md-list-item to="/table">
-                                                   <md-icon style="color: white">camera_alt</md-icon>
-                                                   <span class="md-list-item-text" style="color: white">Pictures</span>
-                                               </md-list-item>
-                                               <md-divider style="background: white"></md-divider>-->
+                        <md-list-item to="/audit-items">
+                            <md-icon style="color: white">update</md-icon>
+                            <span class="md-list-item-text" style="color: white">Audit</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
 
                         <md-list-item to="/pictures">
                             <md-icon style="color: white">camera_alt</md-icon>
@@ -136,8 +136,6 @@
 
     const Login = {template: '<login></login>'};
 
-    const Pictures = {template: '<pictures-items></pictures-items>'};
-    const Table = {template: '<tableUI></tableUI>'};
     const Phones = {template: '<phones-items></phones-items>'};
     const PhoneEdit = {template: '<phone-edit></phone-edit>'};
 
@@ -145,8 +143,13 @@
     const UserAdd = {template: '<user-add></user-add>'};
     const UserEdit = {template: '<user-edit></user-edit>'};
 
-    const CertificationItems = {template: '<certification-items></certification-items>'};
+    const AuditItems = {template: '<audit-items></audit-items>'};
+    const AuditEdit = {template: '<audit-edit></audit-edit>'};
+
+    const Table = {template: '<tableUI></tableUI>'};
+    const Pictures = {template: '<pictures-items></pictures-items>'};
     const SelectItems = {template: '<select-items></select-items>'};
+    const CertificationItems = {template: '<certification-items></certification-items>'};
 
     Vue.component('login', {
         template: `
@@ -327,6 +330,7 @@
                         }, 100)
                     })
                     .catch(error => {
+                        this.$router.push('login');
                     });
             },
             sort(a, b) {
@@ -363,8 +367,636 @@
             },
         }
     });
-
     Vue.component('phone-edit', {
+        template: `
+		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
+                <form novalidate class="md-layout">
+                  <md-card class="md-layout-item md-size-100 md-small-size-50">
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
+                    </md-card-header>
+
+                    <md-card-content style="padding-bottom: 0px;">
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="id">ID</label>
+                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="true" />
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="name">Name</label>
+                            <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="true" />
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="phone">Phone</label>
+                            <md-input name="phone" id="phone" autocomplete="phone" v-model="form.phone" :disabled="true" />
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="street">Street</label>
+                            <md-input name="street" id="street" autocomplete="street" v-model="form.street" :disabled="true" />
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="house">House</label>
+                            <md-input name="house" id="house" autocomplete="house" v-model="form.house" :disabled="true" />
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="apt">Apt</label>
+                            <md-input name="apt" id="apt" autocomplete="apt" v-model="form.apt" :disabled="true" />
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="index">Postal Codes</label>
+                            <md-input name="index" id="index" autocomplete="index" v-model="form.index" :disabled="true" />
+                          </md-field>
+                        </div>
+                    </md-card-content>
+
+                    <md-progress-bar md-mode="indeterminate" v-if="sending" />
+
+                    <md-card-actions style="margin: 20px;">
+                      <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
+                    </md-card-actions>
+                  </md-card>
+
+                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
+                    The phone {{ form.phone }} is shown!
+                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
+                  </md-snackbar>
+                </form>
+  		</div>`,
+        data: () => ({
+            form: {
+                title: null,
+                id: null,
+                name: null,
+                phone: null,
+                street: null,
+                house: null,
+                apt: null,
+                index: null,
+            },
+            userSaved: true,
+            sending: false,
+            lastUser: null,
+        }),
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/phones-items');
+            } else {
+                this.init();
+            }
+        },
+        methods: {
+            init() {
+                this.form = appConfig.item;
+                this.form.title = appConfig.item.name;
+                window.setTimeout(() => {
+                    this.userSaved = false;
+                }, 2000)
+            },
+            back() {
+                this.$router.push('/phones-items');
+            },
+        }
+    });
+
+    Vue.component('users-items', {
+        template: `
+		  <div>
+		  <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
+              <md-speed-dial-target v-on:click="addItem">
+                <md-icon>add</md-icon>
+              </md-speed-dial-target>
+            </md-speed-dial>
+
+			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
+			  <md-table-toolbar>
+				<div class="md-toolbar-section-start">
+				  <h1 class="md-title">Users ({{ searched.length }})</h1>
+				</div>
+
+				<md-field md-clearable class="md-toolbar-section-end">
+				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable"/>
+				</md-field>
+			  </md-table-toolbar>
+              <div style="display: none">{{ searched.length }}</div>
+
+			  <md-table-empty-state>
+			    <div v-if="!loading"> No items</div>
+			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+			  </md-table-empty-state>
+
+			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
+				<md-table-cell md-label="Login" md-sort-by="name">{{ item.name }}</md-table-cell>
+				<md-table-cell md-label="Password" md-sort-by="pass">{{ item.pass }}</md-table-cell>
+				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
+			  </md-table-row>
+			</md-table>
+
+  		</div>`,
+        data: () => ({
+            items: [],
+            search: null,
+            count: 0,
+            searched: [],
+            loading: true
+        }),
+        created() {
+            this.getItems();
+            this.searched = this.items;
+            appConfig.$emit('login', {});
+        },
+        methods: {
+            getItems() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/users/get', {headers: {'Authorization': appConfig.access_token}})
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        this.searched = this.items;
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.$router.push('login');
+                    });
+            },
+            sort (a, b) {
+                let nameA = a.name.toLowerCase();
+                let nameB = b.name.toLowerCase();
+                if (nameA < nameB) {
+                    return -1
+                }
+                if (nameA > nameB) {
+                    return 1
+                }
+                return 0
+            },
+            searchOnTable() {
+                this.searched = this.searchByName(this.items, this.search)
+            },
+            searchByName(items, term) {
+                if (term) {
+                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                }
+                return items
+            },
+            toLower(text) {
+                return text.toString().toLowerCase()
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('/user-edit');
+            },
+            addItem() {
+                appConfig.item = null;
+                this.$router.push('/user-add');
+            },
+        }
+    });
+    Vue.component('user-edit', {
+        template: `
+		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
+                <form class="md-layout">
+                  <md-card class="md-layout-item md-size-100 md-small-size-50">
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
+                    </md-card-header>
+
+                    <md-card-content style="padding-bottom: 0px;">
+
+                        <md-field>
+                            <label>ID</label>
+                            <md-input v-model="form.id" :disabled="true"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassName">
+                            <label>Name</label>
+                            <md-input v-model="form.name" required v-on:keypress="hasMessagesName=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassPassword">
+                            <label>Password</label>
+                            <md-input v-model="form.pass" required v-on:keypress="hasMessagesPassword=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassDescription">
+                            <label>Description</label>
+                            <md-input v-model="form.description" required v-on:keypress="hasMessagesDescription=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <div style="text-align: right; margin-top: 40px;">
+                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
+                                Something went wrong
+                            </span>
+                        </div>
+                    </md-card-content>
+
+                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
+
+                    <md-dialog-confirm
+                          :md-active.sync="dialog"
+                          md-title="Delete user?"
+                          :md-content=form.title
+                          md-confirm-text="Delete"
+                          md-cancel-text="Cancel"
+                          @md-confirm="onDelete" />
+
+                    <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="onUserEdit" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onDeleteDialog" :disabled="loading">Delete</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
+                    </md-card-actions>
+                  </md-card>
+
+                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
+                    The login form is shown!
+                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
+                  </md-snackbar>
+            </form>
+  		</div>`,
+        data: () => ({
+            form: {
+                title: null,
+                id: null,
+                name: null,
+                pass: null,
+                description: null,
+            },
+            hasMessagesName: false,
+            hasMessagesPassword: false,
+            hasMessagesDescription: false,
+            snackbar: true,
+            loading: false,
+            error: false,
+            dialog: false
+        }),
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/users-items');
+            } else {
+                this.init();
+            }
+        },
+        computed: {
+            messageClassName() {
+                return {
+                    'md-invalid': this.hasMessagesName
+                }
+            },
+            messageClassPassword() {
+                return {
+                    'md-invalid': this.hasMessagesPassword
+                }
+            },
+            messageClassDescription() {
+                return {
+                    'md-invalid': this.hasMessagesDescription
+                }
+            }
+        },
+        methods: {
+            init() {
+                this.form = appConfig.item;
+                this.form.title = appConfig.item.name;
+                window.setTimeout(() => {
+                    this.snackbar = false;
+                }, 2000)
+            },
+            onUserEdit() {
+                if (!this.form.name) {
+                    this.hasMessagesName = true;
+                }
+
+                if (!this.form.pass) {
+                    this.hasMessagesPassword = true;
+                }
+
+                if (!this.form.description) {
+                    this.hasMessagesDescription = true;
+                }
+
+                if (this.form.name && this.form.pass && this.form.description) {
+                    this.loading = true;
+                    this.error = false;
+
+                    this.$http.post(appConfig.url + 'api/users/update', {
+                        id: this.form.id,
+                        name: this.form.name,
+                        pass: this.form.pass,
+                        description: this.form.description,
+                        authorization: appConfig.access_token,
+                    })
+                        .then(result => {
+                            this.loading = false;
+                            this.error = false;
+                            this.$router.push('users-items');
+                        })
+                        .catch((error) => {
+                            this.loading = false;
+                            this.error = true;
+                        })
+                }
+            },
+            onDeleteDialog() {
+                this.dialog = true;
+            },
+            onDelete() {
+                this.$http.post(appConfig.url + 'api/users/delete', {
+                    id: this.form.id,
+                    authorization: appConfig.access_token,
+                })
+                    .then(result => {
+                        this.loading = false;
+                        this.error = false;
+                        this.$router.push('users-items');
+                    })
+                    .catch((error) => {
+                        this.loading = false;
+                        this.error = true;
+                    })
+            },
+            onBack() {
+                this.$router.push('/users-items');
+            },
+            onClear() {
+                this.login = '';
+                this.hasMessagesLogin = false;
+                this.password = '';
+                this.hasMessagesPassword = false;
+                this.error = false;
+            },
+        }
+    });
+    Vue.component('user-add', {
+        template: `
+		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
+                <form class="md-layout">
+                  <md-card class="md-layout-item md-size-100 md-small-size-50">
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">Add item</div>
+                    </md-card-header>
+
+                    <md-card-content style="padding-bottom: 0px;">
+
+                        <md-field :class="messageClassName">
+                            <label>Name</label>
+                            <md-input v-model="form.name" required v-on:keypress="hasMessagesName=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassPassword">
+                            <label>Password</label>
+                            <md-input v-model="form.pass" required v-on:keypress="hasMessagesPassword=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassDescription">
+                            <label>Description</label>
+                            <md-input v-model="form.description" required v-on:keypress="hasMessagesDescription=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <div style="text-align: right; margin-top: 40px;">
+                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
+                                Something went wrong
+                            </span>
+                        </div>
+                    </md-card-content>
+
+                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
+
+                    <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="onUserAdd" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onClear" :disabled="loading">Clear</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
+                    </md-card-actions>
+                  </md-card>
+
+                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
+                    The add form is shown!
+                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
+                  </md-snackbar>
+            </form>
+  		</div>`,
+        data: () => ({
+            form: {
+                title: null,
+                id: null,
+                name: null,
+                pass: null,
+                description: null,
+            },
+            hasMessagesName: false,
+            hasMessagesPassword: false,
+            hasMessagesDescription: false,
+            snackbar: true,
+            loading: false,
+            error: false,
+            dialog: false
+        }),
+        created() {
+            this.init();
+        },
+        computed: {
+            messageClassName() {
+                return {
+                    'md-invalid': this.hasMessagesName
+                }
+            },
+            messageClassPassword() {
+                return {
+                    'md-invalid': this.hasMessagesPassword
+                }
+            },
+            messageClassDescription() {
+                return {
+                    'md-invalid': this.hasMessagesDescription
+                }
+            }
+        },
+        methods: {
+            init() {
+                appConfig.getAccessToken();
+                window.setTimeout(() => {
+                    this.snackbar = false;
+                }, 2000)
+            },
+            onUserAdd() {
+                if (!this.form.name) {
+                    this.hasMessagesName = true;
+                }
+
+                if (!this.form.pass) {
+                    this.hasMessagesPassword = true;
+                }
+
+                if (!this.form.description) {
+                    this.hasMessagesDescription = true;
+                }
+
+                if (this.form.name && this.form.pass && this.form.description) {
+                    this.loading = true;
+                    this.error = false;
+
+                    this.$http.post(appConfig.url + 'api/users/add', {
+                        id: +new Date,
+                        name: this.form.name,
+                        pass: this.form.pass,
+                        description: this.form.description,
+                        authorization: appConfig.access_token,
+                    })
+                        .then(result => {
+                            this.loading = false;
+                            this.error = false;
+                            this.$router.push('users-items');
+                        })
+                        .catch((error) => {
+                            this.loading = false;
+                            this.error = true;
+                        })
+                }
+            },
+            onBack() {
+                this.$router.push('/users-items');
+            },
+            onClear() {
+                this.name = '';
+                this.hasMessagesName = false;
+                this.pass = '';
+                this.hasMessagesPassword = false;
+                this.description = '';
+                this.hasMessagesDescription = false;
+                this.error = false;
+            },
+        }
+    });
+
+    Vue.component('audit-items', {
+        template: `
+		  <div>
+			<md-table v-model="searched" md-sort="date" md-sort-order="desc" md-card md-fixed-header>
+			  <md-table-toolbar>
+				<div class="md-toolbar-section-start">
+				  <h1 class="md-title">Audit ({{ searched.length }})</h1>
+				</div>
+
+				<md-field md-clearable class="md-toolbar-section-end">
+				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
+				</md-field>
+			  </md-table-toolbar>
+              <div style="display: none">{{ searched.length }}</div>
+
+			  <md-table-empty-state>
+			    <div v-if="!loading"> No items</div>
+			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+			  </md-table-empty-state>
+
+			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
+				<md-table-cell md-label="Date" md-sort-by="date">{{ item.date }}</md-table-cell>
+				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
+				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
+
+			  </md-table-row>
+			</md-table>
+  		</div>`,
+        data: () => ({
+            items: [],
+            filteredItems: [],
+            recordsCount: 20,
+            positionY: 0,
+            search: null,
+            searched: [],
+            loading: true,
+        }),
+        created() {
+            this.getItems();
+            this.searched = this.items;
+            appConfig.$emit('login', {});
+        },
+        methods: {
+            getItems() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/audit/get', {headers: {'Authorization': appConfig.access_token}})
+                    .then(result => {
+                        this.items = result.data;
+                        this.filteredItems = result.data;
+                        this.searched = this.items;
+                        this.loading = false;
+                        setTimeout(() => {
+                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
+                        }, 100)
+                    })
+                    .catch(error => {
+                        this.$router.push('login');
+                    });
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            handleScroll() {
+                let position = document.querySelector('.md-table-content').scrollTop;
+                let items, positionY, recordsCount;
+                recordsCount = this.recordsCount;
+                positionY = this.positionY;
+                items = this.filteredItems.slice(0, recordsCount);
+                if (position > positionY) {
+                    this.items = items;
+                    this.searched = items;
+                    this.recordsCount = recordsCount + 10;
+                    this.positionY = positionY + 200;
+                }
+            },
+            searchOnTable() {
+                this.searched = this.searchByName(this.filteredItems, this.search)
+            },
+            searchByName(items, term) {
+                if (term) {
+                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                }
+                return items
+            },
+            toLower(text) {
+                return text.toString().toLowerCase()
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('phone-edit');
+            },
+        }
+    });
+    Vue.component('audit-edit', {
         template: `
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
                 <form novalidate class="md-layout">
@@ -546,7 +1178,6 @@
             },
         }
     });
-
     Vue.component('pictures-items', {
         template: `
 		<div>
@@ -639,7 +1270,6 @@
             },
         }
     });
-
     Vue.component('select-items', {
         template: `
         <div>
@@ -881,7 +1511,6 @@
             }
         }
     });
-
     Vue.component('certification-items', {
         template: `
 		  <div>
@@ -994,444 +1623,27 @@
         }
     });
 
-    Vue.component('users-items', {
-        template: `
-		  <div>
-		  <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
-              <md-speed-dial-target v-on:click="addItem">
-                <md-icon>add</md-icon>
-              </md-speed-dial-target>
-            </md-speed-dial>
-
-			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
-			  <md-table-toolbar>
-				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Users ({{ searched.length }})</h1>
-				</div>
-
-				<md-field md-clearable class="md-toolbar-section-end">
-				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable"/>
-				</md-field>
-			  </md-table-toolbar>
-              <div style="display: none">{{ searched.length }}</div>
-
-			  <md-table-empty-state>
-			    <div v-if="!loading"> No items</div>
-			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
-			  </md-table-empty-state>
-
-			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-				<md-table-cell md-label="Login" md-sort-by="name">{{ item.name }}</md-table-cell>
-				<md-table-cell md-label="Password" md-sort-by="pass">{{ item.pass }}</md-table-cell>
-				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
-			  </md-table-row>
-			</md-table>
-
-  		</div>`,
-        data: () => ({
-            items: [],
-            search: null,
-            count: 0,
-            searched: [],
-            loading: true
-        }),
-        created() {
-            this.getItems();
-            this.searched = this.items;
-            appConfig.$emit('login', {});
-        },
-        methods: {
-            getItems() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                this.$http.get(appConfig.url + 'api/users/get', {headers: {'Authorization': appConfig.access_token}})
-                    .then(result => {
-                        this.items = result.data.sort(this.sort);
-                        this.filteredItems = result.data.sort(this.sort);
-                        this.searched = this.items;
-                        this.loading = false;
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },
-            sort (a, b) {
-                let nameA = a.name.toLowerCase();
-                let nameB = b.name.toLowerCase();
-                if (nameA < nameB) {
-                    return -1
-                }
-                if (nameA > nameB) {
-                    return 1
-                }
-                return 0
-            },
-            searchOnTable() {
-                this.searched = this.searchByName(this.items, this.search)
-            },
-            searchByName(items, term) {
-                if (term) {
-                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
-                }
-                return items
-            },
-            toLower(text) {
-                return text.toString().toLowerCase()
-            },
-            showDetails(item) {
-                appConfig.item = item;
-                this.$router.push('/user-edit');
-            },
-            addItem() {
-                appConfig.item = null;
-                this.$router.push('/user-add');
-            },
-        }
-    });
-
-    Vue.component('user-edit', {
-        template: `
-		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
-                <form class="md-layout">
-                  <md-card class="md-layout-item md-size-100 md-small-size-50">
-                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
-                      <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
-                    </md-card-header>
-
-                    <md-card-content style="padding-bottom: 0px;">
-
-                        <md-field>
-                            <label>ID</label>
-                            <md-input v-model="form.id" :disabled="true"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <md-field :class="messageClassName">
-                            <label>Name</label>
-                            <md-input v-model="form.name" required v-on:keypress="hasMessagesName=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <md-field :class="messageClassPassword">
-                            <label>Password</label>
-                            <md-input v-model="form.pass" required v-on:keypress="hasMessagesPassword=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <md-field :class="messageClassDescription">
-                            <label>Description</label>
-                            <md-input v-model="form.description" required v-on:keypress="hasMessagesDescription=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <div style="text-align: right; margin-top: 40px;">
-                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
-                                Something went wrong
-                            </span>
-                        </div>
-                    </md-card-content>
-
-                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
-
-                    <md-dialog-confirm
-                          :md-active.sync="dialog"
-                          md-title="Delete user?"
-                          :md-content=form.title
-                          md-confirm-text="Delete"
-                          md-cancel-text="Cancel"
-                          @md-confirm="onDelete" />
-
-                    <md-card-actions style="margin: 20px;">
-                      <md-button class="md-raised md-primary" v-on:click="onUserEdit" :disabled="loading">Submit</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="onDeleteDialog" :disabled="loading">Delete</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
-                    </md-card-actions>
-                  </md-card>
-
-                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
-                    The login form is shown!
-                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
-                  </md-snackbar>
-            </form>
-  		</div>`,
-        data: () => ({
-            form: {
-                title: null,
-                id: null,
-                name: null,
-                pass: null,
-                description: null,
-            },
-            hasMessagesName: false,
-            hasMessagesPassword: false,
-            hasMessagesDescription: false,
-            snackbar: true,
-            loading: false,
-            error: false,
-            dialog: false
-        }),
-        created() {
-            if (!appConfig.item) {
-                this.$router.push('/users-items');
-            } else {
-                this.init();
-            }
-        },
-        computed: {
-            messageClassName() {
-                return {
-                    'md-invalid': this.hasMessagesName
-                }
-            },
-            messageClassPassword() {
-                return {
-                    'md-invalid': this.hasMessagesPassword
-                }
-            },
-            messageClassDescription() {
-                return {
-                    'md-invalid': this.hasMessagesDescription
-                }
-            }
-        },
-        methods: {
-            init() {
-                this.form = appConfig.item;
-                this.form.title = appConfig.item.name;
-                window.setTimeout(() => {
-                    this.snackbar = false;
-                }, 2000)
-            },
-            onUserEdit() {
-                if (!this.form.name) {
-                    this.hasMessagesName = true;
-                }
-
-                if (!this.form.pass) {
-                    this.hasMessagesPassword = true;
-                }
-
-                if (!this.form.description) {
-                    this.hasMessagesDescription = true;
-                }
-
-                if (this.form.name && this.form.pass && this.form.description) {
-                    this.loading = true;
-                    this.error = false;
-
-                    this.$http.post(appConfig.url + 'api/users/update', {
-                        id: this.form.id,
-                        name: this.form.name,
-                        pass: this.form.pass,
-                        description: this.form.description,
-                        authorization: appConfig.access_token,
-                    })
-                        .then(result => {
-                            this.loading = false;
-                            this.error = false;
-                            this.$router.push('users-items');
-                        })
-                        .catch((error) => {
-                            this.loading = false;
-                            this.error = true;
-                        })
-                }
-            },
-            onDeleteDialog() {
-                this.dialog = true;
-            },
-            onDelete() {
-                this.$http.post(appConfig.url + 'api/users/delete', {
-                    id: this.form.id,
-                    authorization: appConfig.access_token,
-                })
-                    .then(result => {
-                        this.loading = false;
-                        this.error = false;
-                        this.$router.push('users-items');
-                    })
-                    .catch((error) => {
-                        this.loading = false;
-                        this.error = true;
-                    })
-            },
-            onBack() {
-                this.$router.push('/users-items');
-            },
-            onClear() {
-                this.login = '';
-                this.hasMessagesLogin = false;
-                this.password = '';
-                this.hasMessagesPassword = false;
-                this.error = false;
-            },
-        }
-    });
-
-    Vue.component('user-add', {
-        template: `
-		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
-                <form class="md-layout">
-                  <md-card class="md-layout-item md-size-100 md-small-size-50">
-                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
-                      <div class="md-title" style="font-weight: bold;">Add item</div>
-                    </md-card-header>
-
-                    <md-card-content style="padding-bottom: 0px;">
-
-                        <md-field :class="messageClassName">
-                            <label>Name</label>
-                            <md-input v-model="form.name" required v-on:keypress="hasMessagesName=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <md-field :class="messageClassPassword">
-                            <label>Password</label>
-                            <md-input v-model="form.pass" required v-on:keypress="hasMessagesPassword=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <md-field :class="messageClassDescription">
-                            <label>Description</label>
-                            <md-input v-model="form.description" required v-on:keypress="hasMessagesDescription=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <div style="text-align: right; margin-top: 40px;">
-                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
-                                Something went wrong
-                            </span>
-                        </div>
-                    </md-card-content>
-
-                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
-
-                    <md-card-actions style="margin: 20px;">
-                      <md-button class="md-raised md-primary" v-on:click="onUserAdd" :disabled="loading">Submit</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="onClear" :disabled="loading">Clear</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
-                    </md-card-actions>
-                  </md-card>
-
-                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
-                    The add form is shown!
-                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
-                  </md-snackbar>
-            </form>
-  		</div>`,
-        data: () => ({
-            form: {
-                title: null,
-                id: null,
-                name: null,
-                pass: null,
-                description: null,
-            },
-            hasMessagesName: false,
-            hasMessagesPassword: false,
-            hasMessagesDescription: false,
-            snackbar: true,
-            loading: false,
-            error: false,
-            dialog: false
-        }),
-        created() {
-            this.init();
-        },
-        computed: {
-            messageClassName() {
-                return {
-                    'md-invalid': this.hasMessagesName
-                }
-            },
-            messageClassPassword() {
-                return {
-                    'md-invalid': this.hasMessagesPassword
-                }
-            },
-            messageClassDescription() {
-                return {
-                    'md-invalid': this.hasMessagesDescription
-                }
-            }
-        },
-        methods: {
-            init() {
-                appConfig.getAccessToken();
-                window.setTimeout(() => {
-                    this.snackbar = false;
-                }, 2000)
-            },
-            onUserAdd() {
-                if (!this.form.name) {
-                    this.hasMessagesName = true;
-                }
-
-                if (!this.form.pass) {
-                    this.hasMessagesPassword = true;
-                }
-
-                if (!this.form.description) {
-                    this.hasMessagesDescription = true;
-                }
-
-                if (this.form.name && this.form.pass && this.form.description) {
-                    this.loading = true;
-                    this.error = false;
-
-                    this.$http.post(appConfig.url + 'api/users/add', {
-                        id: +new Date,
-                        name: this.form.name,
-                        pass: this.form.pass,
-                        description: this.form.description,
-                        authorization: appConfig.access_token,
-                    })
-                        .then(result => {
-                            this.loading = false;
-                            this.error = false;
-                            this.$router.push('users-items');
-                        })
-                        .catch((error) => {
-                            this.loading = false;
-                            this.error = true;
-                        })
-                }
-            },
-            onBack() {
-                this.$router.push('/users-items');
-            },
-            onClear() {
-                this.name = '';
-                this.hasMessagesName = false;
-                this.pass = '';
-                this.hasMessagesPassword = false;
-                this.description = '';
-                this.hasMessagesDescription = false;
-                this.error = false;
-            },
-        }
-    });
-
     Vue.use(VueMaterial.default);
 
     const routes = [
         {path: '/', component: Login},
         {path: '*', component: Login},
         {path: '/login', component: Login},
-        {path: '/pictures', component: Pictures},
-        {path: '/table', component: Table},
+
         {path: '/phones-items', component: Phones},
         {path: '/phone-edit', component: PhoneEdit},
-        {path: '/certification-items', component: CertificationItems},
-        {path: '/select-items', component: SelectItems},
+
         {path: '/users-items', component: UsersItems},
         {path: '/user-add', component: UserAdd},
         {path: '/user-edit', component: UserEdit},
+
+        {path: '/audit-items', component: AuditItems},
+        {path: '/audit-edit', component: AuditEdit},
+
+        {path: '/table', component: Table},
+        {path: '/pictures', component: Pictures},
+        {path: '/select-items', component: SelectItems},
+        {path: '/certification-items', component: CertificationItems},
     ];
 
     const router = new VueRouter({
