@@ -275,9 +275,19 @@
 				  <h1 class="md-title">Phones ({{ searched.length }})</h1>
 				</div>
 
-				<md-field md-clearable class="md-toolbar-section-end">
+                <md-switch v-model="byName" class="md-primary"></md-switch>
+
+				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
 				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
+				  <md-button class="md-primary" v-on:click="onSearch('name')" style="margin-right: 20px;">Search</md-button>
 				</md-field>
+
+				<md-field v-if=!byName md-clearable class="md-toolbar-section-end">
+				  <md-input placeholder="Search by phone..." v-model="search" @input="searchOnTablePhone" />
+				  <md-button class="md-primary" v-on:click="onSearch('phone')" style="margin-right: 20px;">Search</md-button>
+				</md-field>
+
+
 			  </md-table-toolbar>
               <div style="display: none">{{ searched.length }}</div>
 
@@ -304,6 +314,7 @@
             search: null,
             searched: [],
             loading: true,
+            byName: true,
         }),
         created() {
             this.getItems();
@@ -333,6 +344,36 @@
                         this.$router.push('login');
                     });
             },
+            onSearch(name) {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                if (this.search !== null && this.search !== "") {
+                    this.loading = true;
+                    let url;
+
+                    if (name === 'name') {
+                        url = 'api/items/findByName/'
+                    } else {
+                        url = 'api/items/findByPhone/'
+                    }
+
+                    this.$http.get(appConfig.url + url + this.search, {headers: {'Authorization': appConfig.access_token}})
+                        .then(result => {
+                            this.items = result.data;
+                            this.filteredItems = result.data;
+                            this.searched = this.items;
+                            this.loading = false;
+                        })
+                        .catch(error => {
+                            this.$router.push('login');
+                        });
+                }
+            },
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
             },
@@ -355,6 +396,15 @@
             searchByName(items, term) {
                 if (term) {
                     return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                }
+                return items
+            },
+            searchOnTablePhone() {
+                this.searched = this.searchByPhone(this.filteredItems, this.search)
+            },
+            searchByPhone(items, term) {
+                if (term) {
+                    return items.filter(item => this.toLower(item.phone).includes(this.toLower(term)))
                 }
                 return items
             },
