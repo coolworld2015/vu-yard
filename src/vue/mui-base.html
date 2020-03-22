@@ -147,7 +147,17 @@
     const AuditEdit = {template: '<audit-edit></audit-edit>'};
 
     const Table = {template: '<tableUI></tableUI>'};
-    const Pictures = {template: '<pictures-items></pictures-items>'};
+    const Pictures0 = {template: '<pictures-items></pictures-items>'};
+    const Pictures = {template: `
+        <div>
+            <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                <pictures-items></pictures-items>
+            </div>
+            <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                <phones-items></phones-items>
+            </div>
+        </div>
+    `};
     const SelectItems = {template: '<select-items></select-items>'};
     const CertificationItems = {template: '<certification-items></certification-items>'};
 
