@@ -43,14 +43,14 @@
 
                     <md-list @click="menuVisible = !menuVisible" style="background: #111; color: white">
                         <md-divider style="background: white"></md-divider>
-                            <md-list-item to="/phones-items" style="color: white">
-                                <md-icon style="color: white">perm_contact_calendar</md-icon>
-                                <span class="md-list-item-text" style="color: white;">Checkpoint</span>
+                            <md-list-item to="/pass-items" style="color: black; background: white">
+                                <md-icon style="color: black">perm_contact_calendar</md-icon>
+                                <span class="md-list-item-text" style="color: black;">Checkpoint</span>
                             </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
                         <md-divider style="background: white"></md-divider>
-                            <md-list-item to="/phones-items" style="color: white">
+                            <md-list-item to="/journal-items" style="color: white">
                                 <md-icon style="color: white">list_alt</md-icon>
                                 <span class="md-list-item-text" style="color: white;">Journal</span>
                             </md-list-item>
@@ -120,18 +120,18 @@
         background: rgb(238, 238, 238) !important;
     }
 
-    .md-table-cell-container {
+/*    .md-table-cell-container {
         overflow-wrap: break-word !important;
-        width: 220px !important;
-    }
+        width: 160px !important;
+    }*/
 
     .md-app-scroller {
         background: rgb(238, 238, 238) !important;
     }
 
-    .md-table-head-container {
-        width: 220px !important;
-    }
+/*    .md-table-head-container {
+        width: 140px !important;
+    }*/
 
 </style>
 
@@ -144,7 +144,7 @@
 
     const Login = {template: '<login></login>'};
 
-    const Phones = {template: '<phones-items></phones-items>'};
+    const Journal = {template: '<journal-items></journal-items>'};
     const PhoneEdit = {template: '<phone-edit></phone-edit>'};
 
     const UsersItems = {template: '<users-items></users-items>'};
@@ -155,14 +155,14 @@
     const AuditEdit = {template: '<audit-edit></audit-edit>'};
 
     const Table = {template: '<tableUI></tableUI>'};
-    const Pictures0 = {template: '<pictures-items></pictures-items>'};
-    const Pictures = {template: `
+    const Pictures = {template: '<pictures-items></pictures-items>'};
+    const Checkpoint = {template: `
         <div>
             <div style="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                 <pictures-items></pictures-items>
             </div>
             <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
-                <phones-items></phones-items>
+                <journal-items></journal-items>
             </div>
         </div>
     `};
@@ -284,7 +284,7 @@
         }
     });
 
-    Vue.component('phones-items', {
+    Vue.component('journal-items', {
         template: `
 		  <div>
 			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
@@ -303,7 +303,6 @@
 				  <md-input placeholder="Search by host..." v-model="search" @input="searchOnTableHost" />
 				</md-field>
 
-
 			  </md-table-toolbar>
               <div style="display: none">{{ searched.length }}</div>
 
@@ -312,11 +311,11 @@
 			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
 			  </md-table-empty-state>
 
-			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-				<md-table-cell md-label="Guest" md-sort-by="name">{{ item.name }}</md-table-cell>
-				<md-table-cell md-label="Date" md-sort-by="id">{{ item.date }}</md-table-cell>
-				<md-table-cell md-label="Host" md-sort-by="host">{{ item.host }}</md-table-cell>
-				<md-table-cell md-label="Status" md-sort-by="status">{{ item.status }}</md-table-cell>
+			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)" style="width: 50%">
+				<md-table-cell md-label="Guest" md-sort-by="name" style="width: 100px">{{ item.name }}</md-table-cell>
+				<md-table-cell md-label="Date" md-sort-by="id" style="width: 140px">{{ item.date }}</md-table-cell>
+				<md-table-cell md-label="Host" md-sort-by="host" style="width: 100px">{{ item.host }}</md-table-cell>
+				<md-table-cell md-label="Status" md-sort-by="status" style="width: 100px">{{ item.status }}</md-table-cell>
 			  </md-table-row>
 			</md-table>
   		</div>`,
@@ -1215,10 +1214,10 @@
     Vue.component('pictures-items', {
         template: `
 		<div>
-		<md-card class="md-layout-item " style="position: fixed; z-index: 5; width1: 100%; margin: 0px; padding: 0px; margin-top: -12px;">
-		 <md-card-header>
-          <div class="md-title">Pictures ({{ searched.length }})</div>
-        </md-card-header>
+<!--		<md-card class="md-layout-item " style="position: fixed; z-index: 5; width1: 100%; margin: 0px; padding: 0px; margin-top: -12px;">
+             <md-card-header>
+              <div class="md-title">Pictures ({{ searched.length }})</div>
+            </md-card-header>
             <md-card-content style="padding-bottom: 0px;">
 				<md-field md-clearable class="md-toolbar-section-end" style="width:250px">
 				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
@@ -1226,9 +1225,9 @@
             </md-card-content>
 
             <md-card-actions style="margin-bottom: 20px;">
-                   <!--   <md-button type="button" class="md-raised md-primary">Back</md-button>-->
+                   &lt;!&ndash;   <md-button type="button" class="md-raised md-primary">Back</md-button>&ndash;&gt;
                     </md-card-actions>
-            </md-card>
+            </md-card>-->
 
 
             <md-empty-state v-if="loading" style="padding-top: 35vh;">
@@ -1240,12 +1239,13 @@
                   <md-card md-with-hover style="width: 400px; margin: auto;">
                         <md-card-header>
                           <div class="md-title">{{item.name}}</div>
-                          <div class="md-subhead">{{item.category}}</div>
-                          <div class="md-subhead">{{item.group}}</div>
+                          <div class="md-subhead">{{item.host}}</div>
+                          <div class="md-subhead">{{item.date}}</div>
+                          <div class="md-subhead">{{item.status}}</div>
                         </md-card-header>
                         <md-card-content style="margin-left: 55px">
                             <md-avatar style="width: 250px;height: 200px; margin-bottom: 20px;">
-                              <img :src="item.pic" alt="People">
+                              <img :src="item.photo=='blank' ? './img/no-img.png' : item.photo" style="width: 90%">
                             </md-avatar>
                         </md-card-content>
                   </md-card>
@@ -1260,11 +1260,34 @@
             searched: [],
         }),
         created() {
-            this.getItems();
-            this.getItemsAll();
+            this.getGuests();
+            //this.getItemsAll();
             appConfig.$emit('login', {});
         },
         methods: {
+            getGuests() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/guests/all', {
+                    headers: {'Authorization': appConfig.access_token}
+                })
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        this.searched = this.items;
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                        this.$router.push('login');
+                    });
+            },
             getItems() {
                 this.$http.get('http://ui-collection.herokuapp.com/api/items/get')
                     .then(result => {
@@ -1707,8 +1730,8 @@
         {path: '*', component: Login},
         {path: '/login', component: Login},
 
-        {path: '/phones-items', component: Phones},
-        {path: '/phone-edit', component: PhoneEdit},
+        {path: '/pass-items', component: Checkpoint},
+        {path: '/journal-items', component: Journal},
 
         {path: '/users-items', component: UsersItems},
         {path: '/user-add', component: UserAdd},
