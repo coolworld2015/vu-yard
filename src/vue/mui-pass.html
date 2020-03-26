@@ -175,7 +175,7 @@
                 <form class="md-layout">
                   <md-card class="md-layout-item md-size-100 md-small-size-50">
                     <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
-                      <div class="md-title" style="font-weight: bold;">Base 09</div>
+                      <div class="md-title" style="font-weight: bold;">MUI-Pass</div>
                     </md-card-header>
 
                     <md-card-content style="padding-bottom: 0px;">
@@ -266,7 +266,7 @@
                             localStorage.setItem('access_token', result.body.token);
                             this.loading = false;
                             this.error = false;
-                            this.$router.push('users-items');
+                            this.$router.push('pass-items');
                         })
                         .catch((error) => {
                             this.loading = false;
@@ -313,7 +313,7 @@
 
 			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)" style="width: 50%">
 				<md-table-cell md-label="Guest" md-sort-by="name" style="width: 100px">{{ item.name }}</md-table-cell>
-				<md-table-cell md-label="Date" md-sort-by="id" style="width: 140px">{{ item.date }}</md-table-cell>
+				<md-table-cell md-label="Date" md-sort-by="id" style="width: 150px">{{ item.date }}</md-table-cell>
 				<md-table-cell md-label="Host" md-sort-by="host" style="width: 100px">{{ item.host }}</md-table-cell>
 				<md-table-cell md-label="Status" md-sort-by="status" style="width: 100px">{{ item.status }}</md-table-cell>
 			  </md-table-row>
@@ -513,7 +513,7 @@
         template: `
 		  <div>
 		  <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
-              <md-speed-dial-target v-on:click="addItem">
+              <md-speed-dial-target v-on:click="addItem" style="background: #448aff">
                 <md-icon>add</md-icon>
               </md-speed-dial-target>
             </md-speed-dial>
@@ -1230,7 +1230,7 @@
             </md-card>-->
 
             <md-speed-dial style="position: absolute; z-index: 22; bottom: 50px;right: 50px;">
-              <md-speed-dial-target v-on:click="addItem" style="background: green">
+              <md-speed-dial-target v-on:click="addItem" style="background: #448aff">
                 <md-icon>add</md-icon>
               </md-speed-dial-target>
             </md-speed-dial>
@@ -1604,7 +1604,7 @@
         template: `
 		  <div>
 		  <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
-              <md-speed-dial-target v-on:click="showDetails">
+              <md-speed-dial-target v-on:click="showDetails" style="background: #448aff">
                 <md-icon>add</md-icon>
               </md-speed-dial-target>
             </md-speed-dial>
