@@ -32,22 +32,36 @@
                     <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
                         <md-icon>menu</md-icon>
                     </md-button>
-                    <span class="md-title" style="color: white;font-size: 22px;font-weight: 900;">Base 09</span>
+                    <span class="md-title" style="color: white;font-size: 22px;font-weight: 900;">MUI-Pass</span>
                 </md-app-toolbar>
 
                 <md-app-drawer :md-active.sync="menuVisible" md-persistent1="mini"
                                style="background: black; background1: linear-gradient(45deg, black, transparent)">
                     <md-toolbar class="md-transparent" md-elevation="0"
-                                style="color: white;font-size: 20px;font-weight: 500;">Base 09
+                                style="color: white;font-size: 20px;font-weight: 500;">MUI-Pass
                     </md-toolbar>
 
                     <md-list @click="menuVisible = !menuVisible" style="background: #111; color: white">
                         <md-divider style="background: white"></md-divider>
-                        <md-list-item to="/phones-items" style="color: white">
-                            <md-icon style="color: white">contact_phone</md-icon>
-                            <span class="md-list-item-text" style="color: white;">Phones</span>
+                            <md-list-item to="/phones-items" style="color: white">
+                                <md-icon style="color: white">perm_contact_calendar</md-icon>
+                                <span class="md-list-item-text" style="color: white;">Checkpoint</span>
+                            </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-divider style="background: white"></md-divider>
+                            <md-list-item to="/phones-items" style="color: white">
+                                <md-icon style="color: white">list_alt</md-icon>
+                                <span class="md-list-item-text" style="color: white;">Journal</span>
+                            </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-list-item to="/pictures">
+                            <md-icon style="color: white">account_circle</md-icon>
+                            <span class="md-list-item-text" style="color: white">Pictures</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
+
 
                         <md-list-item to="/users-items" style="color: white">
                             <md-icon style="color: white">people</md-icon>
@@ -58,12 +72,6 @@
                         <md-list-item to="/audit-items">
                             <md-icon style="color: white">update</md-icon>
                             <span class="md-list-item-text" style="color: white">Audit</span>
-                        </md-list-item>
-                        <md-divider style="background: white"></md-divider>
-
-                        <md-list-item to="/pictures">
-                            <md-icon style="color: white">camera_alt</md-icon>
-                            <span class="md-list-item-text" style="color: white">Pictures</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
