@@ -1229,6 +1229,11 @@
                     </md-card-actions>
             </md-card>-->
 
+            <md-speed-dial style="position: absolute; z-index: 22; bottom: 50px;right: 50px;">
+              <md-speed-dial-target v-on:click="addItem" style="background: green">
+                <md-icon>add</md-icon>
+              </md-speed-dial-target>
+            </md-speed-dial>
 
             <md-empty-state v-if="loading" style="padding-top: 35vh;">
                 <md-progress-spinner :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
@@ -1287,6 +1292,9 @@
                         this.loading = false;
                         this.$router.push('login');
                     });
+            },
+            addItem() {
+
             },
             getItems() {
                 this.$http.get('http://ui-collection.herokuapp.com/api/items/get')
