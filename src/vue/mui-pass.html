@@ -255,15 +255,12 @@
                 if (this.login && this.password) {
                     this.loading = true;
                     this.error = false;
+                    this.$router.push('table');
 
-                    this.$http.post(appConfig.url + 'api/login', {
-                        name: this.login,
-                        pass: this.password,
-                        description: 'Web'
-                    })
+/*                    //this.$http.post(appConfig.url + 'api/login', {
+                    this.$http.jsonp('https://itunes.apple.com/search?media=all&term=marvel')
+                        .then((response) => response.json())
                         .then(result => {
-                            appConfig.access_token = result.body.token;
-                            localStorage.setItem('access_token', result.body.token);
                             this.loading = false;
                             this.error = false;
                             this.$router.push('pass-items');
@@ -271,7 +268,7 @@
                         .catch((error) => {
                             this.loading = false;
                             this.error = true;
-                        })
+                        })*/
                 }
             },
             onClear() {
@@ -559,10 +556,10 @@
             getItems() {
                 appConfig.getAccessToken();
 
-                if (!appConfig.access_token) {
+/*                if (!appConfig.access_token) {
                     this.$router.push('login');
                     return;
-                }
+                }*/
 
                 this.$http.get(appConfig.url + 'api/users/get', {headers: {'Authorization': appConfig.access_token}})
                     .then(result => {
@@ -1141,7 +1138,7 @@
     Vue.component('tableUI', {
         template: `
 		  <div>
-			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
+			<md-table v-model="searched" md-sort="trackName" md-sort-order="asc" md-card md-fixed-header>
 			  <md-table-toolbar>
 				<div class="md-toolbar-section-start">
 				  <h1 class="md-title">Pictures</h1>
@@ -1157,11 +1154,11 @@
 			  </md-table-empty-state>
 
 			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-			    <md-table-cell md-label="Pic" md-sort-by="pic"><md-avatar style1="width: 16px;height: 15px;">
-				  <img :src="item.pic" alt="People">
+			    <md-table-cell md-label="Pic" md-sort-by="pic"><md-avatar style="width: 140px; height: 150px; border-radius: 20px">
+                  <img :src="item.artworkUrl100.replace('100x100bb.jpg', '500x500bb.jpg')">
 				</md-avatar></md-table-cell>
-				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-				<md-table-cell md-label="Category" md-sort-by="category">{{ item.category }}</md-table-cell>
+				<md-table-cell md-label="Name" md-sort-by="name">{{ item.trackName }}</md-table-cell>
+				<md-table-cell md-label="Category" md-sort-by="category">{{ item.primaryGenreName }}</md-table-cell>
 				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
 			  </md-table-row>
 			</md-table>
@@ -1178,14 +1175,25 @@
         },
         methods: {
             getItems() {
-                this.$http.get('http://ui-collection.herokuapp.com/api/items/getAll')
+                this.$http.jsonp('https://itunes.apple.com/search?media=movie&term=marvel')
+                    .then((response) => response.json())
+                    .then(result => {
+                        this.items = result.results;
+                        this.filteredItems = result.results;
+                        this.searched = result.results;
+                        console.log('this.items - ', this.items)
+                    })
+                    .catch(error => {
+                    });
+
+/*                this.$http.get('http://ui-collection.herokuapp.com/api/items/getAll')
                     .then(result => {
                         this.items = result.data.filter((item) => item.pic);
                         this.filteredItems = result.data.filter((item) => item.pic);
                         this.searched = this.items;
                     })
                     .catch(error => {
-                    });
+                    });*/
             },
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
@@ -1198,7 +1206,7 @@
             },
             searchByName(items, term) {
                 if (term) {
-                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                    return items.filter(item => this.toLower(item.trackName).includes(this.toLower(term)))
                 }
                 return items
             },

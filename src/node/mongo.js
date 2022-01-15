@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 
 var options = { server: { socketOptions: { connectTimeoutMS: 60000 }}};
 
-mongoose.connect('mongodb://admin:admin1@ds241268.mlab.com:41268/jwt-yard', options);
-//mongoose.connect('mongodb://localhost:27017/chat'); //TODO ONLY for Local INSTANCE MongoDB
+//mongoose.connect('mongodb://admin:admin1@ds241268.mlab.com:41268/jwt-yard', options);
+mongoose.connect('mongodb://localhost:27017/forpost'); //TODO ONLY for Local INSTANCE MongoDB
 
 var db = mongoose.connection;
 
