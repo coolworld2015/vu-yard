@@ -31,6 +31,19 @@ var ItemsModel = mongoose.model('Items', Items);
 module.exports.ItemsModel = ItemsModel;
 
 //---------------------------------------------------------------------------------------------
+var Items1 = new Schema({
+    id: {type: String, required: true},
+    pic: {type: String, required: true},
+    name: {type: String, required: true},
+    category: {type: String, required: true},
+    group: {type: String, required: true},
+    description: {type: String, required: true}
+});
+
+var ItemsModel1 = mongoose.model('Items1', Items1);
+module.exports.ItemsModel1 = ItemsModel1;
+
+//---------------------------------------------------------------------------------------------
 var Vehicles = new Schema({
     id: {type: String, required: true},
     vehicleOid: {type: String, required: true},

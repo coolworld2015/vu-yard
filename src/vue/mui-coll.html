@@ -51,7 +51,7 @@
                         <md-divider style="background: white"></md-divider>
                         <md-list-item to="/phones-items" style="color: white">
                             <md-icon style="color: white">contact_phone</md-icon>
-                            <span class="md-list-item-text" style="color: white;">Table All</span>
+                            <span class="md-list-item-text" style="color: white;">Demo Table 10K</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
@@ -290,20 +290,20 @@
 			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
 			  <md-table-toolbar>
 				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Phones ({{ searched.length }})</h1>
+				  <h1 class="md-title">Items ({{ searched.length }}) (total: {{count}})</h1>
 				</div>
 
-                <md-switch v-model="byName" class="md-primary"></md-switch>
+                <!--<md-switch v-model="byName" class="md-primary"></md-switch>-->
 
 				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
 				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
 				  <md-button class="md-primary" v-on:click="onSearch('name')" style="margin-right: 20px;">Search</md-button>
 				</md-field>
-
+<!--
 				<md-field v-if=!byName md-clearable class="md-toolbar-section-end">
 				  <md-input placeholder="Search by phone..." v-model="search" @input="searchOnTablePhone" />
 				  <md-button class="md-primary" v-on:click="onSearch('phone')" style="margin-right: 20px;">Search</md-button>
-				</md-field>
+				</md-field>-->
 
 
 			  </md-table-toolbar>
@@ -314,13 +314,15 @@
 			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
 			  </md-table-empty-state>
 
-			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
+			    <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
+			    <md-table-cell md-label="Pic" md-sort-by="pic">
+			        <md-avatar class="md-large" style1="width: 126px;height: 115px;">
+				        <img :src="item.pic" alt="N">
+				    </md-avatar>
+				</md-table-cell>
 				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-				<md-table-cell md-label="Phone" md-sort-by="phone">{{ item.phone }}</md-table-cell>
-				<md-table-cell md-label="Street" md-sort-by="street">{{ item.street }}</md-table-cell>
-				<md-table-cell md-label="House" md-sort-by="house">{{ item.house }}</md-table-cell>
-				<md-table-cell md-label="Apt" md-sort-by="apt">{{ item.apt }}</md-table-cell>
-				<md-table-cell md-label="Index" md-sort-by="index">{{ item.index }}</md-table-cell>
+				<md-table-cell md-label="Category" md-sort-by="category">{{ item.category }}</md-table-cell>
+				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
 			  </md-table-row>
 			</md-table>
   		</div>`,
@@ -333,6 +335,8 @@
             searched: [],
             loading: true,
             byName: true,
+            count: 0,
+
         }),
         created() {
             this.getItems();
@@ -348,13 +352,12 @@
                     return;
                 }
 
-                this.$http.get(appConfig.url + 'api/items/get', {headers: {'Authorization': appConfig.access_token}})
+                this.$http.get(appConfig.url + 'api/items1/get', {headers: {'Authorization': appConfig.access_token}})
                     .then(result => {
-                        /*this.items = result.data.splice(0, 100);
-                        this.filteredItems = result.data.splice(0, 100);   */
+                        this.items = result.data.splice(0, 100);
+                        this.filteredItems = result.data.splice(0, 100);
 
-                        this.items = result.data;
-                        this.filteredItems = result.data;
+                        this.count = result.data.length;
                         this.searched = this.items;
                         this.loading = false;
                         setTimeout(() => {
@@ -378,7 +381,7 @@
                     let url;
 
                     if (name === 'name') {
-                        url = 'api/items/findByName/'
+                        url = 'api/items1/findByName/'
                     } else {
                         url = 'api/items/findByPhone/'
                     }
@@ -448,6 +451,11 @@
                     </md-card-header>
 
                     <md-card-content style="padding-bottom: 0px;">
+                    
+
+                            <md-avatar style="width: 90%;height: 50%; margin-left:25px; margin-bottom: 20px;">
+                              <img :src="form.pic" :alt="form.name" v-on:click="onPhotoClick">
+                            </md-avatar>
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
                             <label for="id">ID</label>
@@ -464,36 +472,36 @@
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
-                            <label for="phone">Phone</label>
-                            <md-input name="phone" id="phone" autocomplete="phone" v-model="form.phone" :disabled="true" />
+                            <label for="category">Сategory</label>
+                            <md-input name="category" id="category" autocomplete="category" v-model="form.category" :disabled1="true" />
                           </md-field>
                         </div>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
-                            <label for="street">Street</label>
-                            <md-input name="street" id="street" autocomplete="street" v-model="form.street" :disabled="true" />
+                            <label for="group">Group</label>
+                            <md-input name="group" id="group" autocomplete="group" v-model="form.group" :disabled1="true" />
                           </md-field>
                         </div>
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
-                            <label for="house">House</label>
-                            <md-input name="house" id="house" autocomplete="house" v-model="form.house" :disabled="true" />
+                            <label for="description">Description</label>
+                            <md-input name="description" id="description" autocomplete="description" v-model="form.description" :disabled="true" />
                           </md-field>
                         </div>
 
-                        <div class="md-layout-item md-small-size-100">
+<!--                        <div class="md-layout-item md-small-size-100">
                           <md-field>
-                            <label for="apt">Apt</label>
-                            <md-input name="apt" id="apt" autocomplete="apt" v-model="form.apt" :disabled="true" />
+                            <label for="pic">Photo</label>
+                            <md-input name="pic" id="pic" autocomplete="pic" v-model="form.pic" :disabled="true" />
                           </md-field>
-                        </div>
+                        </div>-->
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
-                            <label for="index">Postal Codes</label>
-                            <md-input name="index" id="index" autocomplete="index" v-model="form.index" :disabled="true" />
+                            <label for="pic">Photo</label>
+                            <md-file v-model="form.placeholder" id="picFileInput" placeholder="Photo" @change="onSelectFile(form.placeholder)"/>
                           </md-field>
                         </div>
                     </md-card-content>
@@ -501,12 +509,13 @@
                     <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
                     <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="onItemEdit" :disabled="loading">Submit</md-button>
                       <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
                     </md-card-actions>
                   </md-card>
 
                   <md-snackbar :md-active.sync="userSaved" md-position="left" >
-                    The phone {{ form.phone }} is shown!
+                    The {{ form.name }} is shown!
                     <md-button class="md-primary" @click="userSaved = false">Close</md-button>
                   </md-snackbar>
                 </form>
@@ -516,15 +525,17 @@
                 title: null,
                 id: null,
                 name: null,
-                phone: null,
-                street: null,
-                house: null,
-                apt: null,
-                index: null,
+                category: null,
+                group: null,
+                description: null,
+                pic: null,
+                placeholder: null,
             },
             userSaved: true,
             sending: false,
             lastUser: null,
+            loading: false,
+            error: false,
         }),
         created() {
             if (!appConfig.item) {
@@ -540,6 +551,60 @@
                 window.setTimeout(() => {
                     this.userSaved = false;
                 }, 2000)
+            },
+            onSelectFile(e) {
+                let reader = new FileReader();
+
+                reader.onload = (event) => {
+                    this.form.pic = event.target.result
+                };
+
+                reader.readAsDataURL(e.target.files[0])
+            },
+            onItemEdit() {
+                if (!this.form.name) {
+                    this.hasMessagesName = true;
+                }
+
+                if (!this.form.category) {
+                    this.hasMessagesPassword = true;
+                }
+
+                if (!this.form.description) {
+                    this.hasMessagesDescription = true;
+                }
+
+                if (this.form.name && this.form.category && this.form.description) {
+                    this.loading = true;
+                    this.error = false;
+
+                    this.$http.post(appConfig.url + 'api/items1/update', {
+                        id: this.form.id,
+                        name: this.form.name,
+                        category: this.form.category,
+                        group: this.form.group,
+                        description: this.form.description,
+                        pic: this.form.pic,
+                        authorization: appConfig.access_token,
+                    })
+                        .then(result => {
+                            this.loading = false;
+                            this.error = false;
+                            this.$router.push('phones-items');
+                        })
+                        .catch((error) => {
+                            this.loading = false;
+                            this.error = true;
+                        })
+                }
+            },
+            onPhotoClick() {
+                let w = window.open('about:blank');
+                let image = new Image();
+                image.src = this.form.pic;
+                setTimeout(function(){
+                    w.document.write(image.outerHTML);
+                }, 0);
             },
             back() {
                 this.$router.push('/phones-items');
@@ -1193,10 +1258,16 @@
 			  <md-table-empty-state>
                 <md-progress-spinner :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
 			  </md-table-empty-state>
+              <div style="display: none">{{ searched.length }}</div>
+
+			  <md-table-empty-state>
+			    <div v-if="!loading"> No items</div>
+			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+			  </md-table-empty-state>
 
 			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
 			    <md-table-cell md-label="Pic" md-sort-by="pic">
-			    <md-avatar class="md-large" style="width: 226px;height: 215px;">
+			    <md-avatar class="md-large" style="width: 126px;height: 115px;">
 				  <img :src="item.pic" alt="People">
 				</md-avatar></md-table-cell>
 				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
@@ -1210,6 +1281,8 @@
             filteredItems: [],
             search: null,
             searched: [],
+            loading: true,
+            byName: true,
         }),
         created() {
             this.getItems();
@@ -1224,6 +1297,11 @@
                         this.items = result.data.filter((item) => item.pic);
                         this.filteredItems = result.data.filter((item) => item.pic);
                         this.searched = this.items;
+                        console.log('this.searched ',this.searched.length)
+                        this.loading = false;
+                        setTimeout(() => {
+                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
+                        }, 100)
                     })
                     .catch(error => {
                     });
@@ -1236,6 +1314,7 @@
             },
             searchOnTable() {
                 this.searched = this.searchByName(this.filteredItems, this.search)
+                console.log('this.searched ',this.searched.length)
             },
             searchByName(items, term) {
                 if (term) {
