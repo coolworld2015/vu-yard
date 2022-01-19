@@ -28,6 +28,8 @@ const server = express()
 
     .get('/api/messages/get', Messages)
 
+    .get('/api/items/get', getItems)
+
     .get('/api/locations/get', Locations)
     .post('/api/locations/add', LocationAdd)
     .post('/api/locations/update', LocationUpdate)
@@ -1203,6 +1205,18 @@ function TestGET(req, res) {
     });
 }
 
+function getItems(req, res) {
+    var ItemsModel = require('./mongo').ItemsModel;
+
+    return ItemsModel.find(function (err, items) {
+        if (!err) {
+            return res.send(items);
+        } else {
+            res.statusCode = 500;
+            return res.send({error: 'Server error'});
+        }
+    });
+}
 /*
 //------------------------------------------------------------------------
  

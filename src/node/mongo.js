@@ -18,6 +18,19 @@ db.once('open', function callback() {
 var Schema = mongoose.Schema;
 
 //---------------------------------------------------------------------------------------------
+var Items = new Schema({
+    id: {type: String, required: true},
+    pic: {type: String, required: true},
+    name: {type: String, required: true},
+    category: {type: String, required: true},
+    group: {type: String, required: true},
+    description: {type: String, required: true}
+});
+
+var ItemsModel = mongoose.model('Items', Items);
+module.exports.ItemsModel = ItemsModel;
+
+//---------------------------------------------------------------------------------------------
 var Vehicles = new Schema({
     id: {type: String, required: true},
     vehicleOid: {type: String, required: true},
