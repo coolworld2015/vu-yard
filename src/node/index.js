@@ -36,6 +36,7 @@ const server = express()
 
     .post('/api/items/update', ItemsUpdate)
     .post('/api/items1/update', ItemsUpdate1)
+    .post('/api/items/add', ItemsAdd)
 
     .get('/api/locations/get', Locations)
     .post('/api/locations/add', LocationAdd)
@@ -1234,6 +1235,35 @@ function getItems1(req, res) {
         } else {
             res.statusCode = 500;
             return res.send({error: 'Server error'});
+        }
+    });
+}
+
+function ItemsAdd(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var ItemsModel = require('./mongo').ItemsModel;
+            ItemsModel.create({
+                    id: req.body.id,
+                    name: req.body.name,
+                    pic: req.body.name,
+                    category: req.body.category,
+                    group: req.body.group,
+                    description: req.body.description
+                },
+                function (err, item) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    }
+                    res.send(item);
+                });
         }
     });
 }
