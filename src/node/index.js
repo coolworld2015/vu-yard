@@ -30,8 +30,12 @@ const server = express()
 
     .get('/api/items/get', getItems)
     .get('/api/items1/get', getItems1)
-    .get('/api/items1/findByName/:name', findByName)
-    .post('/api/items1/update', ItemsUpdate)
+
+    .get('/api/items/findByName/:name', findByName)
+    .get('/api/items1/findByName/:name', findByName1)
+
+    .post('/api/items/update', ItemsUpdate)
+    .post('/api/items1/update', ItemsUpdate1)
 
     .get('/api/locations/get', Locations)
     .post('/api/locations/add', LocationAdd)
@@ -1208,6 +1212,7 @@ function TestGET(req, res) {
     });
 }
 
+//------------------------------------------------------------------------
 function getItems(req, res) {
     var ItemsModel = require('./mongo').ItemsModel;
 
@@ -1233,7 +1238,8 @@ function getItems1(req, res) {
     });
 }
 
-function findByName(req, res) {
+//------------------------------------------------------------------------
+function findByName1(req, res) {
     var ItemsModel1 = require('./mongo').ItemsModel1;
 
     ItemsModel1.find({
@@ -1248,10 +1254,52 @@ function findByName(req, res) {
     });
 }
 
-function ItemsUpdate(req, res) {
+function findByName(req, res) {
+    var ItemsModel = require('./mongo').ItemsModel;
+
+    ItemsModel.find({
+        "name": new RegExp(req.params.name, 'i')
+    }, function (err, item) {
+        if (err) {
+            return res.send({error: err.message});
+        } else {
+            console.log(item);
+            return res.send(item);
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+function ItemsUpdate1(req, res) {
     var ItemsModel1 = require('./mongo').ItemsModel1;
 
     ItemsModel1.findOne({
+        id: req.body.id
+    }, function (err, item) {
+        if (err) {
+            res.send({error: err.message});
+        }
+
+        item.pic = req.body.pic;
+        item.name = req.body.name;
+        item.category = req.body.category;
+        item.group = req.body.group;
+        item.description = req.body.description;
+
+        item.save(function (err) {
+            if (!err) {
+                res.send(item);
+            } else {
+                return res.send(err);
+            }
+        });
+    });
+}
+
+function ItemsUpdate(req, res) {
+    var ItemsModel = require('./mongo').ItemsModel;
+
+    ItemsModel.findOne({
         id: req.body.id
     }, function (err, item) {
         if (err) {

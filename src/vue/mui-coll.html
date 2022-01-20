@@ -42,9 +42,16 @@
                     </md-toolbar>
 
                     <md-list @click="menuVisible = !menuVisible" style="background: #111; color: white">
-                        <md-list-item to="/table" style="color: white">
+                        <md-list-item to="/collection-items" style="color: white">
                             <md-icon style="color: white">camera_alt</md-icon>
                             <span class="md-list-item-text" style="color: white">Table Photos</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-divider style="background: white"></md-divider>
+                        <md-list-item to="/table" style="color: white">
+                            <md-icon style="color: white">contact_phone</md-icon>
+                            <span class="md-list-item-text" style="color: white;">Demo Table</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
@@ -54,7 +61,6 @@
                             <span class="md-list-item-text" style="color: white;">Demo Table 10K</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
-
 
                         <md-list-item to="/pictures">
                             <md-icon style="color: white">camera_alt</md-icon>
@@ -142,6 +148,9 @@
     appConfig.login = false;
 
     const Login = {template: '<login></login>'};
+
+    const Collection = {template: '<collection-items></collection-items>'};
+    const CollectionEdit = {template: '<collection-edit></collection-edit>'};
 
     const Phones = {template: '<phones-items></phones-items>'};
     const PhoneEdit = {template: '<phone-edit></phone-edit>'};
@@ -280,6 +289,364 @@
                 this.password = '';
                 this.hasMessagesPassword = false;
                 this.error = false;
+            },
+        }
+    });
+
+    Vue.component('collection-items', {
+        template: `
+		  <div>
+			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
+			  <md-table-toolbar>
+				<div class="md-toolbar-section-start">
+				  <h1 class="md-title">Items ({{ searched.length }}) (total: {{count}})</h1>
+				</div>
+
+				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
+				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
+				  <md-button class="md-primary" v-on:click="onSearch('name')" style="margin-right: 20px;">Search</md-button>
+				</md-field>
+
+			  </md-table-toolbar>
+              <div style="display: none">{{ searched.length }}</div>
+
+			  <md-table-empty-state>
+			    <div v-if="!loading"> No items</div>
+			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+			  </md-table-empty-state>
+
+			    <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
+			    <md-table-cell md-label="Pic" md-sort-by="pic">
+			        <md-avatar class="md-large" style1="width: 126px;height: 115px;">
+				        <img :src="item.pic" alt="N">
+				    </md-avatar>
+				</md-table-cell>
+				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
+				<md-table-cell md-label="Category" md-sort-by="category">{{ item.category }}</md-table-cell>
+				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
+			  </md-table-row>
+			</md-table>
+  		</div>`,
+        data: () => ({
+            items: [],
+            filteredItems: [],
+            recordsCount: 20,
+            positionY: 0,
+            search: null,
+            searched: [],
+            loading: true,
+            byName: true,
+            count: 0,
+
+        }),
+        created() {
+            this.getItems();
+            this.searched = this.items;
+            appConfig.$emit('login', {});
+        },
+        methods: {
+            getItems() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                this.$http.get(appConfig.url + 'api/items/get', {headers: {'Authorization': appConfig.access_token}})
+                    .then(result => {
+                        this.items = result.data.splice(0, 100);
+                        this.filteredItems = result.data.splice(0, 100);
+
+                        this.count = result.data.length;
+                        this.searched = this.items;
+                        this.loading = false;
+                        setTimeout(() => {
+                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
+                        }, 100)
+                    })
+                    .catch(error => {
+                        this.$router.push('login');
+                    });
+            },
+            onSearch(name) {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+                if (this.search !== null && this.search !== "") {
+                    this.loading = true;
+                    let url;
+
+                    if (name === 'name') {
+                        url = 'api/items/findByName/'
+                    } else {
+                        url = 'api/items/findByPhone/'
+                    }
+
+                    this.$http.get(appConfig.url + url + this.search, {headers: {'Authorization': appConfig.access_token}})
+                        .then(result => {
+                            this.items = result.data;
+                            this.filteredItems = result.data;
+                            this.searched = this.items;
+                            this.loading = false;
+                        })
+                        .catch(error => {
+                            this.$router.push('login');
+                        });
+                }
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            handleScroll() {
+                let position = document.querySelector('.md-table-content').scrollTop;
+                let items, positionY, recordsCount;
+                recordsCount = this.recordsCount;
+                positionY = this.positionY;
+                items = this.filteredItems.slice(0, recordsCount);
+                if (position > positionY) {
+                    this.items = items;
+                    this.searched = items;
+                    this.recordsCount = recordsCount + 10;
+                    this.positionY = positionY + 200;
+                }
+            },
+            searchOnTable() {
+                this.searched = this.searchByName(this.filteredItems, this.search)
+            },
+            searchByName(items, term) {
+                if (term) {
+                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                }
+                return items
+            },
+            searchOnTablePhone() {
+                this.searched = this.searchByPhone(this.filteredItems, this.search)
+            },
+            searchByPhone(items, term) {
+                if (term) {
+                    return items.filter(item => this.toLower(item.phone).includes(this.toLower(term)))
+                }
+                return items
+            },
+            toLower(text) {
+                return text.toString().toLowerCase()
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('collection-edit');
+            },
+        }
+    });
+    Vue.component('collection-edit', {
+        template: `
+		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
+                <form novalidate class="md-layout">
+                  <md-card class="md-layout-item md-size-100 md-small-size-50">
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
+                    </md-card-header>
+
+                    <md-card-content style="padding-bottom: 0px;">
+
+
+                            <md-avatar style="width: 90%;height: 50%; margin-left:25px; margin-bottom: 20px;">
+                              <img :src="form.pic" :alt="form.name" v-on:click="onPhotoClick">
+                            </md-avatar>
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field>
+                            <label for="id">ID</label>
+                            <md-input name="id" id="id" v-model="form.id" :disabled="true" />
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field :class="messageClassName">
+                            <label for="name">Name</label>
+                            <md-input name="name" id="name" required v-on:keypress="hasMessagesName=false" v-model="form.name" :disabled1="true" />
+                            <span class="md-error">Value is requred</span>
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field :class="messageClassСategory">
+                            <label for="category">Сategory</label>
+                            <md-input name="category" id="category" required v-on:keypress="hasMessagesСategory=false" autocomplete="category" v-model="form.category" :disabled1="true" />
+                            <span class="md-error">Value is requred</span>
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field :class="messageClassGroup">
+                            <label for="group">Group</label>
+                            <md-input name="group" id="group" required v-on:keypress="hasMessagesGroup=false" autocomplete="group" v-model="form.group" :disabled1="true" />
+                            <span class="md-error">Value is requred</span>
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field :class="messageClassDescription">
+                            <label for="description">Description</label>
+                            <md-input name="description" id="description" required v-on:keypress="hasMessagesDescription=false" autocomplete="description" v-model="form.description" :disabled="true" />
+                            <span class="md-error">Value is requred</span>
+                          </md-field>
+                        </div>
+
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field :class="messageClassPhoto">
+                            <label for="pic">Photo</label>
+                            <md-file v-model="form.placeholder" id="picFileInput" v-on:click="hasMessagesPhoto=false" placeholder="Photo" @change="onSelectFile(form.placeholder)"/>
+                            <span class="md-error">Value is requred</span>
+                          </md-field>
+                        </div>
+                    </md-card-content>
+
+                    <md-progress-bar md-mode="indeterminate" v-if="sending" />
+
+                    <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="onItemEdit" :disabled="loading">Submit</md-button>
+                      <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
+                    </md-card-actions>
+                  </md-card>
+
+                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
+                    The {{ form.name }} is shown!
+                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
+                  </md-snackbar>
+                </form>
+  		</div>`,
+        data: () => ({
+            form: {
+                title: null,
+                id: null,
+                name: null,
+                category: null,
+                group: null,
+                description: null,
+                pic: '1',
+                placeholder: null,
+            },
+            hasMessagesName: false,
+            hasMessagesСategory: false,
+            hasMessagesGroup: false,
+            hasMessagesDescription: false,
+            hasMessagesPhoto: false,
+            userSaved: true,
+            sending: false,
+            lastUser: null,
+            loading: false,
+            error: false,
+        }),
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/collection-items');
+            } else {
+                this.init();
+            }
+        },
+        computed: {
+            messageClassName() {
+                return {
+                    'md-invalid': this.hasMessagesName
+                }
+            },
+            messageClassСategory() {
+                return {
+                    'md-invalid': this.hasMessagesСategory
+                }
+            },
+            messageClassGroup() {
+                return {
+                    'md-invalid': this.hasMessagesGroup
+                }
+            },
+            messageClassDescription() {
+                return {
+                    'md-invalid': this.hasMessagesDescription
+                }
+            },
+            messageClassPhoto() {
+                return {
+                    'md-invalid': this.hasMessagesPhoto
+                }
+            }
+        },
+        methods: {
+            init() {
+                this.form = appConfig.item;
+                this.form.title = appConfig.item.name;
+                window.setTimeout(() => {
+                    this.userSaved = false;
+                }, 2000)
+            },
+            onSelectFile(e) {
+                let reader = new FileReader();
+
+                reader.onload = (event) => {
+                    this.form.pic = event.target.result
+                };
+
+                reader.readAsDataURL(e.target.files[0])
+            },
+            onItemEdit() {
+                if (!this.form.name) {
+                    this.hasMessagesName = true;
+                }
+
+                if (!this.form.category) {
+                    this.hasMessagesСategory = true;
+                }
+
+                if (!this.form.group) {
+                    this.hasMessagesGroup = true;
+                }
+
+                if (!this.form.description) {
+                    this.hasMessagesDescription = true;
+                }
+
+                if (!this.form.pic) {
+                    this.hasMessagesPhoto = true;
+                }
+
+                if (this.form.name && this.form.category && this.form.group && this.form.description) {
+                    this.loading = true;
+                    this.error = false;
+
+                    this.$http.post(appConfig.url + 'api/items/update', {
+                        id: this.form.id,
+                        name: this.form.name,
+                        category: this.form.category,
+                        group: this.form.group,
+                        description: this.form.description,
+                        pic: this.form.pic,
+                        authorization: appConfig.access_token,
+                    })
+                        .then(result => {
+                            this.loading = false;
+                            this.error = false;
+                            this.$router.push('collection-items');
+                        })
+                        .catch((error) => {
+                            this.loading = false;
+                            this.error = true;
+                        })
+                }
+            },
+            onPhotoClick() {
+                let w = window.open('about:blank');
+                let image = new Image();
+                image.src = this.form.pic;
+                setTimeout(function(){
+                    w.document.write(image.outerHTML);
+                }, 0);
+            },
+            back() {
+                this.$router.push('/collection-items');
             },
         }
     });
@@ -1827,6 +2194,9 @@
         {path: '*', component: Login},
         {path: '/login', component: Login},
 
+        {path: '/collection-items', component: Collection},
+        {path: '/collection-edit', component: CollectionEdit},
+
         {path: '/phones-items', component: Phones},
         {path: '/phone-edit', component: PhoneEdit},
 
@@ -1909,7 +2279,4 @@
             }
         },
     })
-
-    // https://mrtomato-qa.dev.trustsourcing.com/standarts-categories
-    // sprint16tomato@mailinator.com
 </script>
