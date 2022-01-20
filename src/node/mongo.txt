@@ -6,6 +6,7 @@ sudo chmod -R go+w /data/db
 
 mongoimport --db forpost --collection users --file users.json --jsonArray
 
+mongoexport --db forpost --collection items1 -o items1.json --jsonArray
 
 -----------------------------------------------------------------------------------------------------
 //Run mongo
