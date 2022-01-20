@@ -36,7 +36,9 @@ const server = express()
 
     .post('/api/items/update', ItemsUpdate)
     .post('/api/items1/update', ItemsUpdate1)
+
     .post('/api/items/add', ItemsAdd)
+    .post('/api/items/delete', ItemsDelete)
 
     .get('/api/locations/get', Locations)
     .post('/api/locations/add', LocationAdd)
@@ -1263,6 +1265,33 @@ function ItemsAdd(req, res) {
                         return res.send({error: 'Server error'});
                     }
                     res.send(item);
+                });
+        }
+    });
+}
+
+
+function ItemsDelete(req, res) {
+    var agent = req.body.authorization;
+
+    jwt.verify(agent, secret, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        } else {
+            var ItemsModel = require('./mongo').ItemsModel;
+            ItemsModel.remove({
+                    "id": req.body.id
+                },
+                function (err) {
+                    if (err) {
+                        return res.send({error: 'Server error'});
+                    } else {
+                        console.log('Item with id: ', req.body.id, ' was removed');
+                        res.send({text: 'Item with id: ' + req.body.id + ' was removed'});
+                    }
                 });
         }
     });

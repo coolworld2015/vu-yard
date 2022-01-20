@@ -671,7 +671,7 @@
                 this.dialog = true;
             },
             onDelete() {
-                this.$http.post(appConfig.url + 'api/users/delete', {
+                this.$http.post(appConfig.url + 'api/items/delete', {
                     id: this.form.id,
                     authorization: appConfig.access_token,
                 })
@@ -1891,7 +1891,7 @@
             },
             showDetails(item) {
                 appConfig.item = item;
-                this.$router.push('base-item-show');
+                this.$router.push('collection-edit');
             },
         }
     });
