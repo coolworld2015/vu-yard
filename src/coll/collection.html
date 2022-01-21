@@ -19,7 +19,6 @@
 
 <style>
     ::-webkit-scrollbar {
-        /*display: none;*/
     }
 </style>
 
@@ -164,19 +163,13 @@
     const AuditEdit = {template: '<audit-edit></audit-edit>'};
 
     const Table = {template: '<tableUI></tableUI>'};
-    const Pictures0 = {template: '<pictures-items></pictures-items>'};
     const Pictures = {template: `
         <div>
             <div style1="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
                 <pictures-items></pictures-items>
             </div>
-<!--            <div style="width: 50%;padding: 0px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
-                <phones-items></phones-items>
-            </div>-->
         </div>
     `};
-    const SelectItems = {template: '<select-items></select-items>'};
-    const CertificationItems = {template: '<certification-items></certification-items>'};
 
     Vue.component('login', {
         template: `
@@ -857,18 +850,10 @@
 				  <h1 class="md-title">Items ({{ searched.length }}/{{count}})</h1>
 				</div>
 
-                <!--<md-switch v-model="byName" class="md-primary"></md-switch>-->
-
 				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
 				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
 				  <md-button class="md-primary" v-on:click="onSearch('name')" style="margin-right: 20px;">Search</md-button>
 				</md-field>
-<!--
-				<md-field v-if=!byName md-clearable class="md-toolbar-section-end">
-				  <md-input placeholder="Search by phone..." v-model="search" @input="searchOnTablePhone" />
-				  <md-button class="md-primary" v-on:click="onSearch('phone')" style="margin-right: 20px;">Search</md-button>
-				</md-field>-->
-
 
 			  </md-table-toolbar>
               <div style="display: none">{{ searched.length }}</div>
@@ -1054,13 +1039,6 @@
                             <md-input name="description" id="description" autocomplete="description" v-model="form.description" :disabled="true" />
                           </md-field>
                         </div>
-
-<!--                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="pic">Photo</label>
-                            <md-input name="pic" id="pic" autocomplete="pic" v-model="form.pic" :disabled="true" />
-                          </md-field>
-                        </div>-->
 
                         <div class="md-layout-item md-small-size-100">
                           <md-field>
@@ -1617,7 +1595,7 @@
 			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
 			  </md-table-empty-state>
 
-			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
+			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click1="showDetails(item)">
 				<md-table-cell md-label="Date" md-sort-by="date">{{ item.date }}</md-table-cell>
 				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
 				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
@@ -1696,114 +1674,6 @@
             },
         }
     });
-    Vue.component('audit-edit', {
-        template: `
-		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
-                <form novalidate class="md-layout">
-                  <md-card class="md-layout-item md-size-100 md-small-size-50">
-                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
-                      <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
-                    </md-card-header>
-
-                    <md-card-content style="padding-bottom: 0px;">
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="id">ID</label>
-                            <md-input name="id" id="id" autocomplete="id" v-model="form.id" :disabled="true" />
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="name">Name</label>
-                            <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="true" />
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="phone">Phone</label>
-                            <md-input name="phone" id="phone" autocomplete="phone" v-model="form.phone" :disabled="true" />
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="street">Street</label>
-                            <md-input name="street" id="street" autocomplete="street" v-model="form.street" :disabled="true" />
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="house">House</label>
-                            <md-input name="house" id="house" autocomplete="house" v-model="form.house" :disabled="true" />
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="apt">Apt</label>
-                            <md-input name="apt" id="apt" autocomplete="apt" v-model="form.apt" :disabled="true" />
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field>
-                            <label for="index">Postal Codes</label>
-                            <md-input name="index" id="index" autocomplete="index" v-model="form.index" :disabled="true" />
-                          </md-field>
-                        </div>
-                    </md-card-content>
-
-                    <md-progress-bar md-mode="indeterminate" v-if="sending" />
-
-                    <md-card-actions style="margin: 20px;">
-                      <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
-                    </md-card-actions>
-                  </md-card>
-
-                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
-                    The phone {{ form.phone }} is shown!
-                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
-                  </md-snackbar>
-                </form>
-  		</div>`,
-        data: () => ({
-            form: {
-                title: null,
-                id: null,
-                name: null,
-                phone: null,
-                street: null,
-                house: null,
-                apt: null,
-                index: null,
-            },
-            userSaved: true,
-            sending: false,
-            lastUser: null,
-        }),
-        created() {
-            if (!appConfig.item) {
-                this.$router.push('/phones-items');
-            } else {
-                this.init();
-            }
-        },
-        methods: {
-            init() {
-                this.form = appConfig.item;
-                this.form.title = appConfig.item.name;
-                window.setTimeout(() => {
-                    this.userSaved = false;
-                }, 2000)
-            },
-            back() {
-                this.$router.push('/phones-items');
-            },
-        }
-    });
 
     Vue.component('tableUI', {
         template: `
@@ -1855,7 +1725,6 @@
         },
         methods: {
             getItems() {
-                //this.$http.get('http://ui-collection.herokuapp.com/api/items/getAll')
                 this.$http.get(appConfig.url + 'api/items/get')
                     .then(result => {
                         this.items = result.data.filter((item) => item.pic);
@@ -1949,7 +1818,6 @@
         },
         methods: {
             getItems() {
-                //this.$http.get('http://ui-collection.herokuapp.com/api/items/get')
                 this.$http.get(appConfig.url + 'api/items/get')
                     .then(result => {
                         this.items = result.data.filter((item) => item.pic);
@@ -1996,401 +1864,6 @@
             },
         }
     });
-    Vue.component('select-items', {
-        template: `
-        <div>
-
-          <md-tabs md-alignment="centered">
-            <md-tab id="tab-home" md-label="Home" style="background: rgb(238, 238, 238)">
-                <md-content style="height: 80vh;background: rgb(238, 238, 238)">
-                  <md-card md-with-hover style="width: 50%; height1: 50vh; margin: auto;">
-                  <md-ripple>
-                        <md-card-header>
-                          <div class="md-title">Card with hover effect</div>
-                          <div class="md-subhead">It also have a ripple</div>
-                        </md-card-header>
-
-                        <md-card-content>
-                                <div class="md-layout-item">
-                                  <md-field>
-                                    <label for="movies">Movies</label>
-                                    <md-select v-model="selectedMovies" :md-options="movies" name="movies" id="movies" multiple>
-                                      <md-option value="fight-club">Fight Club</md-option>
-                                      <md-option value="godfather">Godfather</md-option>
-                                      <md-option value="godfather-ii">Godfather II</md-option>
-                                      <md-option value="godfather-iii">Godfather III</md-option>
-                                      <md-option value="godfellas">Godfellas</md-option>
-                                      <md-option value="pulp-fiction">Pulp Fiction</md-option>
-                                      <md-option value="scarface">Scarface</md-option>
-                                    </md-select>
-                                  </md-field>
-
-                                    <md-autocomplete v-model="selectedCountry" :md-options="countries">
-                                      <label>Country</label>
-                                    </md-autocomplete>
-
-                                    <md-autocomplete v-model="selectedEmployee" :md-options="employees" md-dense>
-                                      <label>Employees</label>
-                                    </md-autocomplete>
-
-                                    <md-field>
-                                        <label>Textarea with Autogrow</label>
-                                        <md-textarea v-model="message" md-autogrow md-counter="240"></md-textarea>
-                                    </md-field>
-
-                                  <div>
-                                    <strong>Selected movies:</strong>
-                                    {{ selectedCountry }}
-                                    {{ selectedEmployee }}
-                                    {{ selectedMovies }}
-                                  </div>
-                              </div>
-                        </md-card-content>
-
-                        <md-card-actions>
-                            <md-button class="md-raised md-primary" v-on:click="sendMessage">Send</md-button>
-                            <md-button class="md-raised md-primary" v-on:click="getItems">Cancel</md-button>
-                        </md-card-actions>
-                    </md-ripple>
-                </md-card>
-                </md-content>
-            </md-tab>
-
-            <md-tab id="tab-pages" md-label="Pages" style="background: rgb(238, 238, 238)">
-                <md-content style="height: 80vh;background: rgb(238, 238, 238)">
-                  <md-card md-with-hover style="width: 50%; height1: 50vh; margin: auto;">
-                    <md-ripple>
-                        <md-card-header>
-                          <div class="md-title">Card with hover effect</div>
-                          <div class="md-subhead">It also have a ripple</div>
-                        </md-card-header>
-
-                        <md-card-content>
-                            <md-field>
-                              <label>Password toggle</label>
-                              <md-input v-model="password" type="password"></md-input>
-                            </md-field>
-
-                            <md-field :class="messageClassName">
-                              <label>Name</label>
-                              <md-input v-model="name" required v-on:keypress="hasMessagesName=false"></md-input>
-                              <span class="md-error">There is an error</span>
-                            </md-field>
-
-                            <md-field :class="messageClass">
-                              <label>Textarea</label>
-                              <md-textarea v-model="textarea" required v-on:keypress="hasMessages=false"></md-textarea>
-                              <span class="md-helper-text">Helper text</span>
-                              <span class="md-error">There is an error</span>
-                            </md-field>
-
-                            <md-switch v-model="hasMessages">{{ !hasMessages ? 'Show' : 'Hide' }} Errors</md-switch>
-                            <md-button class="md-raised md-primary" v-on:click="checkInputs">Send</md-button>
-                        </md-card-content>
-                        </md-ripple>
-                    </md-card>
-                </md-content>
-            </md-tab>
-
-        </md-tabs>
-
-        <md-snackbar md-position="left" :md-duration="isInfinity ? Infinity : duration" :md-active.sync="showSnackbar" md-persistent>
-          <span>Connection timeout. Showing limited messages!</span>
-          <md-button class="md-primary" @click="showSnackbar = false">Retry</md-button>
-        </md-snackbar>
-
-    </div>
-`,
-        data: () => ({
-            items: [],
-            duration: 4000,
-            showSnackbar: false,
-            isInfinity: false,
-            loading: true,
-            selectedMovies: [],
-            message: null,
-            selectedCountry: null,
-            selectedEmployee: null,
-            countries: [
-                'Algeria',
-                'Argentina',
-                'Brazil',
-                'Canada',
-                'Italy',
-                'Japan',
-                'United Kingdom',
-                'United States'
-            ],
-            employees: [],
-            employeesObject: [],
-            employees0: [
-                {id: 1, name: "Jim Halpert"},
-                {id: 2, name: "Dwight Schrute"},
-                {id: 3, name: "Michael Scott"},
-                {id: 4, name: "Pam Beesly"},
-                {id: 5, name: "Angela Martin"},
-                {id: 6, name: "Kelly Kapoor"},
-                {id: 7, name: "Ryan Howard"},
-                {id: 8, name: "Kevin Malone"},
-                {id: 9, name: "Creed Bratton"},
-            ],
-            employees1: [
-                'Jim Halpert',
-                'Dwight Schrute',
-                'Michael Scott',
-                'Pam Beesly',
-                'Angela Martin',
-                'Kelly Kapoor',
-                'Ryan Howard',
-                'Kevin Malone',
-                'Creed Bratton',
-                'Oscar Nunez',
-                'Toby Flenderson',
-                'Stanley Hudson',
-                'Meredith Palmer',
-                'Phyllis Lapin-Vance'
-            ],
-            noError: null,
-            required: null,
-            password: 12345,
-            name: null,
-            textarea: null,
-            hasMessages: false,
-            hasMessagesName: false
-        }),
-        computed: {
-            messageClass() {
-                return {
-                    'md-invalid': this.hasMessages
-                }
-            },
-            messageClassName() {
-                return {
-                    'md-invalid': this.hasMessagesName
-                }
-            }
-        },
-        created() {
-            this.getItems();
-        },
-        methods: {
-            sendMessage() {
-                const id = this.employeesObject.filter(item => item.name === this.selectedEmployee)[0].id;
-                this.showSnackbar = true;
-                this.NotifyUserById(id, this.message);
-                this.selectedEmployee = '';
-                this.message = '';
-            },
-            NotifyAllUsers() {
-                axios.post('http://localhost:7000/api/Notification/NotifyAllUsers',
-                    {
-                        message: 'Test message'
-                    },
-                    {
-                        withCredentials: true,
-                    })
-                    .then(result => {
-                        console.log(result)
-                    })
-                    .catch(error => {
-                    });
-            },
-            NotifyUserById(id, message) {
-                axios.post('http://localhost:7000/api/Notification/NotifyUser?userId=' + id,
-                    {
-                        body: message
-                    },
-                    {
-                        withCredentials: true,
-                    })
-                    .then(result => {
-                        console.log(result)
-                        this.$router.push('/certification-items');
-                    })
-                    .catch(error => {
-                    });
-            },
-            getItems0() {
-                axios.get('http://localhost:5000/api/Admin/GetAllUsers',
-                    {
-                        withCredentials: true,
-                        headers: {
-                            'Access-Control-Allow-Origin': 'localhost:3000',
-                        },
-                    })
-                    .then(result => {
-                        this.employees = result.data.filter(item => item.name !== null);
-                        this.employeesObject = [...this.employees];
-                        this.employees = this.employees.map((item) => {
-                            return item.name;
-                        });
-                        this.searched = this.items;
-                    })
-                    .catch(error => {
-                    });
-            },
-            getItems() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                this.$http.get(appConfig.url + 'api/users/get', {headers: {'Authorization': appConfig.access_token}})
-                    .then(result => {
-                        this.items = result.data.sort(this.sort);
-                        this.movies = result.data.sort(this.sort);
-                        this.employees = result.data.sort(this.sort);
-                        this.employees = this.employees.map((item) => {
-                            return item.name;
-                        });
-                        this.filteredItems = result.data.sort(this.sort);
-                        this.searched = this.items;
-                        this.loading = false;
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },
-            checkInputs() {
-                console.log(this.name)
-                if (!this.name) {
-                    this.hasMessagesName = true;
-                }
-            }
-        }
-    });
-    Vue.component('certification-items', {
-        template: `
-		  <div>
-		  <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
-              <md-speed-dial-target v-on:click="showDetails">
-                <md-icon>add</md-icon>
-              </md-speed-dial-target>
-            </md-speed-dial>
-
-			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
-			  <md-table-toolbar>
-				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Messages ({{ searched.length }})</h1>
-				</div>
-
-				<md-field md-clearable class="md-toolbar-section-end">
-				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable"/>
-				</md-field>
-			  </md-table-toolbar>
-              {{ count }}
-
-			  <md-table-empty-state>
-                <md-progress-spinner :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
-			  </md-table-empty-state>
-
-			  <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-	<!--			<md-table-cell md-label="ID" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>-->
-				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-
-				<md-table-cell md-label="Message" md-sort-by="body">{{ item.body }}</md-table-cell>
-				<md-table-cell md-label="Date" md-sort-by="dateUtcMs">{{ item.date }}</md-table-cell>
-				<md-table-cell md-label="Role" md-sort-by="role">{{ item.role }}</md-table-cell>
-			  </md-table-row>
-			</md-table>
-
-  		</div>`,
-        data: () => ({
-            items: [],
-            search: null,
-            count: 0,
-            searched: [],
-        }),
-        created() {
-            this.getItems();
-            this.searched = this.items
-        },
-        methods: {
-            getItems() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                this.$http.get(appConfig.url + 'api/users/get', {headers: {'Authorization': appConfig.access_token}})
-                    .then(result => {
-                        this.items = result.data.sort(this.sort);
-                        this.filteredItems = result.data.sort(this.sort);
-                        this.searched = this.items;
-                        this.loading = false;
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },
-            getItems0() {
-                //axios.get('http://localhost:5000/api/Admin/GetAllUsers',
-                axios.get('http://localhost:5000/api/Notification/GetNotificationRequests',
-                    {
-                        withCredentials: true,
-                        headers: {
-                            'Access-Control-Allow-Origin': 'localhost:3000',
-                        },
-                    })
-                    .then(result => {
-                        this.items = result.data.requests.map((item) => {
-                            let role, date;
-                            date = moment(item.dateUtcMs).format('DD.MM.YYYY hh:mm:ss');
-
-                            switch (item.recipient.type) {
-                                case 1:
-                                    role = 'User';
-                                    break;
-                                case 2:
-                                    role = 'AllUsers';
-                                    break;
-                                case 3:
-                                    role = 'Restaurant';
-                                    break;
-                                case 4:
-                                    role = 'Chain';
-                                    break;
-                                default:
-                                    break;
-                            }
-                            return {
-                                ...item,
-                                'name': (item.recipient.name ? item.recipient.name : ''),
-                                'role': role,
-                                'date': date
-                            }
-                        }).sort(this.sort);
-
-                        this.searched = this.items;
-                    })
-                    .catch(error => {
-                    });
-            },
-            sort(a, b) {
-                return parseInt(b.id) - parseInt(a.id);
-            },
-            searchOnTable() {
-                this.searched = this.searchByName(this.items, this.search)
-            },
-            searchByName(items, term) {
-                if (term) {
-                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
-                }
-                return items
-            },
-            toLower(text) {
-                return text.toString().toLowerCase()
-            },
-            showDetails(item) {
-                appConfig.item = item;
-                this.$router.push('/select-items');
-            },
-        }
-    });
 
     Vue.use(VueMaterial.default);
 
@@ -2415,8 +1888,6 @@
 
         {path: '/table', component: Table},
         {path: '/pictures', component: Pictures},
-        {path: '/select-items', component: SelectItems},
-        {path: '/certification-items', component: CertificationItems},
     ];
 
     const router = new VueRouter({
@@ -2460,8 +1931,6 @@
                 this.journal = appConfig.route === 'journal';
             },
             changeRoute(route) {
-                //closeNav();
-
                 appConfig.route = route;
                 this.init();
 
@@ -2481,7 +1950,6 @@
                 localStorage.setItem('access_token', null);
                 this.changeRoute('login');
                 appConfig.$emit('logout', {});
-                //closeNav();
             }
         },
     })
