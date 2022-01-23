@@ -4,7 +4,15 @@
 
 sudo chmod -R go+w /data/db
 
+sudo lsof -iTCP -sTCP:LISTEN -n -P
+sudo kill <mongo_command_pid>
+
+mongod  --dbpath ~/data/db
+
 mongoimport --db forpost --collection users --file users.json --jsonArray
+
+mongoimport --db forpost --collection items --file items.json --jsonArray
+mongoimport --db forpost --collection items1 --file items1.json --jsonArray
 
 mongoexport --db forpost --collection items1 -o items1.json --jsonArray
 

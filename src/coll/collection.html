@@ -355,10 +355,11 @@
 
                 this.$http.get(appConfig.url + 'api/items/get', {headers: {'Authorization': appConfig.access_token}})
                     .then(result => {
+                        this.count = result.data.length;
+
                         this.items = result.data.splice(0, 100);
                         this.filteredItems = result.data.splice(0, 100);
 
-                        this.count = result.data.length;
                         this.searched = this.items;
                         this.loading = false;
                         setTimeout(() => {
@@ -903,11 +904,12 @@
 
                 this.$http.get(appConfig.url + 'api/items1/get', {headers: {'Authorization': appConfig.access_token}})
                     .then(result => {
+                        this.count = result.data.length;
+
                         this.items = result.data.splice(0, 100);
                         this.filteredItems = result.data.splice(0, 100);
-
-                        this.count = result.data.length;
                         this.searched = this.items;
+
                         this.loading = false;
                         setTimeout(() => {
                             //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
