@@ -246,6 +246,7 @@
                 }, 2000)
             },
             onLogin() {
+                this.$router.push('collection-items');
                 if (!this.login) {
                     this.hasMessagesLogin = true;
                 }
