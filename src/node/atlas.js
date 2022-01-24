@@ -49,7 +49,25 @@ const server = express()
 
     .get('/api/items1/get', getItems1)
 
-    .get('/api/items/findByName/:name', findByName)
+    .get('/api/items/findByName/:name', function findByName(req, res) {
+        const { MongoClient } = require('mongodb');
+        const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
+        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+        client.connect(err => {
+            const collection = client.db("forpost").collection("items")
+            console.log(" Mongoose is connected ")
+
+            collection.find({"name": new RegExp(req.params.name, 'i')}).toArray(function(err, item) {
+                if (err) {
+                    return res.send({error: err.message});
+                } else {
+                    //console.log(item);
+                    return res.send(item);
+                }
+            });
+
+        });
+    })
     .get('/api/items1/findByName/:name', findByName1)
 
     .post('/api/items/update', ItemsUpdate)
