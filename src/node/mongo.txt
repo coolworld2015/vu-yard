@@ -18,6 +18,9 @@ mongoexport --db forpost --collection items1 -o items1.json --jsonArray
 
 
 mongoimport --uri mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/forpost --collection items --file items.json --jsonArray
+
+mongoexport --uri mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/forpost --collection items -o atlas_items.json --jsonArray
+
 -----------------------------------------------------------------------------------------------------
 //Run mongo
 mongod.exe --dbpath c:/MongoDB
