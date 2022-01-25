@@ -1,0 +1,74 @@
+1. Install MongoDB
+2. md MongoDB/bin - copy here
+3. md MongoDB/db
+
+sudo chmod -R go+w /data/db
+
+sudo lsof -iTCP -sTCP:LISTEN -n -P
+sudo kill <mongo_command_pid>
+
+mongod  --dbpath ~/data/db
+
+mongoimport --db forpost --collection users --file users.json --jsonArray
+
+mongoimport --db forpost --collection items --file items.json --jsonArray
+mongoimport --db forpost --collection items1 --file items1.json --jsonArray
+
+mongoexport --db forpost --collection items1 -o items1.json --jsonArray
+
+
+mongoimport --uri mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/forpost --collection items --file items.json --jsonArray
+
+mongoexport --uri mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/forpost --collection items -o atlas_items.json --jsonArray
+
+-----------------------------------------------------------------------------------------------------
+//Run mongo
+mongod.exe --dbpath c:/MongoDB
+mongod.exe --dbpath c:/MongoDB --repair
+
+-----------------------------------------------------------------------------------------------------
+//Shell
+mongo shell
+show dbs
+db.getCollectionNames()
+
+use forpost
+show collections
+
+db.createCollection("audits")
+db.audits.find()
+db.audits.drop()
+
+db.hello.insert({'a':'b'})
+db.hello.find()
+
+db.dropDatabase()
+
+-----------------------------------------------------------------------------------------------------
+//Get data from MongoLab
+mongoexport -h ds053728.mongolab.com:53728 -d warehouse -c audits -u admin -p admin -o audits1.json
+mongoexport -h ds053728.mongolab.com:53728 -d warehouse -c clients -u admin -p admin -o clients1.json
+mongoexport -h ds053728.mongolab.com:53728 -d warehouse -c goods -u admin -p admin -o goods1.json
+mongoexport -h ds053728.mongolab.com:53728 -d warehouse -c users -u admin -p admin -o users1.json
+
+-----------------------------------------------------------------------------------------------------
+//Set localData from files
+mongoimport --db forpost --collection audits --file audits.json
+mongoimport --db forpost --collection clients --file clients.json
+mongoimport --db forpost --collection goods --file goods.json
+mongoimport --db forpost --collection users --file users.json --jsonArray
+
+-----------------------------------------------------------------------------------------------------
+//Import/Export localData
+mongoimport --db forpost --collection audits --file audits.json
+mongoexport --db forpost --collection audits -o audits1.json
+
+mongoimport --db forpost --collection clients --file clients.json
+mongoexport --db forpost --collection clients -o clients1.json
+
+mongoimport --db forpost --collection goods --file goods.json
+mongoexport --db forpost --collection goods -o goods1.json
+
+mongoimport --db forpost --collection users --file users.json
+mongoexport --db forpost --collection users -o users1.json
+
