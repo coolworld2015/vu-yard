@@ -20,9 +20,9 @@ const server = express()
     .use(bodyParser({limit: '50mb'}))
     .use(express.static(__dirname + '/build'))
 
-    //.get('/',(req, res) => res.sendFile(__dirname + '/build/index.html'))
+    .get('/',(req, res) => res.sendFile(__dirname + '/build/index.html'))
     //.get('/', (req, res) => res.send('It is just API Server...'))
-    .get('/', (req, res) => res.sendFile(__dirname + '/collection.html'))
+    //.get('/', (req, res) => res.sendFile(__dirname + '/collection.html'))
 
     .post('/api/login', function (req, res) {
         const { MongoClient } = require('mongodb');
