@@ -357,6 +357,33 @@
                         this.loading = false;
                         setTimeout(() => {
                             //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
+                            this.getItemsAll();
+                        }, 100)
+                    })
+                    .catch(error => {
+                        this.$router.push('login');
+                    });
+            },
+            getItemsAll() {
+                appConfig.getAccessToken();
+
+                if (!appConfig.access_token) {
+                    this.$router.push('login');
+                    return;
+                }
+
+
+                this.$http.get(appConfig.url + 'api/items/getall')
+                    .then(result => {
+                        this.count = result.data.length;
+
+                        this.items = [].concat(result.data.sort(this.sort).splice(0, 100));
+                        this.filteredItems = [].concat(result.data.sort(this.sort));
+
+                        this.searched = this.items;
+                        this.loading = false;
+                        setTimeout(() => {
+                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
                         }, 100)
                     })
                     .catch(error => {
@@ -1408,7 +1435,7 @@
         },
         methods: {
             getItems() {
-                this.$http.get(appConfig.url + 'api/items1/get')
+                this.$http.get(appConfig.url + 'api/pic/get')
                     .then(result => {
                         this.items = [].concat(result.data.sort(this.sort));
                         this.filteredItems = [].concat(result.data.sort(this.sort));
@@ -1417,7 +1444,19 @@
                         this.loading = false;
                         setTimeout(() => {
                             //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
+                            this.getItemsAll();
                         }, 100)
+                    })
+                    .catch(error => {
+                    });
+            },
+            getItemsAll() {
+                this.$http.get(appConfig.url + 'api/pic/getall')
+                    .then(result => {
+                        this.items = [].concat(result.data.sort(this.sort));
+                        this.filteredItems = [].concat(result.data.sort(this.sort));
+                        this.searched = this.items;
+                        this.loading = false;
                     })
                     .catch(error => {
                     });
@@ -1496,26 +1535,29 @@
         }),
         created() {
             this.getItems();
-            //this.getItemsAll();
             appConfig.$emit('login', {});
         },
         methods: {
             getItems() {
-                this.$http.get(appConfig.url + 'api/items1/get')
+                this.$http.get(appConfig.url + 'api/pic/get')
                     .then(result => {
                         this.items = [].concat(result.data.sort(this.sort));
                         this.filteredItems = [].concat(result.data.sort(this.sort));
                         this.searched = this.items;
                         this.loading = false;
+                        setTimeout(() => {
+                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
+                            this.getItemsAll();
+                        }, 100)
                     })
                     .catch(error => {
                     });
             },
             getItemsAll() {
-                this.$http.get('http://ui-collection.herokuapp.com/api/items/getAll')
+                this.$http.get(appConfig.url + 'api/pic/getall')
                     .then(result => {
-                        this.items = result.data.filter((item) => item.pic);
-                        this.filteredItems = result.data.filter((item) => item.pic);
+                        this.items = [].concat(result.data.sort(this.sort));
+                        this.filteredItems = [].concat(result.data.sort(this.sort));
                         this.searched = this.items;
                         this.loading = false;
                     })

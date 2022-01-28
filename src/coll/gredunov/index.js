@@ -4,6 +4,11 @@ var express = require('express');
 var bodyParser = require('body-parser');
 const PORT = process.env.PORT || 3000;
 
+const { MongoClient } = require('mongodb');
+const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
+//const uri = "mongodb://localhost:27017/forpost";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
 //------------------------------------------------------------------------
 var jwt = require('jsonwebtoken');
 var secret = 'f3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjoibWFnaWMiLCJpYXQiOjE1NzMxNTY0OTgsImV4cCI6MTU3MzE2MDA5OH0.uUlMkCQKt3U0OWvjBzAZEaa3V49g1AbuVOufNx-g4F0of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32of3oLigPb3vGCg9lgL0Bs97wySTCCuvYdOZg9zqTY32o';
@@ -87,14 +92,11 @@ const server = express()
 
 //------------------------------------------------------------------------
     .get('/api/items/get', function (req, res) {
-        const { MongoClient } = require('mongodb');
-        const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
         client.connect(err => {
             const collection = client.db("forpost").collection("items")
             console.log(" Mongoose is connected ")
 
-            collection.find({}).sort({'_id': -1}).limit(100).toArray(function(err, result) {
+            collection.find({}).sort({'_id': -1}).limit(20).toArray(function(err, result) {
                 if (!err) {
                     console.log('length - ', result.length);
                     client.close();
@@ -108,10 +110,46 @@ const server = express()
         });
     })
 
-    .get('/api/items1/get', function (req, res) {
-        const { MongoClient } = require('mongodb');
-        const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    .get('/api/items/getall', function (req, res) {
+        client.connect(err => {
+            const collection = client.db("forpost").collection("items")
+            console.log(" Mongoose is connected ")
+
+            collection.find({}).sort({'_id': -1}).toArray(function(err, result) {
+                if (!err) {
+                    console.log('length - ', result.length);
+                    client.close();
+                    return res.send(result);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            });
+
+        });
+    })
+
+    .get('/api/pic/get', function (req, res) {
+        client.connect(err => {
+            const collection = client.db("forpost").collection("items")
+            console.log(" Mongoose is connected ")
+
+            collection.find({}).sort({'_id': -1}).limit(20).toArray(function(err, result) {
+                if (!err) {
+                    console.log('length - ', result.length);
+                    let filteredItems = result.filter((item) => item.pic);
+                    client.close();
+                    return res.send(filteredItems);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            });
+
+        });
+    })
+
+    .get('/api/pic/getall', function (req, res) {
         client.connect(err => {
             const collection = client.db("forpost").collection("items")
             console.log(" Mongoose is connected ")
@@ -132,9 +170,6 @@ const server = express()
     })
 
     .get('/api/items/findByName/:name', function (req, res) {
-        const { MongoClient } = require('mongodb');
-        const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
         client.connect(err => {
             const collection = client.db("forpost").collection("items")
             console.log(" Mongoose is connected ")
@@ -154,9 +189,6 @@ const server = express()
     })
 
     .post('/api/items/update', function (req, res) {
-        const {MongoClient} = require('mongodb');
-        const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-        const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
         client.connect(err => {
             const collection = client.db("forpost").collection("items")
             console.log(" Mongoose is connected ")
@@ -191,9 +223,6 @@ const server = express()
                     message: 'No token provided.'
                 });
             } else {
-                const { MongoClient } = require('mongodb');
-                const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-                const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
                 client.connect(err => {
                     const collection = client.db("forpost").collection("items")
                     console.log(" Mongoose is connected ")
@@ -229,9 +258,6 @@ const server = express()
                     message: 'No token provided.'
                 });
             } else {
-                const { MongoClient } = require('mongodb');
-                const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-                const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
                 client.connect(err => {
                     const collection = client.db("forpost").collection("items")
                     console.log(" Mongoose is connected ")
@@ -254,9 +280,6 @@ const server = express()
 
 //------------------------------------------------------------------------
     .get('/api/users/get', function (req, res) {
-        const { MongoClient } = require('mongodb');
-        const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
         client.connect(err => {
             const collection = client.db("forpost").collection("users")
             console.log(" Mongoose is connected ")
@@ -285,9 +308,6 @@ const server = express()
                     message: 'No token provided.'
                 });
             } else {
-                const { MongoClient } = require('mongodb');
-                const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-                const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
                 client.connect(err => {
                     const collection = client.db("forpost").collection("users")
                     console.log(" Mongoose is connected ")
@@ -312,9 +332,6 @@ const server = express()
     })
 
     .post('/api/users/update', function (req, res) {
-        const {MongoClient} = require('mongodb');
-        const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-        const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
         client.connect(err => {
             const collection = client.db("forpost").collection("users")
             console.log(" Mongoose is connected ")
@@ -347,9 +364,6 @@ const server = express()
                     message: 'No token provided.'
                 });
             } else {
-                const { MongoClient } = require('mongodb');
-                const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-                const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
                 client.connect(err => {
                     const collection = client.db("forpost").collection("users")
                     console.log(" Mongoose is connected ")
@@ -381,9 +395,6 @@ const server = express()
                     message: 'No token provided.'
                 });
             } else {
-                const { MongoClient } = require('mongodb');
-                const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-                const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
                 client.connect(err => {
                     const collection = client.db("forpost").collection("audit")
                     console.log(" Mongoose is connected ")
