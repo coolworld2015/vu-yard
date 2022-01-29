@@ -192,6 +192,7 @@ const server = express()
 
             collection.updateOne({id: req.body.id}, { $set : {
                     pic: req.body.pic,
+                    pictures: req.body.pictures,
                     name: req.body.name,
                     category: req.body.category,
                     group: req.body.group,
