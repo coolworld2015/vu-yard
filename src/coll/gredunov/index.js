@@ -30,9 +30,6 @@ const server = express()
     //.get('/', (req, res) => res.sendFile(__dirname + '/collection.html'))
 
     .post('/api/login', function (req, res) {
-        const { MongoClient } = require('mongodb');
-        const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
-        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
         client.connect(err => {
             const collection = client.db("forpost").collection("users")
             console.log(" Mongoose is connected ")
@@ -230,7 +227,7 @@ const server = express()
                     collection.insertOne({
                         id: req.body.id,
                         name: req.body.name,
-                        pic: req.body.name,
+                        pic: req.body.pic,
                         category: req.body.category,
                         group: req.body.group,
                         description: req.body.description
