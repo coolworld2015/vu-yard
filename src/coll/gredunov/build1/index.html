@@ -566,7 +566,7 @@
                         <div class="md-layout-item md-small-size-100">
                           <md-field :class="messageClassDescription">
                             <label for="description">Description</label>
-                            <md-input name="description" id="description" required v-on:keypress="hasMessagesDescription=false" autocomplete="description" v-model="form.description" :disabled="true" />
+                            <md-input name="description" id="description" required v-on:keypress="hasMessagesDescription=false" autocomplete="description" v-model="form.description" :disabled="false" />
                             <span class="md-error">Value is requred</span>
                           </md-field>
                         </div>
