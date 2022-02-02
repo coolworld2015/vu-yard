@@ -395,12 +395,11 @@
                     return;
                 }
 
-
                 this.$http.get(appConfig.url + 'api/items/getall')
                     .then(result => {
                         this.count = result.data.length;
 
-                        this.items = [].concat(result.data.sort(this.sort).splice(0, 100));
+                        this.items = [].concat(result.data.sort(this.sort).splice(0, 500));
                         this.filteredItems = [].concat(result.data.sort(this.sort));
 
                         this.searched = this.items;
@@ -578,6 +577,13 @@
                             <span class="md-error">Value is requred</span>
                           </md-field>
                         </div>
+
+                        <div style="text-align: right; margin-top: 40px;">
+                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
+                                Something went wrong
+                            </span>
+                        </div>
+
                     </md-card-content>
 
                     <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
@@ -919,6 +925,9 @@
                         .catch((error) => {
                             this.loading = false;
                             this.error = true;
+                            window.setTimeout(() => {
+                                this.$router.push('login');
+                            }, 1000)
                         })
                 }
             },
@@ -1700,8 +1709,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://gredunov.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://gredunov.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
