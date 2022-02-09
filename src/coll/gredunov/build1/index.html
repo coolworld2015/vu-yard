@@ -32,14 +32,18 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 
 
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://unpkg.com/vue-material"></script>
+    <link rel="stylesheet"
+          href="css.css">
+    <link rel="stylesheet" href="vue-material.min.css">
+    <link rel="stylesheet" href="default.css">
+    <script src="vue.js"></script>
+    <script src="vue-material.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.0.3/vue-resource.min.js"></script>
-    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script src="vue-resource.min.js"></script>
+    <script src="vue-router.js"></script>
 
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="axios.min.js"></script>
+    <script src="moment.min.js"></script>
 </head>
 
 <style>
@@ -399,7 +403,7 @@
                     .then(result => {
                         this.count = result.data.length;
 
-                        this.items = [].concat(result.data.sort(this.sort).splice(0, 500));
+                        this.items = [].concat(result.data.sort(this.sort).slice(1099, 1300));
                         this.filteredItems = [].concat(result.data.sort(this.sort));
 
                         this.searched = this.items;
