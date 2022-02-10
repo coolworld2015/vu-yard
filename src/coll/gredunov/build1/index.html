@@ -167,6 +167,7 @@
 <script>
     const appConfig = new Vue();
     appConfig.login = false;
+    appConfig.allRecords = false;
 
     const Login = {template: '<login></login>'};
 
@@ -321,6 +322,10 @@
 				  <h1 class="md-title">Items ({{ searched.length }}/{{count}})</h1>
 				</div>
 
+                 <div style="position: absolute; z-index: 11; left: 250px; top: 15px;">
+                     <md-checkbox v-model="allRecords" v-on:change="allRecordsClick">All records</md-checkbox>
+                </div>
+
 				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
 				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
 				  <md-button class="md-primary" v-on:click="onSearch('name')" style="margin-right: 20px;">Search</md-button>
@@ -355,11 +360,13 @@
             searched: [],
             loading: true,
             byName: true,
+            allRecords: true,
             count: 0,
 
         }),
         created() {
             this.getItems();
+            this.allRecords = JSON.parse(localStorage.getItem('all_records'));
             this.searched = this.items;
             appConfig.$emit('login', {});
         },
@@ -384,7 +391,9 @@
                         this.loading = false;
                         setTimeout(() => {
                             //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
-                            this.getItemsAll();
+                            if (this.allRecords === true) {
+                                this.getItemsAll();
+                            }
                         }, 100)
                     })
                     .catch(error => {
@@ -403,7 +412,7 @@
                     .then(result => {
                         this.count = result.data.length;
 
-                        this.items = [].concat(result.data.sort(this.sort).slice(1099, 1300));
+                        this.items = [].concat(result.data.sort(this.sort).slice(1299, 2000));
                         this.filteredItems = [].concat(result.data.sort(this.sort));
 
                         this.searched = this.items;
@@ -415,6 +424,14 @@
                     .catch(error => {
                         this.$router.push('login');
                     });
+            },
+            allRecordsClick() {
+                if (this.allRecords === true) {
+                    localStorage.setItem('all_records', 'true');
+                } else {
+                    localStorage.setItem('all_records', 'false');
+                }
+                this.getItems()
             },
             onSearch(name) {
                 this.loading = true;
