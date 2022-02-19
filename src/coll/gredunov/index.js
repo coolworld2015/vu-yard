@@ -397,7 +397,7 @@ const server = express()
                     const collection = client.db("forpost").collection("audit")
                     console.log(" Mongoose is connected ")
 
-                    collection.find({}).toArray(function(err, result) {
+                    collection.find({}).sort({ id: -1}).toArray(function(err, result) {
                         if (!err) {
                             console.log('length - ', result.length);
                             client.close();

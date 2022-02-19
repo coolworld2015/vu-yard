@@ -75,7 +75,7 @@
                             <span class="md-list-item-text" style="color: white">Table Photos</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
-
+<!--
                         <md-divider style="background: white"></md-divider>
                         <md-list-item to="/table" style="color: white">
                             <md-icon style="color: white">contact_phone</md-icon>
@@ -87,7 +87,7 @@
                             <md-icon style="color: white">camera_alt</md-icon>
                             <span class="md-list-item-text" style="color: white">Pictures</span>
                         </md-list-item>
-                        <md-divider style="background: white"></md-divider>
+                        <md-divider style="background: white"></md-divider>-->
 
                         <md-list-item to="/users-items" style="color: white">
                             <md-icon style="color: white">people</md-icon>
@@ -322,9 +322,9 @@
 				  <h1 class="md-title">Items ({{ searched.length }}/{{count}})</h1>
 				</div>
 
-                 <div style="position: absolute; z-index: 11; left: 250px; top: 15px;">
+<!--                <div style="position: absolute; z-index: 11; left: 250px; top: 15px;">
                      <md-checkbox v-model="allRecords" v-on:change="allRecordsClick">All records</md-checkbox>
-                </div>
+                </div>-->
 
 				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
 				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
@@ -412,7 +412,8 @@
                     .then(result => {
                         this.count = result.data.length;
 
-                        this.items = [].concat(result.data.sort(this.sort).slice(1299, 2000));
+                        //this.items = [].concat(result.data.sort(this.sort).slice(1590, 2000));
+                        this.items = [].concat(result.data.sort(this.sort));
                         this.filteredItems = [].concat(result.data.sort(this.sort));
 
                         this.searched = this.items;
@@ -1730,8 +1731,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            //appConfig.url = 'https://gredunov.herokuapp.com/';
-            appConfig.url = 'http://localhost:3000/';
+            appConfig.url = 'https://gredunov.herokuapp.com/';
+            //appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
