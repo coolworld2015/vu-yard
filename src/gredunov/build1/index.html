@@ -32,18 +32,17 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 
 
-    <link rel="stylesheet"
-          href="css.css">
-    <link rel="stylesheet" href="vue-material.min.css">
-    <link rel="stylesheet" href="default.css">
-    <script src="vue.js"></script>
-    <script src="vue-material.min.js"></script>
+    <link rel="stylesheet" href="./lib/css.css">
+    <link rel="stylesheet" href="./lib/vue-material.min.css">
+    <link rel="stylesheet" href="./lib/default.css">
+    <script src="./lib/vue.js"></script>
+    <script src="./lib/vue-material.min.js"></script>
 
-    <script src="vue-resource.min.js"></script>
-    <script src="vue-router.js"></script>
+    <script src="./lib/vue-resource.min.js"></script>
+    <script src="./lib/vue-router.js"></script>
 
-    <script src="axios.min.js"></script>
-    <script src="moment.min.js"></script>
+    <script src="./lib/axios.min.js"></script>
+    <script src="./lib/moment.min.js"></script>
 </head>
 
 <style>
@@ -319,7 +318,7 @@
 			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
 			  <md-table-toolbar>
 				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Items ({{ searched.length }}/{{count}})</h1>
+				  <h1 class="md-title">Items ({{ searched.length }})</h1>
 				</div>
 
 <!--                <div style="position: absolute; z-index: 11; left: 250px; top: 15px;">
@@ -354,7 +353,7 @@
         data: () => ({
             items: [],
             filteredItems: [],
-            recordsCount: 100,
+            recordsCount: 20,
             positionY: 0,
             search: null,
             searched: [],
@@ -384,17 +383,17 @@
                     .then(result => {
                         this.count = result.data.length;
 
-                        this.items = [].concat(result.data.sort(this.sort).splice(0, 100));
-                        this.filteredItems = [].concat(result.data.sort(this.sort));
+                        this.items = [].concat(result.data);
+                        this.filteredItems = [].concat(result.data);
 
                         this.searched = this.items;
                         this.loading = false;
                         setTimeout(() => {
-                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
+                            document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll);
                             if (this.allRecords === true) {
                                 this.getItemsAll();
                             }
-                        }, 100)
+                        }, 2000)
                     })
                     .catch(error => {
                         this.$router.push('login');
@@ -473,14 +472,27 @@
                 let items, positionY, recordsCount;
                 recordsCount = this.recordsCount;
                 positionY = this.positionY;
+                console.log('recordsCount - ', recordsCount);
                 console.log('position - ', position);
-                console.log('items - ', this.items.length);
-                items = [].concat(this.filteredItems.slice(0, recordsCount));
+
                 if (position > positionY) {
-                    this.items = [].concat(items.sort(this.sort));
-                    this.searched = [].concat(items.sort(this.sort));
-                    this.recordsCount = recordsCount + 100;
-                    this.positionY = positionY + 5000;
+                    this.recordsCount = recordsCount + 20;
+                    this.positionY = positionY + 1200;
+
+                    this.$http.get(appConfig.url + 'api/items/chunk/' + recordsCount)
+                        .then(result => {
+                            this.count = result.data.length;
+
+                            this.items = this.items.concat(result.data);
+                            this.filteredItems = this.filteredItems.concat(result.data);
+
+                            this.searched = this.items;
+                            this.loading = false;
+
+                        })
+                        .catch(error => {
+                            this.$router.push('login');
+                        });
                 }
             },
             searchOnTable() {
@@ -1731,8 +1743,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://gredunov.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://gredunov.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');

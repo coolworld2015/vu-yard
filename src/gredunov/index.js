@@ -107,6 +107,27 @@ const server = express()
         });
     })
 
+    .get('/api/items/chunk/:chunk', function (req, res) {
+        client.connect(err => {
+            const collection = client.db("forpost").collection("items");
+            const start = parseInt(req.params.chunk);
+            console.log(" Mongoose is connected with chunk - ", start);
+
+            collection.find({}).skip(start).limit(20).sort({'_id': -1}).toArray(function(err, result) {
+                if (!err) {
+                    console.log('length - ', result.length);
+                    //client.close();
+                    return res.send(result);
+                } else {
+                    console.log('err - ', err);
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            });
+
+        });
+    })
+
     .get('/api/items/getall', function (req, res) {
         client.connect(err => {
             const collection = client.db("forpost").collection("items")
