@@ -402,7 +402,7 @@
                             if (this.allRecords === true) {
                                 this.getItemsAll();
                             }
-                        }, 2000)
+                        }, 1000)
                     })
                     .catch(error => {
                         this.$router.push('login');
@@ -550,6 +550,11 @@
                   <md-card class="md-layout-item md-size-100 md-small-size-50">
                     <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
                       <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
+                        <div style="float: right; height: 0px;" v-on:click="favoriteOnClick">
+                            <md-avatar class="md-avatar-icon " :class="{'md-accent':favorite}" style="margin-right: 10px;top: -38px;">
+                                <md-icon>favorite</md-icon>
+                            </md-avatar>
+                        </div>
                     </md-card-header>
 
                     <md-card-content style="padding-bottom: 0px;">
@@ -683,7 +688,8 @@
             loading: false,
             error: false,
             snackbar: true,
-            dialog: false
+            dialog: false,
+            favorite: false
         }),
         created() {
             if (!appConfig.item) {
@@ -831,6 +837,10 @@
                         this.loading = false;
                         this.error = true;
                     })
+            },
+            favoriteOnClick() {
+                this.favorite ? this.favorite = false: this.favorite = true;
+                console.log(this.favorite)
             },
             back() {
                 this.$router.push('/collection-items');
