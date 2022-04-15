@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 const PORT = process.env.PORT || 3000;
 
 const { MongoClient } = require('mongodb');
-const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/for1post?retryWrites=true&w=majority";
+const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net";
 //const uri = "mongodb://localhost:27017/forpost";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -239,10 +239,10 @@ const server = express()
 
             console.log("favorites ", favorites);
 
-            collection.find({'_id' : {$in : favorites}}).sort({'_id': -1}).toArray(function(err, result) {
+            collection.find({id : {$in : favorites}}).sort({'_id': -1}).toArray(function(err, result) {
                 if (!err) {
                     console.log('length - ', result.length);
-                    client.close();
+                    //client.close();
                     return res.send(result);
                 } else {
                     res.statusCode = 500;
@@ -254,7 +254,7 @@ const server = express()
     })
 
     .post('/api/items/add', function (req, res) {
-        var agent = req.body.authorization;
+        let agent = req.body.authorization;
 
         jwt.verify(agent, secret, function (err, decoded) {
             if (err) {
