@@ -31,21 +31,21 @@ const server = express()
 
     .post('/api/login', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("users")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("users");
+            console.log(" Mongoose is connected ");
 
             collection.findOne({name: req.body.name}, function(err, user) {
-                console.log('UsersModel ', user)
+                console.log('UsersModel ', user);
                 if (err) {
                     res.send({error: err.message});
                 }
 
                 if (user) {
-                    if (user.pass == req.body.pass) {
+                    if (user.pass === req.body.pass) {
 
                         // Audit start
-                        const audit = client.db("forpost").collection("audit")
-                        console.log(" Mongoose is connected ", audit)
+                        const audit = client.db("forpost").collection("audit");
+                        console.log(" Mongoose is connected ", audit);
 
                         var d = new Date();
                         d.setHours(d.getHours() + 2);
@@ -90,8 +90,8 @@ const server = express()
 //------------------------------------------------------------------------
     .get('/api/items/get', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("items")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("items");
+            console.log(" Mongoose is connected ");
 
             collection.find({}).sort({'_id': -1}).limit(20).toArray(function(err, result) {
                 if (!err) {
@@ -130,8 +130,8 @@ const server = express()
 
     .get('/api/items/getall', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("items")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("items");
+            console.log(" Mongoose is connected ");
 
             collection.find({}).sort({'_id': -1}).toArray(function(err, result) {
                 if (!err) {
@@ -149,8 +149,8 @@ const server = express()
 
     .get('/api/pic/get', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("items")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("items");
+            console.log(" Mongoose is connected ");
 
             collection.find({}).sort({'_id': -1}).limit(20).toArray(function(err, result) {
                 if (!err) {
@@ -169,8 +169,8 @@ const server = express()
 
     .get('/api/pic/getall', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("items")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("items");
+            console.log(" Mongoose is connected ");
 
             collection.find({}).sort({'_id': -1}).toArray(function(err, result) {
                 if (!err) {
@@ -189,8 +189,8 @@ const server = express()
 
     .get('/api/items/findByName/:name', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("items")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("items");
+            console.log(" Mongoose is connected ");
 
             collection.find({"name": new RegExp(req.params.name, 'i')}).sort({'_id': -1}).toArray(function(err, result) {
                 if (!err) {
@@ -208,8 +208,8 @@ const server = express()
 
     .post('/api/items/update', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("items")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("items");
+            console.log(" Mongoose is connected ");
 
             collection.updateOne({id: req.body.id}, { $set : {
                     pic: req.body.pic,
@@ -232,6 +232,27 @@ const server = express()
         });
     })
 
+    .post('/api/favorites/post', function (req, res) {
+        client.connect(err => {
+            const collection = client.db("forpost").collection("items");
+            let favorites = req.body.favorites.split(',');
+
+            console.log("favorites ", favorites);
+
+            collection.find({'_id' : {$in : favorites}}).sort({'_id': -1}).toArray(function(err, result) {
+                if (!err) {
+                    console.log('length - ', result.length);
+                    client.close();
+                    return res.send(result);
+                } else {
+                    res.statusCode = 500;
+                    return res.send({error: 'Server error'});
+                }
+            });
+
+        });
+    })
+
     .post('/api/items/add', function (req, res) {
         var agent = req.body.authorization;
 
@@ -243,8 +264,8 @@ const server = express()
                 });
             } else {
                 client.connect(err => {
-                    const collection = client.db("forpost").collection("items")
-                    console.log(" Mongoose is connected ")
+                    const collection = client.db("forpost").collection("items");
+                    console.log(" Mongoose is connected ");
 
                     collection.insertOne({
                         id: req.body.id,
@@ -278,8 +299,8 @@ const server = express()
                 });
             } else {
                 client.connect(err => {
-                    const collection = client.db("forpost").collection("items")
-                    console.log(" Mongoose is connected ")
+                    const collection = client.db("forpost").collection("items");
+                    console.log(" Mongoose is connected ");
 
                     collection.deleteOne({
                         "id": req.body.id
@@ -300,8 +321,8 @@ const server = express()
 //------------------------------------------------------------------------
     .get('/api/users/get', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("users")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("users");
+            console.log(" Mongoose is connected ");
 
             collection.find({}).sort({'_name': -1}).toArray(function(err, result) {
                 if (!err) {
@@ -328,8 +349,8 @@ const server = express()
                 });
             } else {
                 client.connect(err => {
-                    const collection = client.db("forpost").collection("users")
-                    console.log(" Mongoose is connected ")
+                    const collection = client.db("forpost").collection("users");
+                    console.log(" Mongoose is connected ");
 
                     collection.insertOne({
                             id: req.body.id,
@@ -352,8 +373,8 @@ const server = express()
 
     .post('/api/users/update', function (req, res) {
         client.connect(err => {
-            const collection = client.db("forpost").collection("users")
-            console.log(" Mongoose is connected ")
+            const collection = client.db("forpost").collection("users");
+            console.log(" Mongoose is connected ");
 
             collection.updateOne({id: req.body.id}, { $set : {
                     name: req.body.name,
@@ -384,8 +405,8 @@ const server = express()
                 });
             } else {
                 client.connect(err => {
-                    const collection = client.db("forpost").collection("users")
-                    console.log(" Mongoose is connected ")
+                    const collection = client.db("forpost").collection("users");
+                    console.log(" Mongoose is connected ");
 
                     collection.deleteOne({
                             "id": req.body.id
@@ -415,8 +436,8 @@ const server = express()
                 });
             } else {
                 client.connect(err => {
-                    const collection = client.db("forpost").collection("audit")
-                    console.log(" Mongoose is connected ")
+                    const collection = client.db("forpost").collection("audit");
+                    console.log(" Mongoose is connected ");
 
                     collection.find({}).sort({ id: -1}).toArray(function(err, result) {
                         if (!err) {
