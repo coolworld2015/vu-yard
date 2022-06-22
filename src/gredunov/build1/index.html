@@ -299,12 +299,17 @@
                         description: 'Web'
                     })
                         .then(result => {
-                            appConfig.access_token = result.body.token;
-                            localStorage.setItem('access_token', result.body.token);
-                            this.loading = false;
-                            this.error = false;
-                            //this.$router.push('phones-items');
-                            this.$router.push('collection-items');
+                            console.log('result - ', result.body);
+                            if (result.body.error) {
+                                this.loading = false;
+                                this.error = true;
+                            } else {
+                                appConfig.access_token = result.body.token;
+                                localStorage.setItem('access_token', result.body.token);
+                                this.loading = false;
+                                this.error = false;
+                                this.$router.push('collection-items');
+                            }
                         })
                         .catch((error) => {
                             this.loading = false;
@@ -2018,8 +2023,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://gredunov.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            //appConfig.url = 'https://gredunov.herokuapp.com/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
