@@ -5,8 +5,8 @@ const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 3000;
 
 const {MongoClient} = require('mongodb');
-const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net";
-//const uri = "mongodb://localhost:27017/forpost";
+//const uri = "mongodb+srv://admin:1314@coolworld.obhth.mongodb.net";
+const uri = "mongodb://localhost:27017/forpost";
 const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
 //------------------------------------------------------------------------
