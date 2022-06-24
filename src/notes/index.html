@@ -302,7 +302,6 @@
                         </div>
 
 
-
                         <div class="md-layout-item md-small-size-100">
                           <ul>
                             <li v-for="item in form.todo">
@@ -314,6 +313,8 @@
                         </ul>
                         </div>
 
+                        <md-field :class="messageClassDescription">
+                        </md-field>
 
                         <div style="text-align: right; margin-top: 40px;">
                             <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
@@ -334,7 +335,7 @@
                           @md-confirm="onDelete" />
 
                     <md-card-actions style="margin: 20px;">
-                      <md-button class="md-raised md-primary" v-on:click1="onItemEdit" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onItemEdit" :disabled="loading">Submit</md-button>
                       <md-button class="md-raised md-primary" v-on:click="onDeleteDialog" :disabled="loading">Delete</md-button>
                       <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
                     </md-card-actions>
@@ -356,6 +357,7 @@
                 description: null,
                 pic: '1',
                 placeholder: null,
+                todo: []
             },
             pictures: [],
             hasMessagesName: false,
@@ -375,7 +377,7 @@
         }),
         created() {
             if (!appConfig.item) {
-                this.$router.push('/collection-items');
+                this.$router.push('/notes');
             } else {
                 this.init();
             }
@@ -428,76 +430,30 @@
                     this.userSaved = false;
                 }, 2000);
             },
-            onSelectFile(event) {
-                let arr = [];
-                if (window.File && window.FileList && window.FileReader) {
-
-                    let files = event.target.files;
-
-                    for (let i = 0; i < files.length; i++) {
-                        let file = files[i];
-                        if (!file.type.match('image')) continue;
-
-                        let picReader = new FileReader();
-                        picReader.addEventListener("load", function (event) {
-                            let picFile = event.target;
-                            arr.push(picFile.result);
-                        });
-                        picReader.readAsDataURL(file);
-                    }
-                } else {
-                    console.log("Your browser does not support File API");
-                }
-                window.setTimeout(() => {
-                    this.pictures = [].concat(arr);
-                    this.form.pic = this.pictures[0];
-                }, 100);
-
-            },
             onItemEdit() {
                 if (!this.form.name) {
                     this.hasMessagesName = true;
                 }
 
-                if (!this.form.category) {
-                    this.hasMessagesСategory = true;
-                }
-
-                if (!this.form.group) {
-                    this.hasMessagesGroup = true;
-                }
-
-                if (!this.form.description) {
-                    this.hasMessagesDescription = true;
-                }
-
-                if (!this.form.pic) {
-                    this.hasMessagesPhoto = true;
-                }
-
-                if (this.form.name && this.form.category && this.form.group && this.form.description) {
-                    this.loading = true;
+                if (this.form.name) {
+                    //this.loading = true;
                     this.error = false;
+                    console.log(this.form.todo);
 
-                    this.$http.post(appConfig.url + 'api/items/update', {
-                        id: this.form.id,
-                        name: this.form.name,
-                        category: this.form.category,
-                        group: this.form.group,
-                        description: this.form.description,
-                        pictures: this.pictures,
-                        pic: this.pictures[0],
-                        authorization: appConfig.access_token,
-                    })
-                        .then(result => {
-                            this.loading = false;
-                            this.error = false;
-                            this.$router.push('collection-items');
-                        })
-                        .catch((error) => {
-                            this.loading = false;
-                            this.error = true;
-                        })
+                    const updatedNote = {
+                        'id': this.form.id,
+                        'name': this.form.name,
+                        'todo': this.form.todo,
+                    };
+
+                    this.notes = this.notes.filter(note => {
+                        return note.id !== this.form.id;
+                    });
+
+                    this.notes.push(updatedNote);
+                    console.log('this.notes - ', this.notes);
+                    localStorage.setItem('notes', JSON.stringify(this.notes));
+                    this.$router.push('/notes');
                 }
             },
             onDeleteDialog() {
@@ -517,7 +473,7 @@
                 this.$router.push('/notes');
             },
             back() {
-                this.$router.push('/collection-items');
+                this.$router.push('/notes');
             },
         }
     });
@@ -690,8 +646,8 @@
             </md-empty-state>
 
 			<md-list v-if="!loading" class="md-triple-line" v-for="item in searched" v-bind:key="item.id" style="background: rgb(238, 238, 238);">
-			  <md-list-item style="background: rgb(238, 238, 238);">
-                  <md-card md-with-hover style="width: 50%; margin: auto;">
+			  <md-list-item style1="background: rgb(238, 238, 238);" v-on:click1="showDetails(item)">
+                  <md-card md-with-hover style="width: 50%; margin: auto;" >
                         <md-card-header>
                           <div class="md-title">{{item.name}}</div>
                           <div class="md-subhead">{{item.category}}</div>
@@ -703,7 +659,7 @@
                                 max-width: 600px;
                                 border-left:1em solid transparent;
                                 border-right:1em solid transparent;
-                                text-overflow: ellipsis;">
+                                text-overflow: ellipsis;" v-on:click="showDetails(item)">
                             <div class="md-layout-item md-small-size-200">
                               <ul>
                                 <li v-for="item in item.todo">
@@ -771,6 +727,11 @@
             },
             toLower(text) {
                 return text.toString().toLowerCase()
+            },
+            showDetails(item) {
+                console.log('item', item)
+                appConfig.item = item;
+                this.$router.push('/note-edit');
             },
             onPhotoClick(pic) {
                 let w = window.open('about:blank');
