@@ -149,8 +149,6 @@
     const NoteAdd = {template: '<note-add></note-add>'};
     const NoteEdit = {template: '<note-edit></note-edit>'};
 
-    const Favorites = {template: '<favorites-items></favorites-items>'};
-
     const Pictures = {
         template: `
         <div>
@@ -158,8 +156,7 @@
                 <pictures-items></pictures-items>
             </div>
         </div>
-    `
-    };
+    `};
 
     Vue.component('notes', {
         template: `
@@ -189,7 +186,6 @@
 			  </md-table-empty-state>
 
 			    <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-				<md-table-cell md-label="ID" md-sort-by="id">{{ item.id }}</md-table-cell>
 				<md-table-cell md-label="Title" md-sort-by="name">{{ item.name }}</md-table-cell>
 				<md-table-cell md-label="ToDO">
 				<ul>
@@ -226,16 +222,16 @@
         },
         methods: {
             getNotes() {
-                var retrievedObject = JSON.parse(localStorage.getItem('testObject'));
+                const notes = JSON.parse(localStorage.getItem('notes'));
 
-                console.log('retrievedObject: ', retrievedObject);
+                console.log('notes: ', notes);
 
-                this.count = retrievedObject.length;
+                this.count = notes.length;
 
-                this.items = [].concat(retrievedObject);
-                this.filteredItems = [].concat(retrievedObject);
+                this.items = [].concat(notes);
+                this.filteredItems = [].concat(notes);
             },
-            getItems() {
+/*            getItems() {
                 this.$http.get(appConfig.url + 'api/items/get')
                     .then(result => {
                         this.count = result.data.length;
@@ -255,104 +251,9 @@
                     .catch(error => {
                         this.$router.push('login');
                     });
-            },
-            getItemsAll() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                this.$http.get(appConfig.url + 'api/items/getall')
-                    .then(result => {
-                        this.count = result.data.length;
-
-                        //this.items = [].concat(result.data.sort(this.sort).slice(1590, 2000));
-                        this.items = [].concat(result.data.sort(this.sort));
-                        this.filteredItems = [].concat(result.data.sort(this.sort));
-
-                        this.searched = this.items;
-                        this.loading = false;
-                        setTimeout(() => {
-                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
-                        }, 100)
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },
-            allRecordsClick() {
-                if (this.allRecords === true) {
-                    localStorage.setItem('all_records', 'true');
-                } else {
-                    localStorage.setItem('all_records', 'false');
-                }
-                this.getItems()
-            },
-            onSearch(name) {
-                this.loading = true;
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                if (this.search !== null && this.search !== "") {
-                    this.loading = true;
-                    let url;
-
-                    if (name === 'name') {
-                        url = 'api/items/findByName/'
-                    } else {
-                        url = 'api/items/findByPhone/'
-                    }
-
-                    this.$http.get(appConfig.url + url + this.search, {headers: {'Authorization': appConfig.access_token}})
-                        .then(result => {
-                            this.items = result.data;
-                            this.filteredItems = [].concat(result.data.sort(this.sort));
-                            this.searched = this.items;
-                            this.loading = false;
-                        })
-                        .catch(error => {
-                            this.$router.push('login');
-                        });
-                }
-            },
+            },*/
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
-            },
-            handleScroll() {
-                if (!this.searchCheck) {
-                    let position = document.querySelector('.md-table-content').scrollTop;
-                    let items, positionY, recordsCount;
-                    recordsCount = this.recordsCount;
-                    positionY = this.positionY;
-                    console.log('recordsCount - ', recordsCount);
-                    console.log('position - ', position);
-
-                    if (position > positionY) {
-                        this.recordsCount = recordsCount + 20;
-                        this.positionY = positionY + 1200;
-
-                        this.$http.get(appConfig.url + 'api/items/chunk/' + recordsCount)
-                            .then(result => {
-                                this.count = result.data.length;
-
-                                this.items = this.items.concat(result.data);
-                                this.filteredItems = this.filteredItems.concat(result.data);
-
-                                this.searched = this.items;
-                                this.loading = false;
-
-                            })
-                            .catch(error => {
-                                this.$router.push('login');
-                            });
-                    }
-                }
             },
             searchOnTable() {
                 if (this.search) {
@@ -366,15 +267,6 @@
             searchByName(items, term) {
                 if (term) {
                     return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
-                }
-                return items
-            },
-            searchOnTablePhone() {
-                this.searched = this.searchByPhone(this.filteredItems, this.search)
-            },
-            searchByPhone(items, term) {
-                if (term) {
-                    return items.filter(item => this.toLower(item.phone).includes(this.toLower(term)))
                 }
                 return items
             },
@@ -388,620 +280,6 @@
             addItem() {
                 appConfig.item = null;
                 this.$router.push('/note-add');
-            },
-        }
-    });
-
-    Vue.component('note-add', {
-        template: `
-		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
-                <form class="md-layout">
-                  <md-card class="md-layout-item md-size-100 md-small-size-50">
-                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
-                      <div class="md-title" style="font-weight: bold;">Add item</div>
-                    </md-card-header>
-
-                    <md-card-content style="padding-bottom: 0px;">
-
-                        <md-field :class="messageClassName">
-                            <label>Name</label>
-                            <md-input v-model="form.name" required v-on:keypress="hasMessagesName=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <md-field :class="messageClassPassword">
-                            <label>Category</label>
-                            <md-input v-model="form.category" required v-on:keypress="hasMessagesPassword=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <md-field :class="messageClassPassword">
-                            <label>Group</label>
-                            <md-input v-model="form.group" required v-on:keypress="hasMessagesPassword=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <md-field :class="messageClassDescription">
-                            <label>Description</label>
-                            <md-input v-model="form.description" required v-on:keypress="hasMessagesDescription=false" :disabled="loading"></md-input>
-                            <span class="md-error">Value is requred</span>
-                        </md-field>
-
-                        <div style="text-align: right; margin-top: 40px;">
-                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
-                                Something went wrong
-                            </span>
-                        </div>
-                    </md-card-content>
-
-                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
-
-                    <md-card-actions style="margin: 20px;">
-                      <md-button class="md-raised md-primary" v-on:click="onItemAdd" :disabled="loading">Submit</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="onClear" :disabled="loading">Clear</md-button>
-                      <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
-                    </md-card-actions>
-                  </md-card>
-
-                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
-                    The add form is shown!
-                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
-                  </md-snackbar>
-            </form>
-  		</div>`,
-        data: () => ({
-            form: {
-                title: null,
-                id: null,
-                name: null,
-                category: null,
-                group: null,
-                description: null,
-            },
-            hasMessagesName: false,
-            hasMessagesPassword: false,
-            hasMessagesDescription: false,
-            snackbar: true,
-            loading: false,
-            error: false,
-            dialog: false
-        }),
-        created() {
-            this.init();
-        },
-        computed: {
-            messageClassName() {
-                return {
-                    'md-invalid': this.hasMessagesName
-                }
-            },
-            messageClassPassword() {
-                return {
-                    'md-invalid': this.hasMessagesPassword
-                }
-            },
-            messageClassDescription() {
-                return {
-                    'md-invalid': this.hasMessagesDescription
-                }
-            }
-        },
-        methods: {
-            init() {
-                appConfig.getAccessToken();
-                window.setTimeout(() => {
-                    this.snackbar = false;
-                }, 2000)
-            },
-            onItemAdd() {
-                if (!this.form.name) {
-                    this.hasMessagesName = true;
-                }
-
-                if (!this.form.category) {
-                    this.hasMessagesPassword = true;
-                }
-
-                if (!this.form.group) {
-                    this.hasMessagesPassword = true;
-                }
-
-                if (!this.form.description) {
-                    this.hasMessagesDescription = true;
-                }
-
-                if (this.form.name && this.form.category && this.form.group && this.form.description) {
-                    this.loading = true;
-                    this.error = false;
-
-                    this.$http.post(appConfig.url + 'api/items/add', {
-                        id: (+new Date).toString(),
-                        name: this.form.name,
-                        pic: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBwRXhpZgAATU0AKgAAAAgABAEGAAMAAAABAAIAAAESAAMAAAABAAEAAAEoAAMAAAABAAIAAIdpAAQAAAABAAAAPgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAW6ADAAQAAAABAAAAWAAAAAD/4QkhaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PiA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJYTVAgQ29yZSA2LjAuMCI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiLz4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8P3hwYWNrZXQgZW5kPSJ3Ij8+AP/AABEIAFgAWwMBEQACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy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',
-                        category: this.form.category,
-                        group: this.form.group,
-                        description: this.form.description,
-                        authorization: appConfig.access_token,
-                    })
-                        .then(result => {
-                            this.loading = false;
-                            this.error = false;
-                            this.$router.push('collection-items');
-                        })
-                        .catch((error) => {
-                            this.loading = false;
-                            this.error = true;
-                            window.setTimeout(() => {
-                                this.$router.push('login');
-                            }, 1000)
-                        })
-                }
-            },
-            onBack() {
-                this.$router.push('/collection-items');
-            },
-            onClear() {
-                this.form.name = '';
-                this.hasMessagesName = false;
-                this.form.pass = '';
-                this.hasMessagesPassword = false;
-                this.form.description = '';
-                this.hasMessagesDescription = false;
-                this.error = false;
-            },
-        }
-    });
-
-    Vue.component('favorites-items', {
-        template: `
-		  <div>
-		    <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
-              <md-speed-dial-target v-on:click="addItem">
-                <md-icon>add</md-icon>
-              </md-speed-dial-target>
-            </md-speed-dial>
-
-			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
-			  <md-table-toolbar>
-				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Favorites ({{ searched.length }})</h1>
-				</div>
-
-<!--                <div style="position: absolute; z-index: 11; left: 250px; top: 15px;">
-                     <md-checkbox v-model="allRecords" v-on:change="allRecordsClick">All records</md-checkbox>
-                </div>-->
-
-				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
-				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
-				  <md-button class="md-primary" v-on:click="onSearch('name')" style="margin-right: 20px;">Search</md-button>
-				</md-field>
-
-			  </md-table-toolbar>
-              <div style="display: none">{{ searched.length }}</div>
-
-			  <md-table-empty-state>
-			    <div v-if="!loading"> No items</div>
-			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
-			  </md-table-empty-state>
-
-			    <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-			    <md-table-cell md-label="Pic" md-sort-by="pic">
-			        <md-avatar class="md-large" style1="width: 126px;height: 115px;">
-				        <img :src="item.pic" alt="N">
-				    </md-avatar>
-				</md-table-cell>
-				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-				<md-table-cell md-label="Category" md-sort-by="category">{{ item.category }}</md-table-cell>
-				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
-			  </md-table-row>
-			</md-table>
-  		</div>`,
-        data: () => ({
-            items: [],
-            filteredItems: [],
-            recordsCount: 20,
-            positionY: 0,
-            search: null,
-            searched: [],
-            loading: true,
-            byName: true,
-            allRecords: true,
-            count: 0,
-            searchCheck: false
-        }),
-        created() {
-            this.getItems();
-            this.allRecords = JSON.parse(localStorage.getItem('all_records'));
-            this.searched = this.items;
-            appConfig.$emit('login', {});
-        },
-        methods: {
-            getItems() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                let favorites = localStorage.getItem('favorites');
-
-                this.$http.post(appConfig.url + 'api/favorites/post', {
-                    favorites
-                })
-                    .then(result => {
-                        this.count = result.data.length;
-
-                        this.items = [].concat(result.data);
-                        this.filteredItems = [].concat(result.data);
-
-                        this.searched = this.items;
-                        this.loading = false;
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },
-            getItemsAll() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                this.$http.get(appConfig.url + 'api/items/getall')
-                    .then(result => {
-                        this.count = result.data.length;
-
-                        //this.items = [].concat(result.data.sort(this.sort).slice(1590, 2000));
-                        this.items = [].concat(result.data.sort(this.sort));
-                        this.filteredItems = [].concat(result.data.sort(this.sort));
-
-                        this.searched = this.items;
-                        this.loading = false;
-                        setTimeout(() => {
-                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
-                        }, 100)
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },
-            allRecordsClick() {
-                if (this.allRecords === true) {
-                    localStorage.setItem('all_records', 'true');
-                } else {
-                    localStorage.setItem('all_records', 'false');
-                }
-                this.getItems()
-            },
-            onSearch(name) {
-                this.loading = true;
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                if (this.search !== null && this.search !== "") {
-                    this.loading = true;
-                    let url;
-
-                    if (name === 'name') {
-                        url = 'api/items/findByName/'
-                    } else {
-                        url = 'api/items/findByPhone/'
-                    }
-
-                    this.$http.get(appConfig.url + url + this.search, {headers: {'Authorization': appConfig.access_token}})
-                        .then(result => {
-                            this.items = result.data;
-                            this.filteredItems = [].concat(result.data.sort(this.sort));
-                            this.searched = this.items;
-                            this.loading = false;
-                        })
-                        .catch(error => {
-                            this.$router.push('login');
-                        });
-                }
-            },
-            sort(a, b) {
-                return parseInt(b.id) - parseInt(a.id);
-            },
-            handleScroll() {
-                if (!this.searchCheck) {
-                    let position = document.querySelector('.md-table-content').scrollTop;
-                    let items, positionY, recordsCount;
-                    recordsCount = this.recordsCount;
-                    positionY = this.positionY;
-                    console.log('recordsCount - ', recordsCount);
-                    console.log('position - ', position);
-
-                    if (position > positionY) {
-                        this.recordsCount = recordsCount + 20;
-                        this.positionY = positionY + 1200;
-
-                        this.$http.get(appConfig.url + 'api/items/chunk/' + recordsCount)
-                            .then(result => {
-                                this.count = result.data.length;
-
-                                this.items = this.items.concat(result.data);
-                                this.filteredItems = this.filteredItems.concat(result.data);
-
-                                this.searched = this.items;
-                                this.loading = false;
-
-                            })
-                            .catch(error => {
-                                this.$router.push('login');
-                            });
-                    }
-                }
-            },
-            searchOnTable() {
-                if (this.search) {
-                    this.searchCheck = true;
-                } else {
-                    this.searchCheck = false;
-                }
-
-                this.searched = this.searchByName(this.items, this.search)
-            },
-            searchByName(items, term) {
-                if (term) {
-                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
-                }
-                return items
-            },
-            searchOnTablePhone() {
-                this.searched = this.searchByPhone(this.filteredItems, this.search)
-            },
-            searchByPhone(items, term) {
-                if (term) {
-                    return items.filter(item => this.toLower(item.phone).includes(this.toLower(term)))
-                }
-                return items
-            },
-            toLower(text) {
-                return text.toString().toLowerCase()
-            },
-            showDetails(item) {
-                appConfig.item = item;
-                this.$router.push('collection-edit');
-            },
-            addItem() {
-                appConfig.item = null;
-                this.$router.push('/collection-add');
-            },
-        }
-    });
-    Vue.component('collection-items', {
-        template: `
-		  <div>
-		    <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
-              <md-speed-dial-target v-on:click="addItem">
-                <md-icon>add</md-icon>
-              </md-speed-dial-target>
-            </md-speed-dial>
-
-			<md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
-			  <md-table-toolbar>
-				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Items ({{ searched.length }})</h1>
-				</div>
-
-<!--                <div style="position: absolute; z-index: 11; left: 250px; top: 15px;">
-                     <md-checkbox v-model="allRecords" v-on:change="allRecordsClick">All records</md-checkbox>
-                </div>-->
-
-				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
-				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
-				  <md-button class="md-primary" v-on:click="onSearch('name')" style="margin-right: 20px;">Search</md-button>
-				</md-field>
-
-			  </md-table-toolbar>
-              <div style="display: none">{{ searched.length }}</div>
-
-			  <md-table-empty-state>
-			    <div v-if="!loading"> No items</div>
-			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
-			  </md-table-empty-state>
-
-			    <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-			    <md-table-cell md-label="Pic" md-sort-by="pic">
-			        <md-avatar class="md-large" style1="width: 126px;height: 115px;">
-				        <img :src="item.pic" alt="N">
-				    </md-avatar>
-				</md-table-cell>
-				<md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-				<md-table-cell md-label="Category" md-sort-by="category">{{ item.category }}</md-table-cell>
-				<md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
-			  </md-table-row>
-			</md-table>
-  		</div>`,
-        data: () => ({
-            items: [],
-            filteredItems: [],
-            recordsCount: 20,
-            positionY: 0,
-            search: null,
-            searched: [],
-            loading: true,
-            byName: true,
-            allRecords: true,
-            count: 0,
-            searchCheck: false
-        }),
-        created() {
-            this.getItems();
-            this.allRecords = JSON.parse(localStorage.getItem('all_records'));
-            this.searched = this.items;
-            appConfig.$emit('login', {});
-        },
-        methods: {
-            getItems() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-
-                this.$http.get(appConfig.url + 'api/items/get')
-                    .then(result => {
-                        this.count = result.data.length;
-
-                        this.items = [].concat(result.data);
-                        this.filteredItems = [].concat(result.data);
-
-                        this.searched = this.items;
-                        this.loading = false;
-                        setTimeout(() => {
-                            document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll);
-                            if (this.allRecords === true) {
-                                this.getItemsAll();
-                            }
-                        }, 1000)
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },
-            getItemsAll() {
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                this.$http.get(appConfig.url + 'api/items/getall')
-                    .then(result => {
-                        this.count = result.data.length;
-
-                        //this.items = [].concat(result.data.sort(this.sort).slice(1590, 2000));
-                        this.items = [].concat(result.data.sort(this.sort));
-                        this.filteredItems = [].concat(result.data.sort(this.sort));
-
-                        this.searched = this.items;
-                        this.loading = false;
-                        setTimeout(() => {
-                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
-                        }, 100)
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },
-            allRecordsClick() {
-                if (this.allRecords === true) {
-                    localStorage.setItem('all_records', 'true');
-                } else {
-                    localStorage.setItem('all_records', 'false');
-                }
-                this.getItems()
-            },
-            onSearch(name) {
-                this.loading = true;
-                appConfig.getAccessToken();
-
-                if (!appConfig.access_token) {
-                    this.$router.push('login');
-                    return;
-                }
-
-                if (this.search !== null && this.search !== "") {
-                    this.loading = true;
-                    let url;
-
-                    if (name === 'name') {
-                        url = 'api/items/findByName/'
-                    } else {
-                        url = 'api/items/findByPhone/'
-                    }
-
-                    this.$http.get(appConfig.url + url + this.search, {headers: {'Authorization': appConfig.access_token}})
-                        .then(result => {
-                            this.items = result.data;
-                            this.filteredItems = [].concat(result.data.sort(this.sort));
-                            this.searched = this.items;
-                            this.loading = false;
-                        })
-                        .catch(error => {
-                            this.$router.push('login');
-                        });
-                }
-            },
-            sort(a, b) {
-                return parseInt(b.id) - parseInt(a.id);
-            },
-            handleScroll() {
-                if (!this.searchCheck) {
-                    let position = document.querySelector('.md-table-content').scrollTop;
-                    let items, positionY, recordsCount;
-                    recordsCount = this.recordsCount;
-                    positionY = this.positionY;
-                    console.log('recordsCount - ', recordsCount);
-                    console.log('position - ', position);
-
-                    if (position > positionY) {
-                        this.recordsCount = recordsCount + 20;
-                        this.positionY = positionY + 1200;
-
-                        this.$http.get(appConfig.url + 'api/items/chunk/' + recordsCount)
-                            .then(result => {
-                                this.count = result.data.length;
-
-                                this.items = this.items.concat(result.data);
-                                this.filteredItems = this.filteredItems.concat(result.data);
-
-                                this.searched = this.items;
-                                this.loading = false;
-
-                            })
-                            .catch(error => {
-                                this.$router.push('login');
-                            });
-                    }
-                }
-            },
-            searchOnTable() {
-                if (this.search) {
-                    this.searchCheck = true;
-                } else {
-                    this.searchCheck = false;
-                }
-
-                this.searched = this.searchByName(this.items, this.search)
-            },
-            searchByName(items, term) {
-                if (term) {
-                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
-                }
-                return items
-            },
-            searchOnTablePhone() {
-                this.searched = this.searchByPhone(this.filteredItems, this.search)
-            },
-            searchByPhone(items, term) {
-                if (term) {
-                    return items.filter(item => this.toLower(item.phone).includes(this.toLower(term)))
-                }
-                return items
-            },
-            toLower(text) {
-                return text.toString().toLowerCase()
-            },
-            showDetails(item) {
-                appConfig.item = item;
-                this.$router.push('collection-edit');
-            },
-            addItem() {
-                appConfig.item = null;
-                this.$router.push('/collection-add');
             },
         }
     });
@@ -1023,37 +301,19 @@
                           </md-field>
                         </div>
 
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field :class="messageClassСategory">
-                            <label for="category">Сategory</label>
-                            <md-input name="category" id="category" required v-on:keypress="hasMessagesСategory=false" autocomplete="category" v-model="form.category" :disabled1="true" />
-                            <span class="md-error">Value is requred</span>
-                          </md-field>
-                        </div>
+
 
                         <div class="md-layout-item md-small-size-100">
-                          <md-field :class="messageClassGroup">
-                            <label for="group">Group</label>
-                            <md-input name="group" id="group" required v-on:keypress="hasMessagesGroup=false" autocomplete="group" v-model="form.group" :disabled1="true" />
-                            <span class="md-error">Value is requred</span>
-                          </md-field>
+                          <ul>
+                            <li v-for="item in form.todo">
+                              {{ item.label }}
+                              <div>
+                                <input type="checkbox" v-model="item.done">
+                              </div>
+                            </li>
+                        </ul>
                         </div>
 
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field :class="messageClassDescription">
-                            <label for="description">Description</label>
-                            <md-input name="description" id="description" required v-on:keypress="hasMessagesDescription=false" autocomplete="description" v-model="form.description" :disabled="false" />
-                            <span class="md-error">Value is requred</span>
-                          </md-field>
-                        </div>
-
-                        <div class="md-layout-item md-small-size-100">
-                          <md-field :class="messageClassPhoto">
-                            <label for="pic">Photo</label>
-                            <md-file v-model="form.placeholder" id="picFileInput" v-on:click="hasMessagesPhoto=false" placeholder="Photo" @change="onSelectFile(form.placeholder)" multiple="multiple"/>
-                            <span class="md-error">Value is requred</span>
-                          </md-field>
-                        </div>
 
                         <div style="text-align: right; margin-top: 40px;">
                             <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
@@ -1074,7 +334,7 @@
                           @md-confirm="onDelete" />
 
                     <md-card-actions style="margin: 20px;">
-                      <md-button class="md-raised md-primary" v-on:click="onItemEdit" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click1="onItemEdit" :disabled="loading">Submit</md-button>
                       <md-button class="md-raised md-primary" v-on:click="onDeleteDialog" :disabled="loading">Delete</md-button>
                       <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
                     </md-card-actions>
@@ -1149,6 +409,8 @@
         },
         methods: {
             init() {
+                this.notes = JSON.parse(localStorage.getItem('notes'));
+
                 this.form = appConfig.item;
 
                 if (!appConfig.item.pictures) {
@@ -1238,62 +500,183 @@
                         })
                 }
             },
-            onPhotoClick() {
-                let w = window.open('about:blank');
-                let image = new Image();
-                image.src = this.form.pic;
-                setTimeout(function () {
-                    w.document.write(image.outerHTML);
-                }, 0);
-            },
             onDeleteDialog() {
                 this.dialog = true;
             },
             onDelete() {
-                this.$http.post(appConfig.url + 'api/items/delete', {
-                    id: this.form.id,
-                    authorization: appConfig.access_token,
-                })
-                    .then(result => {
-                        this.loading = false;
-                        this.error = false;
-                        this.$router.push('collection-items');
-                    })
-                    .catch((error) => {
-                        this.loading = false;
-                        this.error = true;
-                    })
-            },
-            favoriteOnClick() {
-                this.favorite ? this.favorite = false : this.favorite = true;
-                if (this.favorite) {
-                    console.log('this.favorites - ', this.favorites);
-                    this.favorites = this.favorites + (this.form.id) + ',';
-                    localStorage.setItem('favorites', this.favorites);
-                } else {
-                    this.favorites = this.favorites.replace(this.form.id + ',', '');
-                    localStorage.setItem('favorites', this.favorites);
-                }
-                console.log('this.favorites - ', this.favorites);
+                console.log(this.form.id);
+                console.log(this.notes);
 
+                this.notes = this.notes.filter(note => {
+                    return note.id !== this.form.id;
+                });
+
+                console.log(this.notes);
+                localStorage.setItem('notes', JSON.stringify(this.notes));
+
+                this.$router.push('/notes');
             },
             back() {
                 this.$router.push('/collection-items');
             },
         }
     });
+    Vue.component('note-add', {
+        template: `
+		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
+                <form class="md-layout">
+                  <md-card class="md-layout-item md-size-100 md-small-size-50">
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">New Note</div>
+                    </md-card-header>
 
+                    <md-card-content style="padding-bottom: 0px;">
+
+                        <md-field :class="messageClassName">
+                            <label>Title</label>
+                            <md-input v-model="form.name" required v-on:keypress="hasMessagesName=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassName">
+                            <div>
+                                <ul>
+                                    <li v-for="item in form.todo">
+                                      {{ item.label }}
+                                      <div>
+                                        <input type="checkbox" v-model="item.done">
+                                      </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassDescription">
+                            <label>Label</label>
+                            <md-input v-model="form.description" v-on:blur="todoAdd" v-on:keypress="hasMessagesDescription=false" :disabled="loading"></md-input>
+                        </md-field>
+
+                        <div style="text-align: right; margin-top: 40px;">
+                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
+                                Something went wrong
+                            </span>
+                        </div>
+                    </md-card-content>
+
+                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
+
+                    <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="onItemAdd" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onClear" :disabled="loading">Clear</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
+                    </md-card-actions>
+                  </md-card>
+
+                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
+                    The add form is shown!
+                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
+                  </md-snackbar>
+            </form>
+  		</div>`,
+        data: () => ({
+            form: {
+                title: null,
+                id: null,
+                name: null,
+                category: null,
+                group: null,
+                description: null,
+                todo: []
+            },
+            hasMessagesName: false,
+            hasMessagesPassword: false,
+            hasMessagesDescription: false,
+            snackbar: true,
+            loading: false,
+            error: false,
+            dialog: false
+        }),
+        created() {
+            this.init();
+            appConfig.$emit('login', {});
+        },
+        computed: {
+            messageClassName() {
+                return {
+                    'md-invalid': this.hasMessagesName
+                }
+            },
+            messageClassPassword() {
+                return {
+                    'md-invalid': this.hasMessagesPassword
+                }
+            },
+            messageClassDescription() {
+                return {
+                    'md-invalid': this.hasMessagesDescription
+                }
+            }
+        },
+        methods: {
+            init() {
+                this.notes = JSON.parse(localStorage.getItem('notes'));
+
+                window.setTimeout(() => {
+                    this.snackbar = false;
+                }, 2000)
+            },
+            todoAdd(event) {
+                console.log(event.target.value);
+                this.form.todo.push({'label': event.target.value, 'done': false});
+                this.form.description = '';
+            },
+            onItemAdd() {
+                if (!this.form.name) {
+                    this.hasMessagesName = true;
+                }
+
+                if (this.form.name) {
+                    this.loading = true;
+                    this.error = false;
+                    const newNote = {
+                        'id': +new Date(),
+                        'name': this.form.name,
+                        'todo': this.form.todo,
+                    };
+
+                    this.notes.push(newNote);
+                    console.log('this.notes - ', this.notes);
+                    localStorage.setItem('notes', JSON.stringify(this.notes));
+                    this.$router.push('/notes');
+                }
+            },
+            onBack() {
+                this.$router.push('/notes');
+            },
+            onClear() {
+                this.form.name = '';
+                this.hasMessagesName = false;
+                this.form.pass = '';
+                this.form.todo = [];
+                this.hasMessagesPassword = false;
+                this.form.description = '';
+                this.hasMessagesDescription = false;
+                this.error = false;
+            },
+        }
+    });
 
     Vue.component('pictures-items', {
         template: `
 		<div>
 		<md-card class="md-layout-item " style="position: fixed; z-index: 5; width1: 100%; margin: 0px; padding: 0px; margin-top: -12px;">
 		 <md-card-header>
-          <div class="md-title">Pictures ({{ searched.length }})</div>
+          <div class="md-title">Notes ({{ searched.length }})</div>
         </md-card-header>
             <md-card-content style="padding-bottom: 0px;">
 				<md-field md-clearable class="md-toolbar-section-end" style="width:250px">
-				  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
+				  <md-input placeholder="Search by title..." v-model="search" @input="searchOnTable" />
 				</md-field>
             </md-card-content>
 
@@ -1301,7 +684,6 @@
                    <!--   <md-button type="button" class="md-raised md-primary">Back</md-button>-->
                     </md-card-actions>
             </md-card>
-
 
             <md-empty-state v-if="loading" style="padding-top: 35vh;">
                 <md-progress-spinner :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
@@ -1315,10 +697,23 @@
                           <div class="md-subhead">{{item.category}}</div>
                           <div class="md-subhead">{{item.group}}</div>
                         </md-card-header>
-                        <md-card-content style="margin-left: 60px">
-                            <md-avatar style="width: 90%;height: 50%; margin-bottom: 20px;">
-                              <img :src="item.pic" :alt="item.name" v-on:click="onPhotoClick(item.pic)">
-                            </md-avatar>
+                        <md-card-content style="margin-left: 60px;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                max-width: 600px;
+                                border-left:1em solid transparent;
+                                border-right:1em solid transparent;
+                                text-overflow: ellipsis;">
+                            <div class="md-layout-item md-small-size-200">
+                              <ul>
+                                <li v-for="item in item.todo">
+                                  {{ item.label }}
+                                  <div>
+                                    <input type="checkbox" v-model="item.done">
+                                  </div>
+                                </li>
+                            </ul>
+                        </div>
                         </md-card-content>
                   </md-card>
                </md-list-item>
@@ -1332,10 +727,23 @@
             searched: [],
         }),
         created() {
-            this.getItems();
+            this.getNotes();
             appConfig.$emit('login', {});
         },
         methods: {
+            getNotes() {
+                const notes = JSON.parse(localStorage.getItem('notes'));
+
+                console.log('notes: ', notes);
+
+                this.count = notes.length;
+
+                this.items = [].concat(notes);
+                this.filteredItems = [].concat(notes);
+                this.searched = this.items;
+                this.loading = false;
+
+            },
             getItems() {
                 this.$http.get(appConfig.url + 'api/pic/get')
                     .then(result => {
@@ -1343,25 +751,12 @@
                         this.filteredItems = [].concat(result.data.sort(this.sort));
                         this.searched = this.items;
                         this.loading = false;
-                        setTimeout(() => {
-                            //document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll)
-                            this.getItemsAll();
-                        }, 100)
+
                     })
                     .catch(error => {
                     });
             },
-            getItemsAll() {
-                this.$http.get(appConfig.url + 'api/pic/getall')
-                    .then(result => {
-                        this.items = [].concat(result.data.sort(this.sort));
-                        this.filteredItems = [].concat(result.data.sort(this.sort));
-                        this.searched = this.items;
-                        this.loading = false;
-                    })
-                    .catch(error => {
-                    });
-            },
+
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
             },
@@ -1398,10 +793,6 @@
         {path: '/note-add', component: NoteAdd},
         {path: '/note-edit', component: NoteEdit},
 
-
-        {path: '/favorites-items', component: Favorites},
-
-
         {path: '/cards', component: Pictures},
     ];
 
@@ -1420,8 +811,7 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'https://gredunov.herokuapp.com/';
-            //appConfig.url = 'http://localhost:3000/';
+            appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
@@ -1442,48 +832,63 @@
         methods: {
             init() {
                 appConfig.favorites = localStorage.getItem('favorites');
-                console.log('appConfig.favorites - ', appConfig.favorites);
+                //console.log('appConfig.favorites - ', appConfig.favorites);
                 if (!appConfig.favorites) {
                     localStorage.setItem('favorites', '');
                 }
-                var testObject = [
-                    {
-                        id: 1,
-                        'name': 'Implement basic functionality',
-                        'todo': [
-                            {'label': 'User should be able to see the list of created notes', 'done': true},
-                            {'label': 'User should be able to create a note with TODO elements', 'done': false},
-                            {'label': 'User should be able to mark/unmark concrete TODO element', 'done': false}]
-                    },
-                    {
-                        id: 2, 'name': 'Implement \'Edit\' and \'Delete\' functionality',
-                        'todo': [
-                            {'label': 'User should be able to edit already existing note', 'done': false},
-                            {'label': 'User should be able to delete existing node', 'done': false}]
-                    },
-                    {
-                        id: 3, 'name': 'Implement \'Redo\' functionality',
-                        'todo': [
-                            {'label': 'User should be able to redo his last action (creating or deleting; no need to do this for editing)', 'done': false}]
-                    },
-                    {
-                        id: 4, 'name': 'Implement confirmation popups for Delete functionality',
-                        'todo': [
-                            {'label': 'User should be prompted to confirm that he really wants to delete this note (without native \'alert()\', \'confirm()\' or \'prompt\')', 'done': false}]
-                    },
-                    {
-                        id: 5, 'name': 'Implement \'Export\' and \'Import\' functionality',
-                        'todo': [
-                            {'label': 'User should be able to export all his notes as a single file and save it on computer', 'done': false},
-                            {'label': 'User should be able to import all notes from file on his computer that previously exported', 'done': false}]
-                    },
-                ];
 
-                // Put the object into storage
-                localStorage.setItem('testObject', JSON.stringify(testObject));
-                var retrievedObject = localStorage.getItem('testObject');
+                appConfig.notes = localStorage.getItem('notes');
+                //console.log('appConfig.notes - ', appConfig.notes);
 
-                console.log('retrievedObject: ', JSON.parse(retrievedObject));
+                if (!appConfig.notes) {
+                    const notes = [
+                        {
+                            id: 1,
+                            'name': 'Implement basic functionality',
+                            'todo': [
+                                {'label': 'User should be able to see the list of created notes', 'done': true},
+                                {'label': 'User should be able to create a note with TODO elements', 'done': false},
+                                {'label': 'User should be able to mark/unmark concrete TODO element', 'done': false}]
+                        },
+                        {
+                            id: 2, 'name': 'Implement \'Edit\' and \'Delete\' functionality',
+                            'todo': [
+                                {'label': 'User should be able to edit already existing note', 'done': false},
+                                {'label': 'User should be able to delete existing node', 'done': false}]
+                        },
+                        {
+                            id: 3, 'name': 'Implement \'Redo\' functionality',
+                            'todo': [
+                                {
+                                    'label': 'User should be able to redo his last action (creating or deleting; no need to do this for editing)',
+                                    'done': false
+                                }]
+                        },
+                        {
+                            id: 4, 'name': 'Implement confirmation popups for Delete functionality',
+                            'todo': [
+                                {
+                                    'label': 'User should be prompted to confirm that he really wants to delete this note (without native \'alert()\', \'confirm()\' or \'prompt\')',
+                                    'done': false
+                                }]
+                        },
+                        {
+                            id: 5, 'name': 'Implement \'Export\' and \'Import\' functionality',
+                            'todo': [
+                                {
+                                    'label': 'User should be able to export all his notes as a single file and save it on computer',
+                                    'done': false
+                                },
+                                {
+                                    'label': 'User should be able to import all notes from file on his computer that previously exported',
+                                    'done': false
+                                }]
+                        },
+                    ];
+
+                    localStorage.setItem('notes', JSON.stringify(notes));
+                }
+
             },
             changeRoute(route) {
                 appConfig.route = route;
