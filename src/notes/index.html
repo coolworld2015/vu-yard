@@ -73,7 +73,7 @@
                     <md-list @click="menuVisible = !menuVisible" style="background: #111; color: white">
                         <md-divider style="background: white"></md-divider>
                         <md-list-item to="/notes" style="color: white">
-                            <md-icon style="color: white">notes</md-icon>
+                            <md-icon style="color: white">speaker_notes</md-icon>
                             <span class="md-list-item-text" style="color: white">Table</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
@@ -81,6 +81,19 @@
                         <md-list-item to="/cards" style="color: white">
                             <md-icon style="color: white">photo</md-icon>
                             <span class="md-list-item-text" style="color: white">Cards</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-list-item v-on:click="fileDownload" style="color: white">
+                            <md-icon style="color: white">download</md-icon>
+                            <span class="md-list-item-text" style="color: white">Download</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-list-item v-on:click="fileUpload" style="color: white">
+                            <md-icon style="color: white">file_upload</md-icon>
+                            <input type="file" id="file-input" />
+                            <span class="md-list-item-text" style="color: white">Upload</span>
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
                     </md-list>
@@ -866,6 +879,38 @@
                 appConfig.$emit(event, {});
                 this.map = true;
                 closeNav();
+            },
+            fileDownload() {
+                let data = localStorage.getItem('notes');
+                let file = new Blob([data], {type: 'text'});
+                if (window.navigator.msSaveOrOpenBlob)
+                    window.navigator.msSaveOrOpenBlob(file, 'notes_demo');
+                else {
+                    let a = document.createElement("a"),
+                        url = URL.createObjectURL(file);
+                    a.href = url;
+                    a.download = 'notes_demo';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function() {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 0);
+                }
+            },
+            fileUpload(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    return;
+                }
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    let contents = e.target.result;
+                    alert('Uploaded');
+                    localStorage.setItem('notes', contents);
+                    console.log(contents);
+                };
+                reader.readAsText(file);
             },
             logout() {
                 localStorage.setItem('access_token', null);
