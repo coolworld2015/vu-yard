@@ -872,7 +872,6 @@
                 closeNav();
             },
             fileDownload() {
-                appConfig.$emit('yard', {});
                 let data = localStorage.getItem('notes');
                 let file = new Blob([data], {type: 'text'});
                 if (window.navigator.msSaveOrOpenBlob)
