@@ -232,6 +232,16 @@
             this.allRecords = JSON.parse(localStorage.getItem('all_records'));
             this.searched = this.items;
             appConfig.$emit('login', {});
+            appConfig.$on('yard', searchQuery => {
+                console.log('yard ON');
+                this.loading = true;
+                this.items = [];
+                this.filteredItems = [];
+                setTimeout(() => {
+                    this.getNotes();
+                }, 1000);
+
+            });
         },
         methods: {
             getNotes() {
@@ -243,6 +253,7 @@
 
                 this.items = [].concat(notes);
                 this.filteredItems = [].concat(notes);
+                this.loading = false;
             },
 /*            getItems() {
                 this.$http.get(appConfig.url + 'api/items/get')
@@ -881,6 +892,7 @@
                 closeNav();
             },
             fileDownload() {
+                appConfig.$emit('yard', {});
                 let data = localStorage.getItem('notes');
                 let file = new Blob([data], {type: 'text'});
                 if (window.navigator.msSaveOrOpenBlob)
@@ -909,6 +921,7 @@
                     alert('Uploaded');
                     localStorage.setItem('notes', contents);
                     console.log(contents);
+                    appConfig.$emit('yard', {});
                 };
                 reader.readAsText(file);
             },
