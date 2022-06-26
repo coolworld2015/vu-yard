@@ -237,45 +237,25 @@
                 this.loading = true;
                 this.items = [];
                 this.filteredItems = [];
+                this.searched = [];
                 setTimeout(() => {
                     this.getNotes();
-                }, 1000);
-
+                }, 2000);
             });
         },
         methods: {
             getNotes() {
                 const notes = JSON.parse(localStorage.getItem('notes'));
 
-                console.log('notes: ', notes);
-
                 this.count = notes.length;
 
                 this.items = [].concat(notes);
+
                 this.filteredItems = [].concat(notes);
+                this.searched = this.items;
                 this.loading = false;
+                console.log('notes: ', notes);
             },
-/*            getItems() {
-                this.$http.get(appConfig.url + 'api/items/get')
-                    .then(result => {
-                        this.count = result.data.length;
-
-                        this.items = [].concat(result.data);
-                        this.filteredItems = [].concat(result.data);
-
-                        this.searched = this.items;
-                        this.loading = false;
-                        setTimeout(() => {
-                            document.querySelector('.md-table-content').addEventListener('scroll', this.handleScroll);
-                            if (this.allRecords === true) {
-                                this.getItemsAll();
-                            }
-                        }, 1000)
-                    })
-                    .catch(error => {
-                        this.$router.push('login');
-                    });
-            },*/
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
             },
@@ -307,6 +287,7 @@
             },
         }
     });
+
     Vue.component('note-edit', {
         template: `
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
@@ -501,6 +482,7 @@
             },
         }
     });
+
     Vue.component('note-add', {
         template: `
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
@@ -817,13 +799,11 @@
         methods: {
             init() {
                 appConfig.favorites = localStorage.getItem('favorites');
-                //console.log('appConfig.favorites - ', appConfig.favorites);
                 if (!appConfig.favorites) {
                     localStorage.setItem('favorites', '');
                 }
 
                 appConfig.notes = localStorage.getItem('notes');
-                //console.log('appConfig.notes - ', appConfig.notes);
 
                 if (!appConfig.notes) {
                     const notes = [
