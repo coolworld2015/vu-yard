@@ -2023,8 +2023,8 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            //appConfig.url = 'https://gredunov.herokuapp.com/';
-            appConfig.url = 'http://localhost:3000/';
+            appConfig.url = 'https://gredunov.herokuapp.com/';
+            //appConfig.url = 'http://localhost:3000/';
 
             appConfig.getAccessToken = () => {
                 appConfig.access_token = localStorage.getItem('access_token');
