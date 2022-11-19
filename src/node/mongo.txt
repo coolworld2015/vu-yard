@@ -35,6 +35,8 @@ db.getCollectionNames()
 use forpost
 show collections
 
+db.items.count()
+
 db.createCollection("audits")
 db.audits.find()
 db.audits.drop()

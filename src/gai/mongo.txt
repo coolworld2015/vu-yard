@@ -1,0 +1,43 @@
+
+
+mongod  --dbpath ~/data/db
+
+-----------------------------------------------------------------------------------------------------
+mongoimport --db gai --collection items --file gai_100_000_data.json --jsonArray
+
+mongoimport --db gai --collection users --file users.json --jsonArray
+mongoexport --db gai --collection users -o users1.json --jsonArray
+
+-----------------------------------------------------------------------------------------------------
+mongoimport --uri mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/gai --collection users --file users.json --jsonArray
+mongoimport --uri mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/gai --collection items --file items.json --jsonArray
+
+mongoexport --uri mongodb+srv://admin:1314@coolworld.obhth.mongodb.net/gai --collection items -o atlas_items.json --jsonArray
+
+-----------------------------------------------------------------------------------------------------
+
+//Shell
+mongo shell
+show dbs
+
+db.getCollectionNames()
+
+use gai
+show collections
+
+db.items.count()
+
+db.createCollection("audit")
+db.audit.find()
+db.audit.drop()
+
+db.hello.insert({'a':'b'})
+db.hello.find()
+
+db.dropDatabase()
+
+
+-----------------------------------------------------------------------------------------------------
+npm i
+node index.js
+
