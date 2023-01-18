@@ -1,0 +1,914 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="logo.jpg"/>
+    <title>Notes Demo</title>
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+<!--    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/vue-material.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/theme/default.css">
+
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link href="https://demos.creative-tim.com/material-kit/assets-old/css/material-kit.min.css?v=2.0.7"
+          rel="stylesheet"/>-->
+<!--
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.2/umd/popper.min.js"></script>
+    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/core/jquery.min.js"
+            type="text/javascript"></script>
+    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/core/popper.min.js"
+            type="text/javascript"></script>
+    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/core/bootstrap-material-design.min.js"
+            type="text/javascript"></script>
+    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/plugins/moment.min.js"></script>
+    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/plugins/bootstrap-datetimepicker.js"
+            type="text/javascript"></script>
+    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/plugins/nouislider.min.js"
+            type="text/javascript"></script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>-->
+
+
+    <link rel="stylesheet" href="./lib/css.css">
+    <link rel="stylesheet" href="./lib/vue-material.min.css">
+    <link rel="stylesheet" href="./lib/default.css">
+    <script src="./lib/vue.js"></script>
+    <script src="./lib/vue-material.min.js"></script>
+
+    <script src="./lib/vue-resource.min.js"></script>
+    <script src="./lib/vue-router.js"></script>
+
+    <script src="./lib/axios.min.js"></script>
+    <script src="./lib/moment.min.js"></script>
+</head>
+
+<style>
+    ::-webkit-scrollbar {
+    }
+</style>
+
+<body>
+<div id="app">
+    <template>
+        <div class="page-container" class="sidenav">
+            <md-app md-mode="fixed">
+                <md-app-toolbar class="md-primary" v-show="login">
+                    <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
+                        <md-icon>menu</md-icon>
+                    </md-button>
+                    <span class="md-title" style="color: white;font-size: 22px;font-weight: 900;">Notes Demo by Eduard Tkachuk</span>
+                </md-app-toolbar>
+
+                <md-app-drawer :md-active.sync="menuVisible" md-persistent1="mini"
+                               style="background: black; background1: linear-gradient(45deg, black, transparent)">
+                    <md-toolbar class="md-transparent" md-elevation="0"
+                                style="color: white;font-size: 20px;font-weight: 500;">Notes Demo
+                    </md-toolbar>
+
+                    <md-list @click="menuVisible = !menuVisible" style="background: #111; color: white">
+                        <md-divider style="background: white"></md-divider>
+                        <md-list-item to="/notes" style="color: white">
+                            <md-icon style="color: white">speaker_notes</md-icon>
+                            <span class="md-list-item-text" style="color: white">Table</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-list-item to="/cards" style="color: white">
+                            <md-icon style="color: white">photo</md-icon>
+                            <span class="md-list-item-text" style="color: white">Cards</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-list-item v-on:click="fileDownload" style="color: white">
+                            <md-icon style="color: white">download</md-icon>
+                            <span class="md-list-item-text" style="color: white">Download</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+
+                        <md-list-item v-on:click="fileUpload" style="color: white">
+                            <md-icon style="color: white">file_upload</md-icon>
+                            <input type="file" id="file-input" />
+                            <span class="md-list-item-text" style="color: white">Upload</span>
+                        </md-list-item>
+                        <md-divider style="background: white"></md-divider>
+                    </md-list>
+                </md-app-drawer>
+
+                <md-app-content style="background: #eee">
+                    <router-view></router-view>
+                </md-app-content>
+            </md-app>
+
+        </div>
+    </template>
+</div>
+
+<style lang="scss" scoped>
+    .md-app {
+        height: 100vh;
+    }
+
+    .md-drawer {
+        width: 230px;
+        max-width: calc(100vw - 125px);
+    }
+
+    .md-table {
+        height: 88vh;
+    }
+
+    .md-title {
+        overflow: hidden;
+    }
+
+    .md-table-content {
+        height: 85vh !important;
+        max-height: 85vh !important;
+    }
+
+    .md-tabs-navigation {
+        background: rgb(238, 238, 238) !important;
+    }
+
+    .md-table-cell-container {
+        overflow-wrap: break-word !important;
+        width: 220px !important;
+    }
+
+    .md-app-scroller {
+        background: rgb(238, 238, 238) !important;
+    }
+
+    .md-table-head-container {
+        width: 220px !important;
+    }
+
+</style>
+
+</body>
+</html>
+
+<script>
+    const appConfig = new Vue();
+    appConfig.login = false;
+    appConfig.allRecords = false;
+
+    const Notes = {template: '<notes></notes>'};
+    const NoteAdd = {template: '<note-add></note-add>'};
+    const NoteEdit = {template: '<note-edit></note-edit>'};
+
+    const Pictures = {
+        template: `
+        <div>
+            <div style1="width: 49%;padding: 0 5px;overflow-y: scroll;float: right;left: 0;top: 0;height:100vh;">
+                <pictures-items></pictures-items>
+            </div>
+        </div>
+    `};
+
+    Vue.component('notes', {
+        template: `
+		  <div>
+		    <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
+              <md-speed-dial-target v-on:click="addItem">
+                <md-icon>add</md-icon>
+              </md-speed-dial-target>
+            </md-speed-dial>
+
+			<md-table v-model="searched" md-sort="id" md-sort-order="asc" md-card md-fixed-header>
+			  <md-table-toolbar>
+				<div class="md-toolbar-section-start">
+				  <h1 class="md-title">Notes ({{ searched.length }})</h1>
+				</div>
+
+				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
+				  <md-input placeholder="Search by title..." v-model="search" @input="searchOnTable" />
+				</md-field>
+
+			  </md-table-toolbar>
+              <div style="display: none">{{ searched.length }}</div>
+
+			  <md-table-empty-state>
+			    <div v-if="!loading"> No items</div>
+			    <md-progress-spinner v-show="loading" :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+			  </md-table-empty-state>
+
+			    <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
+				<md-table-cell md-label="Title" md-sort-by="name">{{ item.name }}</md-table-cell>
+				<md-table-cell md-label="ToDO">
+				<ul>
+                    <li v-for="item in item.todo">
+                      {{ item.label }}
+                      <div>
+                        <input type="checkbox" v-model="item.done">
+                      </div>
+                    </li>
+                </ul>
+				</md-table-cell>
+			  </md-table-row>
+			</md-table>
+  		</div>`,
+        data: () => ({
+            items: [],
+            todo: [1, 1, 1],
+            filteredItems: [],
+            recordsCount: 20,
+            positionY: 0,
+            search: null,
+            searched: [],
+            loading: true,
+            byName: true,
+            allRecords: true,
+            count: 0,
+            searchCheck: false
+        }),
+        created() {
+            this.getNotes();
+            this.allRecords = JSON.parse(localStorage.getItem('all_records'));
+            this.searched = this.items;
+            appConfig.$emit('login', {});
+            appConfig.$on('yard', searchQuery => {
+                console.log('yard ON');
+                this.loading = true;
+                this.items = [];
+                this.filteredItems = [];
+                this.searched = [];
+                setTimeout(() => {
+                    this.getNotes();
+                }, 2000);
+            });
+        },
+        methods: {
+            getNotes() {
+                const notes = JSON.parse(localStorage.getItem('notes'));
+
+                this.count = notes.length;
+
+                this.items = [].concat(notes);
+
+                this.filteredItems = [].concat(notes);
+                this.searched = this.items;
+                this.loading = false;
+                console.log('notes: ', notes);
+            },
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            searchOnTable() {
+                if (this.search) {
+                    this.searchCheck = true;
+                } else {
+                    this.searchCheck = false;
+                }
+
+                this.searched = this.searchByName(this.items, this.search)
+            },
+            searchByName(items, term) {
+                if (term) {
+                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                }
+                return items
+            },
+            toLower(text) {
+                return text.toString().toLowerCase()
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('note-edit');
+            },
+            addItem() {
+                appConfig.item = null;
+                this.$router.push('/note-add');
+            },
+        }
+    });
+
+    Vue.component('note-edit', {
+        template: `
+		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
+                <form novalidate class="md-layout">
+                  <md-card class="md-layout-item md-size-100 md-small-size-50">
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">{{ form.title }}</div>
+                    </md-card-header>
+
+                    <md-card-content style="padding-bottom: 0px;">
+                        <div class="md-layout-item md-small-size-100">
+                          <md-field :class="messageClassName">
+                            <label for="name">Title</label>
+                            <md-input name="name" id="name" required v-on:keypress="hasMessagesName=false" v-model="form.name" :disabled1="true" />
+                            <span class="md-error">Value is requred</span>
+                          </md-field>
+                        </div>
+
+
+                        <div class="md-layout-item md-small-size-100">
+                          <ul>
+                            <li v-for="item in form.todo">
+                              {{ item.label }}
+                              <div>
+                                <input type="checkbox" v-model="item.done">
+                              </div>
+                            </li>
+                        </ul>
+                        </div>
+
+                        <md-field :class="messageClassDescription">
+                        </md-field>
+
+                        <div style="text-align: right; margin-top: 40px;">
+                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
+                                Something went wrong
+                            </span>
+                        </div>
+
+                    </md-card-content>
+
+                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
+
+                    <md-dialog-confirm
+                          :md-active.sync="dialog"
+                          md-title="Delete item?"
+                          :md-content=form.title
+                          md-confirm-text="Delete"
+                          md-cancel-text="Cancel"
+                          @md-confirm="onDelete" />
+
+                    <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="onItemEdit" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onDeleteDialog" :disabled="loading">Delete</md-button>
+                      <md-button type="button" class="md-raised md-primary" v-on:click="back">Back</md-button>
+                    </md-card-actions>
+                  </md-card>
+
+                  <md-snackbar :md-active.sync="userSaved" md-position="left" >
+                    The {{ form.name }} is shown!
+                    <md-button class="md-primary" @click="userSaved = false">Close</md-button>
+                  </md-snackbar>
+                </form>
+  		</div>`,
+        data: () => ({
+            form: {
+                title: null,
+                id: null,
+                name: null,
+                category: null,
+                group: null,
+                description: null,
+                pic: '1',
+                placeholder: null,
+                todo: []
+            },
+            pictures: [],
+            hasMessagesName: false,
+            hasMessagesСategory: false,
+            hasMessagesGroup: false,
+            hasMessagesDescription: false,
+            hasMessagesPhoto: false,
+            userSaved: true,
+            sending: false,
+            lastUser: null,
+            loading: false,
+            error: false,
+            snackbar: true,
+            dialog: false,
+            favorite: false,
+            favorites: ''
+        }),
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/notes');
+            } else {
+                this.init();
+            }
+        },
+        computed: {
+            messageClassName() {
+                return {
+                    'md-invalid': this.hasMessagesName
+                }
+            },
+            messageClassСategory() {
+                return {
+                    'md-invalid': this.hasMessagesСategory
+                }
+            },
+            messageClassGroup() {
+                return {
+                    'md-invalid': this.hasMessagesGroup
+                }
+            },
+            messageClassDescription() {
+                return {
+                    'md-invalid': this.hasMessagesDescription
+                }
+            },
+            messageClassPhoto() {
+                return {
+                    'md-invalid': this.hasMessagesPhoto
+                }
+            }
+        },
+        methods: {
+            init() {
+                this.notes = JSON.parse(localStorage.getItem('notes'));
+
+                this.form = appConfig.item;
+
+                if (!appConfig.item.pictures) {
+                    this.pictures.push(appConfig.item.pic);
+                } else {
+                    this.pictures = [].concat(appConfig.item.pictures);
+                }
+
+                this.form.title = appConfig.item.name;
+
+                this.favorites = localStorage.getItem('favorites');
+                this.favorite = this.favorites.includes(this.form.id);
+
+                window.setTimeout(() => {
+                    this.userSaved = false;
+                }, 2000);
+            },
+            onItemEdit() {
+                if (!this.form.name) {
+                    this.hasMessagesName = true;
+                }
+
+                if (this.form.name) {
+                    //this.loading = true;
+                    this.error = false;
+                    console.log(this.form.todo);
+
+                    const updatedNote = {
+                        'id': this.form.id,
+                        'name': this.form.name,
+                        'todo': this.form.todo,
+                    };
+
+                    this.notes = this.notes.filter(note => {
+                        return note.id !== this.form.id;
+                    });
+
+                    this.notes.push(updatedNote);
+                    console.log('this.notes - ', this.notes);
+                    localStorage.setItem('notes', JSON.stringify(this.notes));
+                    this.$router.push('/notes');
+                }
+            },
+            onDeleteDialog() {
+                this.dialog = true;
+            },
+            onDelete() {
+                console.log(this.form.id);
+                console.log(this.notes);
+
+                this.notes = this.notes.filter(note => {
+                    return note.id !== this.form.id;
+                });
+
+                console.log(this.notes);
+                localStorage.setItem('notes', JSON.stringify(this.notes));
+
+                this.$router.push('/notes');
+            },
+            back() {
+                this.$router.push('/notes');
+            },
+        }
+    });
+
+    Vue.component('note-add', {
+        template: `
+		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
+                <form class="md-layout">
+                  <md-card class="md-layout-item md-size-100 md-small-size-50">
+                    <md-card-header style="background: #448aff; color: white;margin-bottom: 20px;padding: 10px;">
+                      <div class="md-title" style="font-weight: bold;">New Note</div>
+                    </md-card-header>
+
+                    <md-card-content style="padding-bottom: 0px;">
+
+                        <md-field :class="messageClassName">
+                            <label>Title</label>
+                            <md-input v-model="form.name" required v-on:keypress="hasMessagesName=false" :disabled="loading"></md-input>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassName">
+                            <div>
+                                <ul>
+                                    <li v-for="item in form.todo">
+                                      {{ item.label }}
+                                      <div>
+                                        <input type="checkbox" v-model="item.done">
+                                      </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <span class="md-error">Value is requred</span>
+                        </md-field>
+
+                        <md-field :class="messageClassDescription">
+                            <label>Label</label>
+                            <md-input v-model="form.description" v-on:blur="todoAdd" v-on:keypress="hasMessagesDescription=false" :disabled="loading"></md-input>
+                        </md-field>
+
+                        <div style="text-align: right; margin-top: 40px;">
+                            <span v-if="error" class="md-error" style="color: #ff1744; font-weight: bold; margin-right: 15px;">
+                                Something went wrong
+                            </span>
+                        </div>
+                    </md-card-content>
+
+                    <md-progress-bar style="margin-top: 40px;" md-mode="indeterminate" v-if="loading" />
+
+                    <md-card-actions style="margin: 20px;">
+                      <md-button class="md-raised md-primary" v-on:click="onItemAdd" :disabled="loading">Submit</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onClear" :disabled="loading">Clear</md-button>
+                      <md-button class="md-raised md-primary" v-on:click="onBack" :disabled="loading">Back</md-button>
+                    </md-card-actions>
+                  </md-card>
+
+                  <md-snackbar :md-active.sync="snackbar" md-position="left" >
+                    The add form is shown!
+                    <md-button class="md-primary" @click="snackbar = false">Close</md-button>
+                  </md-snackbar>
+            </form>
+  		</div>`,
+        data: () => ({
+            form: {
+                title: null,
+                id: null,
+                name: null,
+                category: null,
+                group: null,
+                description: null,
+                todo: []
+            },
+            hasMessagesName: false,
+            hasMessagesPassword: false,
+            hasMessagesDescription: false,
+            snackbar: true,
+            loading: false,
+            error: false,
+            dialog: false
+        }),
+        created() {
+            this.init();
+            appConfig.$emit('login', {});
+        },
+        computed: {
+            messageClassName() {
+                return {
+                    'md-invalid': this.hasMessagesName
+                }
+            },
+            messageClassPassword() {
+                return {
+                    'md-invalid': this.hasMessagesPassword
+                }
+            },
+            messageClassDescription() {
+                return {
+                    'md-invalid': this.hasMessagesDescription
+                }
+            }
+        },
+        methods: {
+            init() {
+                this.notes = JSON.parse(localStorage.getItem('notes'));
+
+                window.setTimeout(() => {
+                    this.snackbar = false;
+                }, 2000)
+            },
+            todoAdd(event) {
+                console.log(event.target.value);
+                this.form.todo.push({'label': event.target.value, 'done': false});
+                this.form.description = '';
+            },
+            onItemAdd() {
+                if (!this.form.name) {
+                    this.hasMessagesName = true;
+                }
+
+                if (this.form.name) {
+                    this.loading = true;
+                    this.error = false;
+                    const newNote = {
+                        'id': +new Date(),
+                        'name': this.form.name,
+                        'todo': this.form.todo,
+                    };
+
+                    this.notes.push(newNote);
+                    console.log('this.notes - ', this.notes);
+                    localStorage.setItem('notes', JSON.stringify(this.notes));
+                    this.$router.push('/notes');
+                }
+            },
+            onBack() {
+                this.$router.push('/notes');
+            },
+            onClear() {
+                this.form.name = '';
+                this.hasMessagesName = false;
+                this.form.pass = '';
+                this.form.todo = [];
+                this.hasMessagesPassword = false;
+                this.form.description = '';
+                this.hasMessagesDescription = false;
+                this.error = false;
+            },
+        }
+    });
+
+    Vue.component('pictures-items', {
+        template: `
+		<div>
+		<md-card class="md-layout-item " style="position: fixed; z-index: 5; width1: 100%; margin: 0px; padding: 0px; margin-top: -12px;">
+		 <md-card-header>
+          <div class="md-title">Notes ({{ searched.length }})</div>
+        </md-card-header>
+            <md-card-content style="padding-bottom: 0px;">
+				<md-field md-clearable class="md-toolbar-section-end" style="width:250px">
+				  <md-input placeholder="Search by title..." v-model="search" @input="searchOnTable" />
+				</md-field>
+            </md-card-content>
+
+            <md-card-actions style="margin-bottom: 20px;">
+                   <!--   <md-button type="button" class="md-raised md-primary">Back</md-button>-->
+                    </md-card-actions>
+            </md-card>
+
+            <md-empty-state v-if="loading" style="padding-top: 35vh;">
+                <md-progress-spinner :md-diameter="70" :md-stroke="10" md-mode="indeterminate"></md-progress-spinner>
+            </md-empty-state>
+
+			<md-list v-if="!loading" class="md-triple-line" v-for="item in searched" v-on:click="showDetails(item)" v-bind:key="item.id" style="background: rgb(238, 238, 238);">
+			  <md-list-item style="background: rgb(238, 238, 238);">
+                  <md-card md-with-hover style="width: 50%; margin: auto;" >
+                        <md-card-header>
+                          <div class="md-title">{{item.name}}</div>
+                          <div class="md-subhead">{{item.category}}</div>
+                          <div class="md-subhead">{{item.group}}</div>
+                        </md-card-header>
+                        <md-card-content style="margin-left: 60px;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                max-width: 600px;
+                                border-left:1em solid transparent;
+                                border-right:1em solid transparent;
+                                text-overflow: ellipsis;" v-on:click="showDetails(item)">
+                            <div class="md-layout-item md-small-size-200">
+                              <ul>
+                                <li v-for="item in item.todo">
+                                  {{ item.label }}
+                                  <div>
+                                    <input type="checkbox" v-model="item.done">
+                                  </div>
+                                </li>
+                            </ul>
+                        </div>
+                        </md-card-content>
+                  </md-card>
+               </md-list-item>
+			</md-list>
+  		</div>`,
+        data: () => ({
+            items: [],
+            loading: true,
+            filteredItems: [],
+            search: null,
+            searched: [],
+        }),
+        created() {
+            this.getNotes();
+            appConfig.$emit('login', {});
+        },
+        methods: {
+            getNotes() {
+                const notes = JSON.parse(localStorage.getItem('notes'));
+
+                console.log('notes: ', notes);
+
+                this.count = notes.length;
+
+                this.items = [].concat(notes);
+                this.filteredItems = [].concat(notes);
+                this.searched = this.items;
+                this.loading = false;
+
+            },
+            getItems() {
+                this.$http.get(appConfig.url + 'api/pic/get')
+                    .then(result => {
+                        this.items = [].concat(result.data.sort(this.sort));
+                        this.filteredItems = [].concat(result.data.sort(this.sort));
+                        this.searched = this.items;
+                        this.loading = false;
+
+                    })
+                    .catch(error => {
+                    });
+            },
+
+            sort(a, b) {
+                return parseInt(b.id) - parseInt(a.id);
+            },
+            searchOnTable() {
+                this.searched = this.searchByName(this.filteredItems, this.search)
+            },
+            searchByName(items, term) {
+                if (term) {
+                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                }
+                return items
+            },
+            toLower(text) {
+                return text.toString().toLowerCase()
+            },
+            showDetails(item) {
+                console.log('item', item)
+                appConfig.item = item;
+                this.$router.push('/note-edit');
+            },
+            onPhotoClick(pic) {
+                let w = window.open('about:blank');
+                let image = new Image();
+                image.src = pic;
+                setTimeout(function () {
+                    w.document.write(image.outerHTML);
+                }, 0);
+            },
+        }
+    });
+
+    Vue.use(VueMaterial.default);
+
+    const routes = [
+        {path: '/', component: Notes},
+        {path: '*', component: Notes},
+
+        {path: '/notes', component: Notes},
+        {path: '/note-add', component: NoteAdd},
+        {path: '/note-edit', component: NoteEdit},
+
+        {path: '/cards', component: Pictures},
+    ];
+
+    const router = new VueRouter({
+        routes,
+    });
+
+    new Vue({
+        el: '#app',
+        router,
+        data: () => ({
+            menuVisible: false,
+            login: appConfig.login,
+        }),
+        created() {
+            this.init();
+            appConfig.route = this.$route.path.split('/')[1];
+
+            appConfig.url = 'http://localhost:3000/';
+
+            appConfig.getAccessToken = () => {
+                appConfig.access_token = localStorage.getItem('access_token');
+            };
+
+            appConfig.$on('route', route => {
+                this.changeRoute(route);
+            });
+
+            appConfig.$on('login', () => {
+                this.login = true;
+            });
+
+            appConfig.$on('logout', () => {
+                this.login = false;
+            });
+        },
+        methods: {
+            init() {
+                appConfig.favorites = localStorage.getItem('favorites');
+                if (!appConfig.favorites) {
+                    localStorage.setItem('favorites', '');
+                }
+
+                appConfig.notes = localStorage.getItem('notes');
+
+                if (!appConfig.notes) {
+                    const notes = [
+                        {
+                            id: 1,
+                            'name': 'Implement basic functionality',
+                            'todo': [
+                                {'label': 'User should be able to see the list of created notes', 'done': true},
+                                {'label': 'User should be able to create a note with TODO elements', 'done': false},
+                                {'label': 'User should be able to mark/unmark concrete TODO element', 'done': false}]
+                        },
+                        {
+                            id: 2, 'name': 'Implement \'Edit\' and \'Delete\' functionality',
+                            'todo': [
+                                {'label': 'User should be able to edit already existing note', 'done': false},
+                                {'label': 'User should be able to delete existing node', 'done': false}]
+                        },
+                        {
+                            id: 3, 'name': 'Implement \'Redo\' functionality',
+                            'todo': [
+                                {
+                                    'label': 'User should be able to redo his last action (creating or deleting; no need to do this for editing)',
+                                    'done': false
+                                }]
+                        },
+                        {
+                            id: 4, 'name': 'Implement confirmation popups for Delete functionality',
+                            'todo': [
+                                {
+                                    'label': 'User should be prompted to confirm that he really wants to delete this note (without native \'alert()\', \'confirm()\' or \'prompt\')',
+                                    'done': false
+                                }]
+                        },
+                        {
+                            id: 5, 'name': 'Implement \'Export\' and \'Import\' functionality',
+                            'todo': [
+                                {
+                                    'label': 'User should be able to export all his notes as a single file and save it on computer',
+                                    'done': false
+                                },
+                                {
+                                    'label': 'User should be able to import all notes from file on his computer that previously exported',
+                                    'done': false
+                                }]
+                        },
+                    ];
+
+                    localStorage.setItem('notes', JSON.stringify(notes));
+                }
+
+            },
+            changeRoute(route) {
+                appConfig.route = route;
+                this.init();
+
+                if (this.$router.currentRoute.path === '/' + route) {
+                    return false;
+                }
+
+                this.$router.push('/' + route);
+                return false;
+            },
+            emitEvent(event) {
+                appConfig.$emit(event, {});
+                this.map = true;
+                closeNav();
+            },
+            fileDownload() {
+                let data = localStorage.getItem('notes');
+                let file = new Blob([data], {type: 'text'});
+                if (window.navigator.msSaveOrOpenBlob)
+                    window.navigator.msSaveOrOpenBlob(file, 'notes_demo');
+                else {
+                    let a = document.createElement("a"),
+                        url = URL.createObjectURL(file);
+                    a.href = url;
+                    a.download = 'notes_demo';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function() {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 0);
+                }
+            },
+            fileUpload(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    return;
+                }
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    let contents = e.target.result;
+                    alert('Uploaded');
+                    localStorage.setItem('notes', contents);
+                    console.log(contents);
+                    appConfig.$emit('yard', {});
+                };
+                reader.readAsText(file);
+            },
+            logout() {
+                localStorage.setItem('access_token', null);
+                this.changeRoute('login');
+                appConfig.$emit('logout', {});
+            }
+        },
+    })
+</script>
