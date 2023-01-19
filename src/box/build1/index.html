@@ -143,11 +143,11 @@
 			<md-table v-model="searched" md-sort="id" md-sort-order="asc" md-card md-fixed-header>
 			  <md-table-toolbar>
 				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Notes ({{ searched.length }})</h1>
+				  <h1 class="md-title">Items ({{ searched.length }})</h1>
 				</div>
 
 				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
-				  <md-input placeholder="Search by title..." v-model="search" @input="searchOnTable" />
+				  <md-input placeholder="Search by title..." v-model="search" @input="searchOnTable" v-on:keyup.enter="onSearch('name')"/>
 				</md-field>
 
 			  </md-table-toolbar>
@@ -231,6 +231,35 @@
                     //appConfig.notifications.items.push(this.notification);
                     this.status = 'show';
                 })
+            },
+            onSearch(name) {
+                console.log('Enter')
+                if (this.search !== null && this.search !== "") {
+                    this.loading = true;
+                    let url;
+
+
+
+                    this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + this.search)
+                        .then((response) => response.json())
+                        .then(result => {
+                            this.count = result.results.length;
+                            this.items = [].concat(result.results);
+                            console.log('yard ON - ', result.results.length );
+                            this.filteredItems = [].concat(result.results);
+                            this.searched = this.items;
+                            this.loading = false;
+                            /*                        this.status = 'show';
+                                                    appConfig.setSearchText(searchQuery);
+                                                    appConfig.$emit('itemsCount', result.results.length);
+                                                    setTimeout(() => {
+                                                        document.querySelector('.search-results-content').addEventListener('scroll', this.handleScroll)
+                                                    }, 100)*/
+                        }).catch((error) => {
+                        //appConfig.notifications.items.push(this.notification);
+                        this.status = 'show';
+                    })
+                }
             },
             getNotes() {
                 const notes = JSON.parse(localStorage.getItem('notes'));
