@@ -3,36 +3,8 @@
 <head>
     <meta charset="utf-8">
     <link rel="shortcut icon" href="logo.jpg"/>
-    <title>Notes Demo</title>
+    <title>Media Box by Eduard Tkachuk</title>
     <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
-<!--    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
-    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/vue-material.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/theme/default.css">
-
-    <link rel="stylesheet" type="text/css"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link href="https://demos.creative-tim.com/material-kit/assets-old/css/material-kit.min.css?v=2.0.7"
-          rel="stylesheet"/>-->
-<!--
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.2/umd/popper.min.js"></script>
-    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/core/jquery.min.js"
-            type="text/javascript"></script>
-    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/core/popper.min.js"
-            type="text/javascript"></script>
-    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/core/bootstrap-material-design.min.js"
-            type="text/javascript"></script>
-    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/plugins/moment.min.js"></script>
-    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/plugins/bootstrap-datetimepicker.js"
-            type="text/javascript"></script>
-    <script src="https://demos.creative-tim.com/material-kit/assets-old/js/plugins/nouislider.min.js"
-            type="text/javascript"></script>
-    <script async defer src="https://buttons.github.io/buttons.js"></script>-->
-
 
     <link rel="stylesheet" href="./lib/css.css">
     <link rel="stylesheet" href="./lib/vue-material.min.css">
@@ -61,13 +33,13 @@
                     <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
                         <md-icon>menu</md-icon>
                     </md-button>
-                    <span class="md-title" style="color: white;font-size: 22px;font-weight: 900;">Notes Demo by Eduard Tkachuk</span>
+                    <span class="md-title" style="color: white;font-size: 22px;font-weight: 900;">Media Box by Eduard Tkachuk</span>
                 </md-app-toolbar>
 
                 <md-app-drawer :md-active.sync="menuVisible" md-persistent1="mini"
                                style="background: black; background1: linear-gradient(45deg, black, transparent)">
                     <md-toolbar class="md-transparent" md-elevation="0"
-                                style="color: white;font-size: 20px;font-weight: 500;">Notes Demo
+                                style="color: white;font-size: 20px;font-weight: 500;">Media Box
                     </md-toolbar>
 
                     <md-list @click="menuVisible = !menuVisible" style="background: #111; color: white">
@@ -84,18 +56,6 @@
                         </md-list-item>
                         <md-divider style="background: white"></md-divider>
 
-                        <md-list-item v-on:click="fileDownload" style="color: white">
-                            <md-icon style="color: white">download</md-icon>
-                            <span class="md-list-item-text" style="color: white">Download</span>
-                        </md-list-item>
-                        <md-divider style="background: white"></md-divider>
-
-                        <md-list-item v-on:click="fileUpload" style="color: white">
-                            <md-icon style="color: white">file_upload</md-icon>
-                            <input type="file" id="file-input" />
-                            <span class="md-list-item-text" style="color: white">Upload</span>
-                        </md-list-item>
-                        <md-divider style="background: white"></md-divider>
                     </md-list>
                 </md-app-drawer>
 
@@ -199,17 +159,15 @@
 			  </md-table-empty-state>
 
 			    <md-table-row slot="md-table-row" slot-scope="{ item }" v-on:click="showDetails(item)">
-				<md-table-cell md-label="Title" md-sort-by="name">{{ item.name }}</md-table-cell>
-				<md-table-cell md-label="ToDO">
-				<ul>
-                    <li v-for="item in item.todo">
-                      {{ item.label }}
-                      <div>
-                        <input type="checkbox" v-model="item.done">
-                      </div>
-                    </li>
-                </ul>
+
+                <md-table-cell md-label="Poster" md-sort-by="pic">
+			        <md-avatar class="md-large" style="width: 126px;height: 115px;">
+				        <img :src="item.artworkUrl100.replace('100x100bb.jpg', '500x500bb.jpg')"
+                     style="width: 240px; height: 150px; border-radius: 20px">
+				    </md-avatar>
 				</md-table-cell>
+
+                <md-table-cell md-label="Title" md-sort-by="name">{{ item.trackName }}</md-table-cell>
 			  </md-table-row>
 			</md-table>
   		</div>`,
@@ -228,22 +186,52 @@
             searchCheck: false
         }),
         created() {
-            this.getNotes();
+            this.fetchData('Marvel');
             this.allRecords = JSON.parse(localStorage.getItem('all_records'));
             this.searched = this.items;
             appConfig.$emit('login', {});
-            appConfig.$on('yard', searchQuery => {
+            appConfig.$on('yard1', searchQuery => {
                 console.log('yard ON');
                 this.loading = true;
                 this.items = [];
                 this.filteredItems = [];
                 this.searched = [];
                 setTimeout(() => {
-                    this.getNotes();
+                    //this.getNotes();
                 }, 2000);
             });
         },
         methods: {
+            fetchData(searchQuery) {
+                this.status = 'loading';
+
+                if (!searchQuery) {
+                    if (!appConfig.searchText) {
+                        appConfig.getSearchText();
+                    }
+                    searchQuery = appConfig.searchText;
+                }
+
+                this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + searchQuery)
+                    .then((response) => response.json())
+                    .then(result => {
+                        this.count = result.results.length;
+                        this.items = [].concat(result.results);
+                        console.log('yard ON - ', result.results.length );
+                        this.filteredItems = [].concat(result.results);
+                        this.searched = this.items;
+                        this.loading = false;
+/*                        this.status = 'show';
+                        appConfig.setSearchText(searchQuery);
+                        appConfig.$emit('itemsCount', result.results.length);
+                        setTimeout(() => {
+                            document.querySelector('.search-results-content').addEventListener('scroll', this.handleScroll)
+                        }, 100)*/
+                    }).catch((error) => {
+                    //appConfig.notifications.items.push(this.notification);
+                    this.status = 'show';
+                })
+            },
             getNotes() {
                 const notes = JSON.parse(localStorage.getItem('notes'));
 
@@ -270,7 +258,7 @@
             },
             searchByName(items, term) {
                 if (term) {
-                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                    return items.filter(item => this.toLower(item.trackName).includes(this.toLower(term)))
                 }
                 return items
             },
@@ -870,39 +858,6 @@
                 appConfig.$emit(event, {});
                 this.map = true;
                 closeNav();
-            },
-            fileDownload() {
-                let data = localStorage.getItem('notes');
-                let file = new Blob([data], {type: 'text'});
-                if (window.navigator.msSaveOrOpenBlob)
-                    window.navigator.msSaveOrOpenBlob(file, 'notes_demo');
-                else {
-                    let a = document.createElement("a"),
-                        url = URL.createObjectURL(file);
-                    a.href = url;
-                    a.download = 'notes_demo';
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(function() {
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(url);
-                    }, 0);
-                }
-            },
-            fileUpload(e) {
-                const file = e.target.files[0];
-                if (!file) {
-                    return;
-                }
-                let reader = new FileReader();
-                reader.onload = (e) => {
-                    let contents = e.target.result;
-                    alert('Uploaded');
-                    localStorage.setItem('notes', contents);
-                    console.log(contents);
-                    appConfig.$emit('yard', {});
-                };
-                reader.readAsText(file);
             },
             logout() {
                 localStorage.setItem('access_token', null);
