@@ -44,7 +44,7 @@
 
                     <md-list @click="menuVisible = !menuVisible" style="background: #111; color: white">
                         <md-divider style="background: white"></md-divider>
-                        <md-list-item to="/notes" style="color: white">
+                        <md-list-item to="/box" style="color: white">
                             <md-icon style="color: white">list</md-icon>
                             <span class="md-list-item-text" style="color: white">Table</span>
                         </md-list-item>
@@ -251,12 +251,18 @@
             },
             searchByName(items, term) {
                 if (term) {
-                    return items.filter(item => this.toLower(item.trackName).includes(this.toLower(term)))
+                    return items.filter(item => {
+                        if (item.trackName) {
+                            return this.toLower(item.trackName).includes(this.toLower(term))
+                        }
+                    })
                 }
                 return items
             },
             toLower(text) {
-                return text.toString().toLowerCase()
+                if (text) {
+                    return text.toString().toLowerCase();
+                }
             },
             showDetails(item) {
                 appConfig.item = item;
@@ -407,13 +413,14 @@
     Vue.component('pictures-items', {
         template: `
 		<div>
+
 		<md-card class="md-layout-item " style="position: fixed; z-index: 5; width1: 100%; margin: 0px; padding: 0px; margin-top: -12px;">
 		 <md-card-header>
-          <div class="md-title">Notes ({{ searched.length }})</div>
+          <div class="md-title">{{this.searchQuery}} ({{ searched.length }})</div>
         </md-card-header>
             <md-card-content style="padding-bottom: 0px;">
 				<md-field md-clearable class="md-toolbar-section-end" style="width:250px">
-				  <md-input placeholder="Search by title..." v-model="search" @input="searchOnTable" />
+				  <md-input placeholder="Search by title..." v-model="search" @input="searchOnTable" v-on:keyup.enter="onSearch('name')"/>
 				</md-field>
             </md-card-content>
 
@@ -430,9 +437,9 @@
 			  <md-list-item style="background: rgb(238, 238, 238);">
                   <md-card md-with-hover style="width: 50%; margin: auto;" >
                         <md-card-header>
-                          <div class="md-title">{{item.name}}</div>
-                          <div class="md-subhead">{{item.category}}</div>
-                          <div class="md-subhead">{{item.group}}</div>
+                            <center>
+                                <div class="md-title">{{item.trackName}}</div>
+                            </center>
                         </md-card-header>
                         <md-card-content style="margin-left: 60px;
                                 white-space: nowrap;
@@ -441,16 +448,16 @@
                                 border-left:1em solid transparent;
                                 border-right:1em solid transparent;
                                 text-overflow: ellipsis;" v-on:click="showDetails(item)">
-                            <div class="md-layout-item md-small-size-200">
-                              <ul>
-                                <li v-for="item in item.todo">
-                                  {{ item.label }}
-                                  <div>
-                                    <input type="checkbox" v-model="item.done">
-                                  </div>
-                                </li>
-                            </ul>
-                        </div>
+                                <center>
+                           <div class="md-layout-item md-small-size-200">
+                              <md-avatar class="md-large" style="width: 126px;height: 115px;">
+                                    <img :src="item.artworkUrl100.replace('100x100bb.jpg', '500x500bb.jpg')"
+                                 style="width: 240px; height: 150px; border-radius: 20px">
+                                </md-avatar>
+                          </div>
+                          <div class="md-subhead">{{item.primaryGenreName}}</div>
+                          <div class="md-subhead">{{item.releaseDate.split('-')[0]}}</div>
+                          </center>
                         </md-card-content>
                   </md-card>
                </md-list-item>
@@ -458,42 +465,71 @@
   		</div>`,
         data: () => ({
             items: [],
-            loading: true,
+            todo: [1, 1, 1],
             filteredItems: [],
+            recordsCount: 20,
+            positionY: 0,
             search: null,
             searched: [],
+            loading: true,
+            byName: true,
+            allRecords: true,
+            count: 0,
+            searchCheck: false,
+            searchQuery: '',
         }),
         created() {
-            this.getNotes();
+            this.searchQuery = appConfig.searchQuery;
+            this.fetchData(appConfig.searchQuery);
+            this.searched = this.items;
             appConfig.$emit('login', {});
         },
         methods: {
-            getNotes() {
-                const notes = JSON.parse(localStorage.getItem('notes'));
+            fetchData(searchQuery) {
+                this.status = 'loading';
 
-                console.log('notes: ', notes);
+                if (!searchQuery) {
+                    if (!appConfig.searchText) {
+                        appConfig.getSearchText();
+                    }
+                    searchQuery = appConfig.searchText;
+                }
 
-                this.count = notes.length;
-
-                this.items = [].concat(notes);
-                this.filteredItems = [].concat(notes);
-                this.searched = this.items;
-                this.loading = false;
-
-            },
-            getItems() {
-                this.$http.get(appConfig.url + 'api/pic/get')
+                this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + searchQuery)
+                    .then((response) => response.json())
                     .then(result => {
-                        this.items = [].concat(result.data.sort(this.sort));
-                        this.filteredItems = [].concat(result.data.sort(this.sort));
+                        this.count = result.results.length;
+                        this.items = [].concat(result.results);
+                        this.filteredItems = [].concat(result.results);
                         this.searched = this.items;
                         this.loading = false;
 
-                    })
-                    .catch(error => {
-                    });
+                    }).catch((error) => {
+                    this.status = 'show';
+                })
             },
+            onSearch() {
+                if (this.search !== null && this.search !== "") {
+                    this.loading = true;
+                    let url;
 
+                    this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + this.search)
+                        .then((response) => response.json())
+                        .then(result => {
+                            this.count = result.results.length;
+                            this.items = [].concat(result.results);
+                            this.filteredItems = [].concat(result.results);
+                            this.searched = this.items;
+                            this.loading = false;
+                            appConfig.searchQuery = this.search;
+                            localStorage.setItem('searchQuery', JSON.stringify(this.search));
+                            this.searchQuery = this.search;
+
+                        }).catch((error) => {
+                        this.status = 'show';
+                    })
+                }
+            },
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
             },
@@ -502,26 +538,24 @@
             },
             searchByName(items, term) {
                 if (term) {
-                    return items.filter(item => this.toLower(item.name).includes(this.toLower(term)))
+                    return items.filter(item => {
+                        if (item.trackName) {
+                            return this.toLower(item.trackName).includes(this.toLower(term))
+                        }
+                    })
                 }
                 return items
             },
             toLower(text) {
-                return text.toString().toLowerCase()
+                if (text) {
+                    return text.toString().toLowerCase();
+                }
             },
             showDetails(item) {
-                console.log('item', item)
                 appConfig.item = item;
-                this.$router.push('/note-edit');
-            },
-            onPhotoClick(pic) {
-                let w = window.open('about:blank');
-                let image = new Image();
-                image.src = pic;
-                setTimeout(function () {
-                    w.document.write(image.outerHTML);
-                }, 0);
-            },
+                localStorage.setItem('item', JSON.stringify(item));
+                this.$router.push('/box-edit');
+            }
         }
     });
 
