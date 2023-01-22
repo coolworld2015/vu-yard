@@ -118,9 +118,8 @@
     appConfig.login = false;
     appConfig.allRecords = false;
 
-    const Notes = {template: '<notes></notes>'};
-    const NoteAdd = {template: '<note-add></note-add>'};
-    const NoteEdit = {template: '<note-edit></note-edit>'};
+    const Box = {template: '<box-items></box-items>'};
+    const BoxEdit = {template: '<box-edit></box-edit>'};
 
     const Pictures = {
         template: `
@@ -131,11 +130,11 @@
         </div>
     `};
 
-    Vue.component('notes', {
+    Vue.component('box-items', {
         template: `
 		  <div>
 		    <md-speed-dial style="position: absolute; z-index: 22; bottom: 100px;right: 100px;">
-              <md-speed-dial-target v-on:click="addItem">
+              <md-speed-dial-target v-on:click="">
                 <md-icon>add</md-icon>
               </md-speed-dial-target>
             </md-speed-dial>
@@ -143,7 +142,7 @@
 			<md-table v-model="searched" md-sort="id" md-sort-order="asc" md-card md-fixed-header>
 			  <md-table-toolbar>
 				<div class="md-toolbar-section-start">
-				  <h1 class="md-title">Items ({{ searched.length }})</h1>
+				  <h1 class="md-title">{{this.searchQuery}} ({{ searched.length }})</h1>
 				</div>
 
 				<md-field v-if=byName md-clearable class="md-toolbar-section-end">
@@ -183,10 +182,12 @@
             byName: true,
             allRecords: true,
             count: 0,
-            searchCheck: false
+            searchCheck: false,
+            searchQuery: '',
         }),
         created() {
-            this.fetchData('Marvel');
+            this.searchQuery = appConfig.searchQuery;
+            this.fetchData(appConfig.searchQuery);
             this.searched = this.items;
             appConfig.$emit('login', {});
         },
@@ -206,7 +207,6 @@
                     .then(result => {
                         this.count = result.results.length;
                         this.items = [].concat(result.results);
-                        console.log('yard ON - ', result.results.length );
                         this.filteredItems = [].concat(result.results);
                         this.searched = this.items;
                         this.loading = false;
@@ -215,8 +215,7 @@
                     this.status = 'show';
                 })
             },
-            onSearch(name) {
-                console.log('Enter')
+            onSearch() {
                 if (this.search !== null && this.search !== "") {
                     this.loading = true;
                     let url;
@@ -226,28 +225,17 @@
                         .then(result => {
                             this.count = result.results.length;
                             this.items = [].concat(result.results);
-                            console.log('yard ON - ', result.results.length );
                             this.filteredItems = [].concat(result.results);
                             this.searched = this.items;
                             this.loading = false;
+                            appConfig.searchQuery = this.search;
+                            localStorage.setItem('searchQuery', JSON.stringify(this.search));
+                            this.searchQuery = this.search;
 
                         }).catch((error) => {
-                        //appConfig.notifications.items.push(this.notification);
                         this.status = 'show';
                     })
                 }
-            },
-            getNotes() {
-                const notes = JSON.parse(localStorage.getItem('notes'));
-
-                this.count = notes.length;
-
-                this.items = [].concat(notes);
-
-                this.filteredItems = [].concat(notes);
-                this.searched = this.items;
-                this.loading = false;
-                console.log('notes: ', notes);
             },
             sort(a, b) {
                 return parseInt(b.id) - parseInt(a.id);
@@ -273,16 +261,12 @@
             showDetails(item) {
                 appConfig.item = item;
                 localStorage.setItem('item', JSON.stringify(item));
-                this.$router.push('note-edit');
-            },
-            addItem() {
-                appConfig.item = null;
-                this.$router.push('/note-add');
+                this.$router.push('box-edit');
             },
         }
     });
 
-    Vue.component('note-edit', {
+    Vue.component('box-edit', {
         template: `
 		    <div style="width:500px; margin: auto; padding-top: 5vh; min-width: 300px">
                   <md-card class="md-layout-item md-size-100 md-small-size-50">
@@ -361,7 +345,6 @@
             pic: '1',
             placeholder: null,
             todo: [],
-
             pictures: [],
             hasMessagesName: false,
             hasMessagesСategory: false,
@@ -416,7 +399,7 @@
                 window.location = this.url
             },
             back() {
-                this.$router.push('/notes');
+                this.$router.push('/box');
             },
         }
     });
@@ -545,12 +528,11 @@
     Vue.use(VueMaterial.default);
 
     const routes = [
-        {path: '/', component: Notes},
-        {path: '*', component: Notes},
+        {path: '/', component: Box},
+        {path: '*', component: Box},
 
-        {path: '/notes', component: Notes},
-        {path: '/note-add', component: NoteAdd},
-        {path: '/note-edit', component: NoteEdit},
+        {path: '/box', component: Box},
+        {path: '/box-edit', component: BoxEdit},
 
         {path: '/cards', component: Pictures},
     ];
@@ -570,12 +552,6 @@
             this.init();
             appConfig.route = this.$route.path.split('/')[1];
 
-            appConfig.url = 'http://localhost:3000/';
-
-            appConfig.getAccessToken = () => {
-                appConfig.access_token = localStorage.getItem('access_token');
-            };
-
             appConfig.$on('route', route => {
                 this.changeRoute(route);
             });
@@ -590,62 +566,13 @@
         },
         methods: {
             init() {
-                appConfig.favorites = localStorage.getItem('favorites');
-                if (!appConfig.favorites) {
-                    localStorage.setItem('favorites', '');
+                appConfig.searchQuery = localStorage.getItem('searchQuery');
+                if (!appConfig.searchQuery) {
+                    localStorage.setItem('searchQuery', JSON.stringify('Marvel'));
+                    appConfig.searchQuery = 'Marvel';
+                } else {
+                    appConfig.searchQuery = appConfig.searchQuery.replaceAll('"','');
                 }
-
-                appConfig.notes = localStorage.getItem('notes');
-
-                if (!appConfig.notes) {
-                    const notes = [
-                        {
-                            id: 1,
-                            'name': 'Implement basic functionality',
-                            'todo': [
-                                {'label': 'User should be able to see the list of created notes', 'done': true},
-                                {'label': 'User should be able to create a note with TODO elements', 'done': false},
-                                {'label': 'User should be able to mark/unmark concrete TODO element', 'done': false}]
-                        },
-                        {
-                            id: 2, 'name': 'Implement \'Edit\' and \'Delete\' functionality',
-                            'todo': [
-                                {'label': 'User should be able to edit already existing note', 'done': false},
-                                {'label': 'User should be able to delete existing node', 'done': false}]
-                        },
-                        {
-                            id: 3, 'name': 'Implement \'Redo\' functionality',
-                            'todo': [
-                                {
-                                    'label': 'User should be able to redo his last action (creating or deleting; no need to do this for editing)',
-                                    'done': false
-                                }]
-                        },
-                        {
-                            id: 4, 'name': 'Implement confirmation popups for Delete functionality',
-                            'todo': [
-                                {
-                                    'label': 'User should be prompted to confirm that he really wants to delete this note (without native \'alert()\', \'confirm()\' or \'prompt\')',
-                                    'done': false
-                                }]
-                        },
-                        {
-                            id: 5, 'name': 'Implement \'Export\' and \'Import\' functionality',
-                            'todo': [
-                                {
-                                    'label': 'User should be able to export all his notes as a single file and save it on computer',
-                                    'done': false
-                                },
-                                {
-                                    'label': 'User should be able to import all notes from file on his computer that previously exported',
-                                    'done': false
-                                }]
-                        },
-                    ];
-
-                    localStorage.setItem('notes', JSON.stringify(notes));
-                }
-
             },
             changeRoute(route) {
                 appConfig.route = route;
